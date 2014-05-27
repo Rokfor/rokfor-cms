@@ -35,7 +35,7 @@ Prerequisites: MySQL, PHP > 5.0, phpmyadmin, Apache, Mod-Sendfile (not necessary
 * Add a repository folder where Rokfor-cms can store the uploads. Normally, this is the /udb folder in your document root. The name comes from Universal Database Blugin.  
 Make sure, apache has access rights for this folder (chmod or chown)
 
-_You shold now be able to log into Rokfor CMS under the url http://example.com/rf on your webserver as superuser __root__ with the default password __1234__. Make sure to change it!_
+You shold now be able to log into Rokfor CMS under the url http://example.com/rf on your webserver as superuser __root__ with the default password __1234__. Make sure to change it!
 
 
 Todos
