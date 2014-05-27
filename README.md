@@ -9,7 +9,18 @@ These forms - or templates as we call them - can be assigned to different users.
 
 Rokfor has its roots in print-publishing, where the writer of text passes the final control to the editor.
 
+Rokfor has Features like:
 
+* Batch processing: Custom PHP scripts can be stored in the backend to automate tasks
+* Field processing: Custom PHP scripts can be executed when storing data for a specified field
+* Exporter Plugins: Data of single contributions or whole issues can be piped into an exporter plugin to generate PDFs or other files. 
+
+Among the printed books we produced so far you can find 
+
+* the critically acclaimed <a href="http://www.editionpatrickfrey.com/de/books/ich-buchstabendrescher-robert-fischer">"Ich/Buchstabendrescher"</a> Book published by Patrick Frey
+* or <a href="http://www.salisverlag.com/title/gina-bucher-beat-mazenauer-hg-lieber-barfuss-als-ohne-buch">"Lieber Barfuss als ohne Buch"</a> by Salisverlag
+
+To generate the printed documents, we use 3rdparty software like LaTeX or Pdflib. You can't find these plugins in this repository, we'll add a new one in the future.
 
 Todos
 -----
