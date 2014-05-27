@@ -1,0 +1,1335 @@
+\hypertarget{classrokfor___d_b}{
+\section{rokfor\-\_\-\-D\-B \-Class \-Reference}
+\label{classrokfor___d_b}\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}}
+}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classrokfor___d_b_a024921bacc528922e69b4a7c18eb7088}{rokfor\-\_\-\-D\-B} (\$rootdir=false, \$dbase=\-D\-B\-A\-S\-E, \$dbuser=\-D\-B\-U\-S\-E\-R, \$dbpass=\-D\-B\-P\-A\-S\-S, \$dbname=\-D\-B\-N\-A\-M\-E)
+\item 
+\hyperlink{classrokfor___d_b_a881366691dcdfc3fd046b239c715c678}{query} (\$q)
+\item 
+\hyperlink{classrokfor___d_b_a7e86a52bf10ebddb935a49b1d96fa321}{affected\-\_\-rows} (\$q)
+\item 
+\hyperlink{classrokfor___d_b_af7750ae1b875d55abc718767da9bfd44}{num\-\_\-rows} (\$q)
+\item 
+\hyperlink{classrokfor___d_b_ad701de033e617b9723b6034493f60533}{insert\-\_\-id} (\$i=false)
+\item 
+\hyperlink{classrokfor___d_b_ac3176856eddeb02c4b0290f83c004549}{fetch\-\_\-object} (\$link)
+\item 
+\hyperlink{classrokfor___d_b_adbf04212e5e421b8c8769a8d23e8a29b}{new\-Session} (\$user, \$pass)
+\item 
+\hyperlink{classrokfor___d_b_aefd889b7b14b9f8c55cfe64726513702}{check\-Session} (\$id, \$dont\-\_\-update\-\_\-time=false)
+\item 
+\hyperlink{classrokfor___d_b_aa9889007e27fedadb28ae8f2fd77a569}{get\-Session\-Id} ()
+\item 
+\hyperlink{classrokfor___d_b_abd983ac3c514c5984d7dd7baede4c8ac}{clean\-Session\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_aafd6d1ef27e6acc5833aba4012e5ee77}{get\-User\-Name} ()
+\item 
+\hyperlink{classrokfor___d_b_a51621a1c5a0e95942008cc6491342595}{get\-User\-Group} ()
+\item 
+\hyperlink{classrokfor___d_b_a05f6aa1ffae6295260d9f1cca016bf33}{get\-User\-Id} ()
+\item 
+\hyperlink{classrokfor___d_b_aa666d2cbd49e3f8feed14896773a3006}{set\-User\-Restriction} (\$\-\_\-state=true)
+\item 
+\hyperlink{classrokfor___d_b_a42c7e6a04c4267bf7ca00c8da1cbdcf5}{show\-Group\-Rights} (\$\-\_\-group)
+\item 
+\hyperlink{classrokfor___d_b_aaa31c3bd4f2160cdb031853f0a1f98df}{get\-User\-Name\-By\-Id} (\$id\-\_\-or\-\_\-name)
+\item 
+\hyperlink{classrokfor___d_b_ae9befc7da9622522b92e7166b344dc66}{get\-Projects} (\$reset=false, \$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a9320d2593446e4bdc803b20d47c7b36e}{set\-Project\-Active} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a79de8205e59144dd9ab03c7366a35e4c}{get\-Editions} (\$id=false, \$reset=false, \$status= 'open')
+\item 
+\hyperlink{classrokfor___d_b_a0bdff735b256d3d0b19de601d305a229}{set\-Edition\-Active} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a8770ff258a970263fc4f06095470195f}{get\-Parts} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a41f63552292422a28378289006da79e8}{get\-Part\-By\-Name} (\$name, \$projectid=false)
+\item 
+\hyperlink{classrokfor___d_b_a47a162a7645f67de4ff791ee16a62dc2}{set\-Part\-Active} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a8f00ab03c3a5c67d7a3dd43ee5ba5aa7}{add\-Element} (\$\-\_\-contribname, \$\-\_\-template\-Id, \$\-\_\-chapterid=false, \$\-\_\-issueid=false)
+\item 
+\hyperlink{classrokfor___d_b_ae3bdbe96ae91f4f4978f3c8e1ae1dcc3}{get\-Elements} (\$id=false, \$status= '\-Close', \$ed=false, \$templatename=false, \$order=false)
+\item 
+\hyperlink{classrokfor___d_b_ac783575e3c1c6f6327c44c3fa4d5dad0}{get\-Elements\-Nameby\-Id} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a30d11550e437374a50ecf9bcc684fd69}{get\-Elements\-Idby\-Name} (\$name, \$templatename=false)
+\item 
+\hyperlink{classrokfor___d_b_a3cca4c9f02cd1dcf760067584fc992f6}{set\-Element\-Active} (\$id=false)
+\item 
+\hyperlink{classrokfor___d_b_a360af4c0ba1d8fc85c6441a32dde9669}{get\-Fields\-Id} (\$id=false)
+\item 
+\hypertarget{classrokfor___d_b_abff514d4408439808c93f62b178ad8ec}{
+{\bfseries get\-Fields\-By\-Element} (\$id=false, \$resolve\-Foreign=true)}
+\label{classrokfor___d_b_abff514d4408439808c93f62b178ad8ec}
+
+\item 
+\hyperlink{classrokfor___d_b_a4e4817fb5f02855babe16f7e0611b310}{get\-Template\-Fields} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_ab63eab8e087779aeddf6999d2efe7dec}{get\-Fields\-By\-Name} (\$fieldname, \$element\-Id=false)
+\item 
+\hyperlink{classrokfor___d_b_a16e5ecd1298d430bf50b54f9838c785a}{get\-Field\-Names\-By\-Template\-Name} (\$templatename)
+\item 
+\hyperlink{classrokfor___d_b_ab517c7ce5a1c68c903edbb0bf8656d0f}{get\-Fields\-By\-Template\-Id} (\$fieldid, \$issue=false)
+\item 
+\hyperlink{classrokfor___d_b_a48b67b40557bfa9ba8737fc763770ea0}{get\-Field\-Data} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a4e54441b478ff151d2251dca986d2b23}{set\-Field\-Data} (\$data, \$id, \$type)
+\item 
+\hyperlink{classrokfor___d_b_acdc1b96abed965253edbf679683c2c4a}{get\-Cloud\-Data} (\$field\-Id, \$xmin=-\/100, \$xmax=100, \$ymin=-\/100, \$ymax=100)
+\item 
+\hyperlink{classrokfor___d_b_acf1c352cec538014d301207aa72222c1}{\-\_\-split\-Cloud\-Data} (\$rawdata, \$xmin=-\/100, \$xmax=100, \$ymin=-\/100, \$ymax=100)
+\item 
+\hyperlink{classrokfor___d_b_a0ebaf78e4aa380bac5648485d711d874}{\-\_\-split\-Clean} (\$\-\_\-pattern, \$\-\_\-string)
+\item 
+\hyperlink{classrokfor___d_b_ad7d8994bb1b830838968ff00c0da59d8}{get\-Slider\-Data} (\$field\-Id, \$xmin=0, \$xmax=100)
+\item 
+\hyperlink{classrokfor___d_b_aea302de7ee07faaed9b0d7ee6be7d9e1}{get\-Matrix\-Data} (\$field\-Id, \$xmin=-\/100, \$xmax=100, \$ymin=-\/100, \$ymax=100)
+\item 
+\hyperlink{classrokfor___d_b_ab9a243f64faeb5cd2a7fce8deaf756f2}{get\-Wordlist\-Data} (\$field\-Id)
+\item 
+\hyperlink{classrokfor___d_b_a9b9b200bee98ec42949b81644b7c760e}{\-\_\-split\-Word\-List\-Data} (\$\-\_\-rawdata)
+\item 
+\hyperlink{classrokfor___d_b_a667716009c6acc088e29d0d6a97b1db6}{\-\_\-split\-Text\-List\-Data} (\$\-\_\-rawdata)
+\item 
+\hyperlink{classrokfor___d_b_ab4976c3e948ee5de581b9893c774aa25}{\-\_\-split\-Table\-Data} (\$\-\_\-rawdata, \$\-\_\-force\-\_\-col\-\_\-count=false)
+\item 
+\hyperlink{classrokfor___d_b_ae021306373e3c9c0bffe17691e80190e}{\-\_\-glue\-Table\-Data} (\$\-\_\-data)
+\item 
+\hyperlink{classrokfor___d_b_acba2b0706f7f29dd2b203fc19023f6a9}{get\-Template\-Nameby\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a6ef88e1ad5c4466c97f23cbbd9326712}{get\-Templates} (\$project=false, \$part=false, \$all=false)
+\item 
+\hyperlink{classrokfor___d_b_a7c8cc6e3421f4cc81da51d3f65d4ba62}{get\-Part\-Nameby\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_ad78efd3b3471743ca584c621d633b860}{get\-Project\-Nameby\-Part\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a7c06a6c19756825c936ad4cf76753a65}{get\-Project\-Nameby\-Edition\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a2b5fad4213a74f13c33998dda781eee3}{get\-Edition\-Nameby\-Id} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a281703aa27a5b6138c2ed08e9a80c444}{get\-Edition\-Info} (\$id)
+\item 
+\hyperlink{classrokfor___d_b_a5b571190b5c767a3249932078278f935}{get\-Edition\-Idby\-Editionname} (\$name)
+\item 
+\hyperlink{classrokfor___d_b_ac01828cae86291d0bc8a78b24de6089f}{clear\-Cache} ()
+\end{DoxyCompactItemize}
+\subsection*{\-Data \-Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classrokfor___d_b_a1fa3127fc82f96b1436d871ef02be319}{
+{\bfseries \$db} = \-N\-U\-L\-L}
+\label{classrokfor___d_b_a1fa3127fc82f96b1436d871ef02be319}
+
+\item 
+\hypertarget{classrokfor___d_b_a52a32e3f7e0139738aa790669077adf6}{
+{\bfseries \$projects} = array()}
+\label{classrokfor___d_b_a52a32e3f7e0139738aa790669077adf6}
+
+\item 
+\hypertarget{classrokfor___d_b_ade22a693c05636f2badf4b6a1f37cef7}{
+{\bfseries \$active\-Project}}
+\label{classrokfor___d_b_ade22a693c05636f2badf4b6a1f37cef7}
+
+\item 
+\hypertarget{classrokfor___d_b_a65336a28520b269300245ecb09c0053c}{
+{\bfseries \$editions} = array()}
+\label{classrokfor___d_b_a65336a28520b269300245ecb09c0053c}
+
+\item 
+\hypertarget{classrokfor___d_b_a402b0097a59a10273d89ccdd0a18ba03}{
+{\bfseries \$active\-Edition}}
+\label{classrokfor___d_b_a402b0097a59a10273d89ccdd0a18ba03}
+
+\item 
+\hypertarget{classrokfor___d_b_aa8dfa90e1feaffe49fc70696cc75c2f3}{
+{\bfseries \$parts} = array()}
+\label{classrokfor___d_b_aa8dfa90e1feaffe49fc70696cc75c2f3}
+
+\item 
+\hypertarget{classrokfor___d_b_ae27dc4238dc46ad4aa76c2126b39006e}{
+{\bfseries \$active\-Part}}
+\label{classrokfor___d_b_ae27dc4238dc46ad4aa76c2126b39006e}
+
+\item 
+\hypertarget{classrokfor___d_b_ad18dd8fbe31b294e2bc4711dcde4548d}{
+{\bfseries \$elements} = array()}
+\label{classrokfor___d_b_ad18dd8fbe31b294e2bc4711dcde4548d}
+
+\item 
+\hypertarget{classrokfor___d_b_a7c6abc809a8299ec9f952d2c98462869}{
+{\bfseries \$active\-Element}}
+\label{classrokfor___d_b_a7c6abc809a8299ec9f952d2c98462869}
+
+\item 
+\hypertarget{classrokfor___d_b_ab2303c817e3b402b77b7f99627b9c319}{
+{\bfseries \$fields} = array()}
+\label{classrokfor___d_b_ab2303c817e3b402b77b7f99627b9c319}
+
+\item 
+\hypertarget{classrokfor___d_b_a6efc15b5a2314dd4b5aaa556a375c6d6}{
+{\bfseries \$data}}
+\label{classrokfor___d_b_a6efc15b5a2314dd4b5aaa556a375c6d6}
+
+\item 
+\hypertarget{classrokfor___d_b_ac2dc76d756ec398393d4b1d23659276c}{
+{\bfseries \$cache} = array()}
+\label{classrokfor___d_b_ac2dc76d756ec398393d4b1d23659276c}
+
+\item 
+\hypertarget{classrokfor___d_b_ad2656f9460978ac6e3ad8f2450359ae6}{
+{\bfseries \$active\-Session}}
+\label{classrokfor___d_b_ad2656f9460978ac6e3ad8f2450359ae6}
+
+\item 
+\hypertarget{classrokfor___d_b_a41e29695876806b19781d62dc5d08389}{
+{\bfseries \$active\-Username}}
+\label{classrokfor___d_b_a41e29695876806b19781d62dc5d08389}
+
+\item 
+\hypertarget{classrokfor___d_b_a46b91790fc6ae1a7ae47b35b2f1b86b9}{
+{\bfseries \$active\-Usergroup}}
+\label{classrokfor___d_b_a46b91790fc6ae1a7ae47b35b2f1b86b9}
+
+\item 
+\hypertarget{classrokfor___d_b_ab3cab6c30771c76de11bd3ea03ef1f30}{
+{\bfseries \$active\-User\-Id}}
+\label{classrokfor___d_b_ab3cab6c30771c76de11bd3ea03ef1f30}
+
+\item 
+\hypertarget{classrokfor___d_b_a4b8c91d3e8bc773f4dbba18232b7bef8}{
+{\bfseries \$user\-Restriction}}
+\label{classrokfor___d_b_a4b8c91d3e8bc773f4dbba18232b7bef8}
+
+\item 
+{\bfseries \$access\-Table}
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{classrokfor___d_b_ae021306373e3c9c0bffe17691e80190e}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-glue\-Table\-Data@{\-\_\-glue\-Table\-Data}}
+\index{\-\_\-glue\-Table\-Data@{\-\_\-glue\-Table\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-glue\-Table\-Data}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-glue\-Table\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-data}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ae021306373e3c9c0bffe17691e80190e}
+serializes 2d-\/array into $<$\-:\-:\-:\-:\-:\-:$>$ / $<$;;;;;;$>$ form string
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$\-\_\-data} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a0ebaf78e4aa380bac5648485d711d874}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-split\-Clean@{\-\_\-split\-Clean}}
+\index{\-\_\-split\-Clean@{\-\_\-split\-Clean}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-split\-Clean}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-split\-Clean (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-pattern, }
+\item[{\$}]{\-\_\-string}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a0ebaf78e4aa380bac5648485d711d874}
+\-\_\-split\-Clean like explode, but cleans the final array from empty results
+
+\begin{DoxyReturn}{\-Returns}
+array 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_acf1c352cec538014d301207aa72222c1}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-split\-Cloud\-Data@{\-\_\-split\-Cloud\-Data}}
+\index{\-\_\-split\-Cloud\-Data@{\-\_\-split\-Cloud\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-split\-Cloud\-Data}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-split\-Cloud\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{rawdata, }
+\item[{\$}]{xmin = {\ttfamily -\/100}, }
+\item[{\$}]{xmax = {\ttfamily 100}, }
+\item[{\$}]{ymin = {\ttfamily -\/100}, }
+\item[{\$}]{ymax = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_acf1c352cec538014d301207aa72222c1}
+\-\_\-split\-Cloud\-Data -\/ gets \-Data of a cloud, puts it into array and normalizes it
+
+\-Data are stored in the database like this\-: asd$<$\-::::::$>$60$<$\-:\-:\-:\-:\-:\-:$>$65$<$;;;;;;$>$fsd$<$\-::::::$>$122$<$\-:\-:\-:\-:\-:\-:$>$71$<$;;;;;;$>$asdd$<$\-::::::$>$15$<$\-:\-:\-:\-:\-:\-:$>$25$<$;;;;;;$>$
+
+\begin{DoxyReturn}{\-Returns}
+array data\mbox{[}word=$>$array\mbox{[}x,y\mbox{]}\mbox{]} 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\-Frontend\-: \-Size of \-Cloud \-X
+
+\-Frontend\-: \-Size of \-Cloud \-Y\hypertarget{classrokfor___d_b_ab4976c3e948ee5de581b9893c774aa25}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-split\-Table\-Data@{\-\_\-split\-Table\-Data}}
+\index{\-\_\-split\-Table\-Data@{\-\_\-split\-Table\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-split\-Table\-Data}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-split\-Table\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-rawdata, }
+\item[{\$}]{\-\_\-force\-\_\-col\-\_\-count = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ab4976c3e948ee5de581b9893c774aa25}
+splits serialized table data into parts. with \$\-\_\-force\-\_\-col\-\_\-count a number of columns can be forced, even if there is not enough data in the string. (creating empty cells)
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$\-\_\-rawdata} & \\
+\hline
+int & {\em \$\-\_\-force\-\_\-col\-\_\-count} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a667716009c6acc088e29d0d6a97b1db6}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-split\-Text\-List\-Data@{\-\_\-split\-Text\-List\-Data}}
+\index{\-\_\-split\-Text\-List\-Data@{\-\_\-split\-Text\-List\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-split\-Text\-List\-Data}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-split\-Text\-List\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-rawdata}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a667716009c6acc088e29d0d6a97b1db6}
+splits serialized multi field text string into parts
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$\-\_\-rawdata} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a9b9b200bee98ec42949b81644b7c760e}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\-\_\-split\-Word\-List\-Data@{\-\_\-split\-Word\-List\-Data}}
+\index{\-\_\-split\-Word\-List\-Data@{\-\_\-split\-Word\-List\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\-\_\-split\-Word\-List\-Data}]{\setlength{\rightskip}{0pt plus 5cm}\-\_\-split\-Word\-List\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-rawdata}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a9b9b200bee98ec42949b81644b7c760e}
+splits serialized string into parts
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$\-\_\-rawdata} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a8f00ab03c3a5c67d7a3dd43ee5ba5aa7}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!add\-Element@{add\-Element}}
+\index{add\-Element@{add\-Element}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{add\-Element}]{\setlength{\rightskip}{0pt plus 5cm}add\-Element (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-contribname, }
+\item[{\$}]{\-\_\-template\-Id, }
+\item[{\$}]{\-\_\-chapterid = {\ttfamily false}, }
+\item[{\$}]{\-\_\-issueid = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a8f00ab03c3a5c67d7a3dd43ee5ba5aa7}
+\hyperlink{classrokfor___d_b_a8f00ab03c3a5c67d7a3dd43ee5ba5aa7}{add\-Element()} -\/ adds an element (contribution) to the database if part\-Id and edition\-Id are not set, the active parts/edition\-Id will be used
+
+\begin{DoxyReturn}{\-Returns}
+id of the new contribution or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a7e86a52bf10ebddb935a49b1d96fa321}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!affected\-\_\-rows@{affected\-\_\-rows}}
+\index{affected\-\_\-rows@{affected\-\_\-rows}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{affected\-\_\-rows}]{\setlength{\rightskip}{0pt plus 5cm}affected\-\_\-rows (
+\begin{DoxyParamCaption}
+\item[{\$}]{q}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a7e86a52bf10ebddb935a49b1d96fa321}
+affected\-\_\-rows\-: wrapping affected\-\_\-rows from the mysql-\/library
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$q} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+query 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aefd889b7b14b9f8c55cfe64726513702}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!check\-Session@{check\-Session}}
+\index{check\-Session@{check\-Session}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{check\-Session}]{\setlength{\rightskip}{0pt plus 5cm}check\-Session (
+\begin{DoxyParamCaption}
+\item[{\$}]{id, }
+\item[{\$}]{dont\-\_\-update\-\_\-time = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aefd889b7b14b9f8c55cfe64726513702}
+check\-Session\-: returns 1 (ok), 0 (not valid), -\/1 (expired)
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+int 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_abd983ac3c514c5984d7dd7baede4c8ac}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!clean\-Session\-Id@{clean\-Session\-Id}}
+\index{clean\-Session\-Id@{clean\-Session\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{clean\-Session\-Id}]{\setlength{\rightskip}{0pt plus 5cm}clean\-Session\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_abd983ac3c514c5984d7dd7baede4c8ac}
+deletes a session with a certain id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ac01828cae86291d0bc8a78b24de6089f}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!clear\-Cache@{clear\-Cache}}
+\index{clear\-Cache@{clear\-Cache}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{clear\-Cache}]{\setlength{\rightskip}{0pt plus 5cm}clear\-Cache (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ac01828cae86291d0bc8a78b24de6089f}
+clear\-Cache -\/ resets the data cache
+
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ac3176856eddeb02c4b0290f83c004549}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!fetch\-\_\-object@{fetch\-\_\-object}}
+\index{fetch\-\_\-object@{fetch\-\_\-object}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{fetch\-\_\-object}]{\setlength{\rightskip}{0pt plus 5cm}fetch\-\_\-object (
+\begin{DoxyParamCaption}
+\item[{\$}]{link}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ac3176856eddeb02c4b0290f83c004549}
+fetch\-\_\-object\-: wrapping fetch\-\_\-object from the mysql-\/library
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+dblink & {\em \$link} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_acdc1b96abed965253edbf679683c2c4a}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Cloud\-Data@{get\-Cloud\-Data}}
+\index{get\-Cloud\-Data@{get\-Cloud\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Cloud\-Data}]{\setlength{\rightskip}{0pt plus 5cm}get\-Cloud\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{field\-Id, }
+\item[{\$}]{xmin = {\ttfamily -\/100}, }
+\item[{\$}]{xmax = {\ttfamily 100}, }
+\item[{\$}]{ymin = {\ttfamily -\/100}, }
+\item[{\$}]{ymax = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_acdc1b96abed965253edbf679683c2c4a}
+get\-Cloud\-Data -\/ gets id of a data-\/field, gets the data from the db and returns a split-\/cloud-\/array
+
+\begin{DoxyReturn}{\-Returns}
+array data\mbox{[}word=$>$array\mbox{[}x,y\mbox{]}\mbox{]} 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a5b571190b5c767a3249932078278f935}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Edition\-Idby\-Editionname@{get\-Edition\-Idby\-Editionname}}
+\index{get\-Edition\-Idby\-Editionname@{get\-Edition\-Idby\-Editionname}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Edition\-Idby\-Editionname}]{\setlength{\rightskip}{0pt plus 5cm}get\-Edition\-Idby\-Editionname (
+\begin{DoxyParamCaption}
+\item[{\$}]{name}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a5b571190b5c767a3249932078278f935}
+\-Returns the edition id by \-Editionname
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a281703aa27a5b6138c2ed08e9a80c444}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Edition\-Info@{get\-Edition\-Info}}
+\index{get\-Edition\-Info@{get\-Edition\-Info}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Edition\-Info}]{\setlength{\rightskip}{0pt plus 5cm}get\-Edition\-Info (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a281703aa27a5b6138c2ed08e9a80c444}
+\-Returns the edition info by edition id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a2b5fad4213a74f13c33998dda781eee3}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Edition\-Nameby\-Id@{get\-Edition\-Nameby\-Id}}
+\index{get\-Edition\-Nameby\-Id@{get\-Edition\-Nameby\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Edition\-Nameby\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Edition\-Nameby\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a2b5fad4213a74f13c33998dda781eee3}
+\-Returns the edition name of an element (contribution) with id \$id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a79de8205e59144dd9ab03c7366a35e4c}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Editions@{get\-Editions}}
+\index{get\-Editions@{get\-Editions}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Editions}]{\setlength{\rightskip}{0pt plus 5cm}get\-Editions (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}, }
+\item[{\$}]{reset = {\ttfamily false}, }
+\item[{\$}]{status = {\ttfamily 'open'}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a79de8205e59144dd9ab03c7366a35e4c}
+\hyperlink{classrokfor___d_b_a79de8205e59144dd9ab03c7366a35e4c}{get\-Editions()} -\/ gets all editions for a project with id = \$id and status = \$status
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$editions or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ae3bdbe96ae91f4f4978f3c8e1ae1dcc3}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Elements@{get\-Elements}}
+\index{get\-Elements@{get\-Elements}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Elements}]{\setlength{\rightskip}{0pt plus 5cm}get\-Elements (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}, }
+\item[{\$}]{status = {\ttfamily '\-Close'}, }
+\item[{\$}]{ed = {\ttfamily false}, }
+\item[{\$}]{templatename = {\ttfamily false}, }
+\item[{\$}]{order = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ae3bdbe96ae91f4f4978f3c8e1ae1dcc3}
+\hyperlink{classrokfor___d_b_ae3bdbe96ae91f4f4978f3c8e1ae1dcc3}{get\-Elements()} -\/ gets all elements (contributions) for a part within an issue of a project if \$id not set, uses \$this-\/$>$active\-Part, if \$status not set uses '\-Close'. \-If status = false neglects all status info. \$ed\-: edition-\/id (issue-\/id). if not set, the active edition set with set\-Edition\-Active will be used. \$order\-: \char`\"{}\-\_\-name A\-S\-C\char`\"{} or \char`\"{}\-\_\-newdate D\-E\-S\-C\char`\"{} or \char`\"{}\-\_\-name A\-S\-C, \-\_\-moddate D\-E\-S\-C\char`\"{} or false
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$parts or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a30d11550e437374a50ecf9bcc684fd69}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Elements\-Idby\-Name@{get\-Elements\-Idby\-Name}}
+\index{get\-Elements\-Idby\-Name@{get\-Elements\-Idby\-Name}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Elements\-Idby\-Name}]{\setlength{\rightskip}{0pt plus 5cm}get\-Elements\-Idby\-Name (
+\begin{DoxyParamCaption}
+\item[{\$}]{name, }
+\item[{\$}]{templatename = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a30d11550e437374a50ecf9bcc684fd69}
+\hyperlink{classrokfor___d_b_a30d11550e437374a50ecf9bcc684fd69}{get\-Elements\-Idby\-Name()} -\/ returns the id of an element by name
+
+\begin{DoxyReturn}{\-Returns}
+\$int or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ac783575e3c1c6f6327c44c3fa4d5dad0}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Elements\-Nameby\-Id@{get\-Elements\-Nameby\-Id}}
+\index{get\-Elements\-Nameby\-Id@{get\-Elements\-Nameby\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Elements\-Nameby\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Elements\-Nameby\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ac783575e3c1c6f6327c44c3fa4d5dad0}
+\hyperlink{classrokfor___d_b_ac783575e3c1c6f6327c44c3fa4d5dad0}{get\-Elements\-Nameby\-Id()} -\/ returns a name of an element by id
+
+\begin{DoxyReturn}{\-Returns}
+string or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a48b67b40557bfa9ba8737fc763770ea0}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Field\-Data@{get\-Field\-Data}}
+\index{get\-Field\-Data@{get\-Field\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Field\-Data}]{\setlength{\rightskip}{0pt plus 5cm}get\-Field\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a48b67b40557bfa9ba8737fc763770ea0}
+get\-Field\-Data -\/ get data of a field with template infos \$id for a field is strictly required
+
+\-Returned \-Data \-Object\-:
+
+( \mbox{[}d\-\_\-id\mbox{]} =$>$ \-Int \mbox{[}d\-\_\-forelement\mbox{]} =$>$ \-Int \mbox{[}d\-\_\-text\mbox{]} =$>$ \-String \mbox{[}d\-\_\-binary\mbox{]} =$>$ \-String \mbox{[}d\-\_\-integer\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-id\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-fortemplate\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-fieldname\mbox{]} =$>$ \-String \mbox{[}t\-\_\-fieldtype\mbox{]} =$>$ \-String \mbox{[}t\-\_\-maxlines\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-textlength\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-imagewidth\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-imageheight\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-cols\mbox{]} =$>$ \-Int \mbox{[}t\-\_\-colnames\mbox{]} =$>$ \-String \mbox{[}t\-\_\-history\mbox{]} =$>$ \-String \mbox{[}t\-\_\-growing\mbox{]} =$>$ \-String \mbox{[}t\-\_\-len\-\_\-influence\mbox{]} =$>$ \-String )
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$data 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a16e5ecd1298d430bf50b54f9838c785a}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Field\-Names\-By\-Template\-Name@{get\-Field\-Names\-By\-Template\-Name}}
+\index{get\-Field\-Names\-By\-Template\-Name@{get\-Field\-Names\-By\-Template\-Name}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Field\-Names\-By\-Template\-Name}]{\setlength{\rightskip}{0pt plus 5cm}get\-Field\-Names\-By\-Template\-Name (
+\begin{DoxyParamCaption}
+\item[{\$}]{templatename}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a16e5ecd1298d430bf50b54f9838c785a}
+\-Return \-Field \-Names and \-Info by \-Template\-Name
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$templatename} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ab63eab8e087779aeddf6999d2efe7dec}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Fields\-By\-Name@{get\-Fields\-By\-Name}}
+\index{get\-Fields\-By\-Name@{get\-Fields\-By\-Name}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Fields\-By\-Name}]{\setlength{\rightskip}{0pt plus 5cm}get\-Fields\-By\-Name (
+\begin{DoxyParamCaption}
+\item[{\$}]{fieldname, }
+\item[{\$}]{element\-Id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ab63eab8e087779aeddf6999d2efe7dec}
+get\-Fields\-By\-Name -\/ returns the id of a field in an element/contribution by name
+
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ab517c7ce5a1c68c903edbb0bf8656d0f}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Fields\-By\-Template\-Id@{get\-Fields\-By\-Template\-Id}}
+\index{get\-Fields\-By\-Template\-Id@{get\-Fields\-By\-Template\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Fields\-By\-Template\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Fields\-By\-Template\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{fieldid, }
+\item[{\$}]{issue = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ab517c7ce5a1c68c903edbb0bf8656d0f}
+get\-Fields\-By\-Id -\/ returns all \-Data \-Fields with a certain (template) id of a defined issue (if set!)
+
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a360af4c0ba1d8fc85c6441a32dde9669}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Fields\-Id@{get\-Fields\-Id}}
+\index{get\-Fields\-Id@{get\-Fields\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Fields\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Fields\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a360af4c0ba1d8fc85c6441a32dde9669}
+get\-Fields\-Id -\/ gets id's of all data fields for an element. if \$id not set, uses the active\-Element, otherwise the fields for \-Element with id = \$id if \$resolve\-Foreign is false, no template infos are merged (which is way faster in big tables)
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$fields array of data-\/objects, false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aea302de7ee07faaed9b0d7ee6be7d9e1}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Matrix\-Data@{get\-Matrix\-Data}}
+\index{get\-Matrix\-Data@{get\-Matrix\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Matrix\-Data}]{\setlength{\rightskip}{0pt plus 5cm}get\-Matrix\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{field\-Id, }
+\item[{\$}]{xmin = {\ttfamily -\/100}, }
+\item[{\$}]{xmax = {\ttfamily 100}, }
+\item[{\$}]{ymin = {\ttfamily -\/100}, }
+\item[{\$}]{ymax = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aea302de7ee07faaed9b0d7ee6be7d9e1}
+get\-Matrix\-Data -\/ gets \-Data of a \-Matrix, normalizes it and returns it as an array
+
+\begin{DoxyReturn}{\-Returns}
+array 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a41f63552292422a28378289006da79e8}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Part\-By\-Name@{get\-Part\-By\-Name}}
+\index{get\-Part\-By\-Name@{get\-Part\-By\-Name}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Part\-By\-Name}]{\setlength{\rightskip}{0pt plus 5cm}get\-Part\-By\-Name (
+\begin{DoxyParamCaption}
+\item[{\$}]{name, }
+\item[{\$}]{projectid = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a41f63552292422a28378289006da79e8}
+get\-Part\-By\-Name\-: returns the id of a part according to its name
+
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a7c8cc6e3421f4cc81da51d3f65d4ba62}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Part\-Nameby\-Id@{get\-Part\-Nameby\-Id}}
+\index{get\-Part\-Nameby\-Id@{get\-Part\-Nameby\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Part\-Nameby\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Part\-Nameby\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a7c8cc6e3421f4cc81da51d3f65d4ba62}
+\-Returns the part name of an element (contribution) with id \$id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a8770ff258a970263fc4f06095470195f}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Parts@{get\-Parts}}
+\index{get\-Parts@{get\-Parts}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Parts}]{\setlength{\rightskip}{0pt plus 5cm}get\-Parts (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a8770ff258a970263fc4f06095470195f}
+\hyperlink{classrokfor___d_b_a8770ff258a970263fc4f06095470195f}{get\-Parts()} -\/ gets all parts for a project with id = \$id if \$id not set, uses \$this-\/$>$active\-Project
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$parts or false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a7c06a6c19756825c936ad4cf76753a65}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Project\-Nameby\-Edition\-Id@{get\-Project\-Nameby\-Edition\-Id}}
+\index{get\-Project\-Nameby\-Edition\-Id@{get\-Project\-Nameby\-Edition\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Project\-Nameby\-Edition\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Project\-Nameby\-Edition\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a7c06a6c19756825c936ad4cf76753a65}
+\-Returns the project name of an issue (edition) with id \$id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ad78efd3b3471743ca584c621d633b860}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Project\-Nameby\-Part\-Id@{get\-Project\-Nameby\-Part\-Id}}
+\index{get\-Project\-Nameby\-Part\-Id@{get\-Project\-Nameby\-Part\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Project\-Nameby\-Part\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Project\-Nameby\-Part\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ad78efd3b3471743ca584c621d633b860}
+\-Returns the project name of an part (chapter) with id \$id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ae9befc7da9622522b92e7166b344dc66}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Projects@{get\-Projects}}
+\index{get\-Projects@{get\-Projects}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Projects}]{\setlength{\rightskip}{0pt plus 5cm}get\-Projects (
+\begin{DoxyParamCaption}
+\item[{\$}]{reset = {\ttfamily false}, }
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ae9befc7da9622522b92e7166b344dc66}
+\hyperlink{classrokfor___d_b_ae9befc7da9622522b92e7166b344dc66}{get\-Projects()} -\/ \-Loads all current \-Projects into the array requires the \-\_\-books table
+
+\begin{DoxyReturn}{\-Returns}
+\$this-\/$>$projects 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aa9889007e27fedadb28ae8f2fd77a569}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Session\-Id@{get\-Session\-Id}}
+\index{get\-Session\-Id@{get\-Session\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Session\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Session\-Id (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aa9889007e27fedadb28ae8f2fd77a569}
+get\-Session\-Id
+
+\begin{DoxyReturn}{\-Returns}
+int 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ad7d8994bb1b830838968ff00c0da59d8}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Slider\-Data@{get\-Slider\-Data}}
+\index{get\-Slider\-Data@{get\-Slider\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Slider\-Data}]{\setlength{\rightskip}{0pt plus 5cm}get\-Slider\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{field\-Id, }
+\item[{\$}]{xmin = {\ttfamily 0}, }
+\item[{\$}]{xmax = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ad7d8994bb1b830838968ff00c0da59d8}
+get\-Slider\-Data -\/ gets \-Data for a \-Slider, normalizes the value, returns it.
+
+\begin{DoxyReturn}{\-Returns}
+int 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a4e4817fb5f02855babe16f7e0611b310}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Template\-Fields@{get\-Template\-Fields}}
+\index{get\-Template\-Fields@{get\-Template\-Fields}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Template\-Fields}]{\setlength{\rightskip}{0pt plus 5cm}get\-Template\-Fields (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a4e4817fb5f02855babe16f7e0611b310}
+returns all \-Field-\/\-Definitions of a certain \-Template \-Id.
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_acba2b0706f7f29dd2b203fc19023f6a9}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Template\-Nameby\-Id@{get\-Template\-Nameby\-Id}}
+\index{get\-Template\-Nameby\-Id@{get\-Template\-Nameby\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Template\-Nameby\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-Template\-Nameby\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_acba2b0706f7f29dd2b203fc19023f6a9}
+\-Returns the template name of an element (contribution) with id \$id
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+object 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a6ef88e1ad5c4466c97f23cbbd9326712}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Templates@{get\-Templates}}
+\index{get\-Templates@{get\-Templates}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Templates}]{\setlength{\rightskip}{0pt plus 5cm}get\-Templates (
+\begin{DoxyParamCaption}
+\item[{\$}]{project = {\ttfamily false}, }
+\item[{\$}]{part = {\ttfamily false}, }
+\item[{\$}]{all = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a6ef88e1ad5c4466c97f23cbbd9326712}
+returns the \-Templates accessible for the user for the edition \$id if all=true, all templates will be returned
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+array 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a51621a1c5a0e95942008cc6491342595}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-User\-Group@{get\-User\-Group}}
+\index{get\-User\-Group@{get\-User\-Group}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-User\-Group}]{\setlength{\rightskip}{0pt plus 5cm}get\-User\-Group (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a51621a1c5a0e95942008cc6491342595}
+get\-User\-Group
+
+\begin{DoxyReturn}{\-Returns}
+string 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a05f6aa1ffae6295260d9f1cca016bf33}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-User\-Id@{get\-User\-Id}}
+\index{get\-User\-Id@{get\-User\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-User\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-User\-Id (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a05f6aa1ffae6295260d9f1cca016bf33}
+get\-User\-Id
+
+\begin{DoxyReturn}{\-Returns}
+int 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aafd6d1ef27e6acc5833aba4012e5ee77}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-User\-Name@{get\-User\-Name}}
+\index{get\-User\-Name@{get\-User\-Name}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-User\-Name}]{\setlength{\rightskip}{0pt plus 5cm}get\-User\-Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aafd6d1ef27e6acc5833aba4012e5ee77}
+get\-User\-Name
+
+\begin{DoxyReturn}{\-Returns}
+string 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aaa31c3bd4f2160cdb031853f0a1f98df}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-User\-Name\-By\-Id@{get\-User\-Name\-By\-Id}}
+\index{get\-User\-Name\-By\-Id@{get\-User\-Name\-By\-Id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-User\-Name\-By\-Id}]{\setlength{\rightskip}{0pt plus 5cm}get\-User\-Name\-By\-Id (
+\begin{DoxyParamCaption}
+\item[{\$}]{id\-\_\-or\-\_\-name}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aaa31c3bd4f2160cdb031853f0a1f98df}
+returns the username by id. in case of a passed username, it will be checked and returned
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$id\-\_\-or\-\_\-name} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ab9a243f64faeb5cd2a7fce8deaf756f2}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!get\-Wordlist\-Data@{get\-Wordlist\-Data}}
+\index{get\-Wordlist\-Data@{get\-Wordlist\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{get\-Wordlist\-Data}]{\setlength{\rightskip}{0pt plus 5cm}get\-Wordlist\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{field\-Id}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ab9a243f64faeb5cd2a7fce8deaf756f2}
+get\-Wordlist\-Data -\/ gets the \-Words of a wordlist and returns them in an array
+
+\begin{DoxyReturn}{\-Returns}
+array 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_ad701de033e617b9723b6034493f60533}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!insert\-\_\-id@{insert\-\_\-id}}
+\index{insert\-\_\-id@{insert\-\_\-id}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{insert\-\_\-id}]{\setlength{\rightskip}{0pt plus 5cm}insert\-\_\-id (
+\begin{DoxyParamCaption}
+\item[{\$}]{i = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_ad701de033e617b9723b6034493f60533}
+insert\-\_\-id\-: wrapping insert\-\_\-id from the mysql-\/library
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$i} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_adbf04212e5e421b8c8769a8d23e8a29b}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!new\-Session@{new\-Session}}
+\index{new\-Session@{new\-Session}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{new\-Session}]{\setlength{\rightskip}{0pt plus 5cm}new\-Session (
+\begin{DoxyParamCaption}
+\item[{\$}]{user, }
+\item[{\$}]{pass}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_adbf04212e5e421b8c8769a8d23e8a29b}
+new\-Session
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$user} & \\
+\hline
+string & {\em \$pass} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_af7750ae1b875d55abc718767da9bfd44}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!num\-\_\-rows@{num\-\_\-rows}}
+\index{num\-\_\-rows@{num\-\_\-rows}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{num\-\_\-rows}]{\setlength{\rightskip}{0pt plus 5cm}num\-\_\-rows (
+\begin{DoxyParamCaption}
+\item[{\$}]{q}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_af7750ae1b875d55abc718767da9bfd44}
+num\-\_\-rows\-: wrapping affected\-\_\-rows from the mysql-\/library
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$q} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+query 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a881366691dcdfc3fd046b239c715c678}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!query@{query}}
+\index{query@{query}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{query}]{\setlength{\rightskip}{0pt plus 5cm}query (
+\begin{DoxyParamCaption}
+\item[{\$}]{q}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a881366691dcdfc3fd046b239c715c678}
+query\-: wrapping query from the mysql-\/library
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$q} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+query 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a024921bacc528922e69b4a7c18eb7088}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}}
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{rokfor\-\_\-\-D\-B}]{\setlength{\rightskip}{0pt plus 5cm}{\bf rokfor\-\_\-\-D\-B} (
+\begin{DoxyParamCaption}
+\item[{\$}]{rootdir = {\ttfamily false}, }
+\item[{\$}]{dbase = {\ttfamily \-D\-B\-A\-S\-E}, }
+\item[{\$}]{dbuser = {\ttfamily \-D\-B\-U\-S\-E\-R}, }
+\item[{\$}]{dbpass = {\ttfamily \-D\-B\-P\-A\-S\-S}, }
+\item[{\$}]{dbname = {\ttfamily \-D\-B\-N\-A\-M\-E}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a024921bacc528922e69b4a7c18eb7088}
+constructor
+
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a0bdff735b256d3d0b19de601d305a229}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-Edition\-Active@{set\-Edition\-Active}}
+\index{set\-Edition\-Active@{set\-Edition\-Active}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-Edition\-Active}]{\setlength{\rightskip}{0pt plus 5cm}set\-Edition\-Active (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a0bdff735b256d3d0b19de601d305a229}
+set\-Edition\-Active -\/ \-Sets a pointer to an active edition
+
+\begin{DoxyReturn}{\-Returns}
+true, false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a3cca4c9f02cd1dcf760067584fc992f6}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-Element\-Active@{set\-Element\-Active}}
+\index{set\-Element\-Active@{set\-Element\-Active}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-Element\-Active}]{\setlength{\rightskip}{0pt plus 5cm}set\-Element\-Active (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a3cca4c9f02cd1dcf760067584fc992f6}
+set\-Element\-Active -\/ \-Sets a pointer to an active element within a part of an issue in a project
+
+\begin{DoxyReturn}{\-Returns}
+true, false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a4e54441b478ff151d2251dca986d2b23}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-Field\-Data@{set\-Field\-Data}}
+\index{set\-Field\-Data@{set\-Field\-Data}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-Field\-Data}]{\setlength{\rightskip}{0pt plus 5cm}set\-Field\-Data (
+\begin{DoxyParamCaption}
+\item[{\$}]{data, }
+\item[{\$}]{id, }
+\item[{\$}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a4e54441b478ff151d2251dca986d2b23}
+set\-Field\-Data sets the value of a field
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+string & {\em \$data} & \\
+\hline
+int & {\em \$id} & \\
+\hline
+string & {\em \$type} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a47a162a7645f67de4ff791ee16a62dc2}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-Part\-Active@{set\-Part\-Active}}
+\index{set\-Part\-Active@{set\-Part\-Active}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-Part\-Active}]{\setlength{\rightskip}{0pt plus 5cm}set\-Part\-Active (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a47a162a7645f67de4ff791ee16a62dc2}
+set\-Part\-Active -\/ \-Sets a pointer to an active part within an project
+
+\begin{DoxyReturn}{\-Returns}
+true, false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a9320d2593446e4bdc803b20d47c7b36e}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-Project\-Active@{set\-Project\-Active}}
+\index{set\-Project\-Active@{set\-Project\-Active}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-Project\-Active}]{\setlength{\rightskip}{0pt plus 5cm}set\-Project\-Active (
+\begin{DoxyParamCaption}
+\item[{\$}]{id = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a9320d2593446e4bdc803b20d47c7b36e}
+set\-Project\-Active -\/ \-Sets a pointer to an active project requires \$this-\/$>$projects set \-If \$id is passed, activate the project with id = \$id, \$id can also resemble the name of the \-Project \-Otherwise, activate first
+
+\begin{DoxyReturn}{\-Returns}
+true, false on error 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_aa666d2cbd49e3f8feed14896773a3006}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!set\-User\-Restriction@{set\-User\-Restriction}}
+\index{set\-User\-Restriction@{set\-User\-Restriction}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{set\-User\-Restriction}]{\setlength{\rightskip}{0pt plus 5cm}set\-User\-Restriction (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-state = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_aa666d2cbd49e3f8feed14896773a3006}
+set\-User\-Restriction restricts \-Projects / \-Issues / \-Contributions access only for the current activated user
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+boolean & {\em \$\-\_\-state} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+void 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+\hypertarget{classrokfor___d_b_a42c7e6a04c4267bf7ca00c8da1cbdcf5}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!show\-Group\-Rights@{show\-Group\-Rights}}
+\index{show\-Group\-Rights@{show\-Group\-Rights}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{show\-Group\-Rights}]{\setlength{\rightskip}{0pt plus 5cm}show\-Group\-Rights (
+\begin{DoxyParamCaption}
+\item[{\$}]{\-\_\-group}
+\end{DoxyParamCaption}
+)}}
+\label{classrokfor___d_b_a42c7e6a04c4267bf7ca00c8da1cbdcf5}
+returns the rights per group, does not store anything class wide
+
+
+\begin{DoxyParams}[1]{\-Parameters}
+int & {\em \$\-\_\-userid} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+array 
+\end{DoxyReturn}
+\begin{DoxyAuthor}{\-Author}
+\-Urs \-Hofer 
+\end{DoxyAuthor}
+
+
+\subsection{\-Field \-Documentation}
+\hypertarget{classrokfor___d_b_a8c4ba7dc50a7c4755880e763de1fe029}{
+\index{rokfor\-\_\-\-D\-B@{rokfor\-\_\-\-D\-B}!\$access\-Table@{\$access\-Table}}
+\index{\$access\-Table@{\$access\-Table}!rokfor_DB@{rokfor\-\_\-\-D\-B}}
+\subsubsection[{\$access\-Table}]{\setlength{\rightskip}{0pt plus 5cm}\$access\-Table}}
+\label{classrokfor___d_b_a8c4ba7dc50a7c4755880e763de1fe029}
+{\bfseries \-Initial value\-:}
+\begin{DoxyCode}
+ array(
+                "Projects" => array(),
+                "Editions" => array(),                  
+                "Templates" => array()
+        )
+\end{DoxyCode}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/\-Users/urshofer/\-Documents/text\-Mate\-Repositories/rokfor/branch/version-\/2/core/sys/rokfor\-\_\-\-D\-B.\-inc\end{DoxyCompactItemize}

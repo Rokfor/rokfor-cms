@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Rokfor API</title>
+	<style type="text/css" media="screen">
+		body {
+			font: normal normal normal 12px/18px Helvetica;			
+		}
+		pre {
+			padding: 10px;
+			margin: 10px;
+			background: #EEE;
+			font: normal normal normal 12px/16px Courier;
+		}
+		h2 {
+			font: normal normal normal 18px/27px Helvetica;			
+			border-top: 1px solid;
+			border-left: 1px solid;			
+			border-right: 1px solid;						
+			margin-bottom: 0px;
+			background: #CCC;
+			padding: 5px;
+		}
+		h2 a {
+			float: right;
+			font: normal normal normal 12px/18px Helvetica;			
+			text-decoration: none;
+		}
+		h3 {
+			font: normal normal normal 12px/16px Courier;			
+			border-bottom: 1px solid;
+			border-left: 1px solid;			
+			border-right: 1px solid;
+			margin-top: 0px;
+			padding: 5px;
+			border-top: 1px dotted;
+		}		
+	</style>
+</head>
+
+<h2 id="top">Table of Contents</h2>
+<h3>
+<a href="#1">XML Dump</a><br>
+<a href="#2">Login</a><br>
+<a href="#3">Logout</a><br>
+<a href="#4">Export</a>
+</h3>
+
+<h2 id="1">XML Dump<a href="#top">Up</a></h2>
+<h3>
+	/rf/Api/XML/Guest/[Book_Name]<br/>
+	/rf/Api/XML/SessionId/[Book_Name]
+</h3>
+<p>
+	<b>Returns a whole project as XML dump.</b><br>
+	The access is limited: Either you have to log in first, or the project has to be made accessible for the public by setting BOOKS_ALLOWED_FOR_GUESTS in the config file.
+</p>
+<h4>
+	Return Value
+</h4>
+<pre>A well formatted XML Document, might be huge:
+	
+&lt;?xml version="1.0" standalone="yes"?&gt;
+&lt;book id="4" name="Edition Rokfor"&gt;
+	&lt;issue id="18" name="Gestaltung|Chic\\politique" status="open"&gt;
+		&lt;chapter id="9" name="Vorwort"&gt;
+			&lt;contribution id="27189" name="Vorwort" status="Open" template="Edition Rokfor: Template" user="Gina Bucher" last_modified="1299160951"&gt;
+				&lt;field id="80056" name="Kapiteltitel" type="Text"&gt;
+					&lt;![CDATA[ Chic politique ]]&gt;
+				&lt;/field&gt;
+				&lt;field id="80058" name="Kapitelbilder" type="Bild"&gt;
+					&lt;file url="http://edition.rokfor.ch/udb/collage.jpg.jpg" description="Caption"/&gt;
+				&lt;/field&gt;
+				…
+			&lt;/contribution&gt;
+			…
+		&lt;/chapter&gt;
+		…
+	&lt;/issue&gt;
+	…
+&lt;/book&gt;</pre>
+<h2 id="2">Login<a href="#top">Up</a></h2>
+<h3>
+	/rf/Api/Login/[Username]/[Pass(md5)]
+</h3>
+<p>
+	<b>Returns a Session Id as json value</b><br/>
+	If validation fails, an error message is returned.
+</p>
+<h4>
+	Return Value
+</h4>
+<pre>["ok",sessionid(int)]
+["wrong username or password",false]</pre>
+<h2 id="3">Logout<a href="#top">Up</a></h2>
+<h3>
+	/rf/Api/Logout/[SessionId]
+</h3>
+<p>
+	<b>Returns ok as json value</b><br/>
+	If there's no session id, an error message is returned.
+</p>
+<h4>
+	Return Value
+</h4>
+<pre>["ok"]
+["wrong username or password",false]</pre>
+<h2>Export<a href="#top">Up</a></h2>
+<h3 id="4">
+	/rf/Api/Export/Guest/Single/[ContribId]/[PlugId]<br/>
+	/rf/Api/Export/[SessionId]/Single/[ContribId]/[PlugId]
+</h3>
+<p>
+	<b>Exports a single contribution as pdf</b><br/>
+	If the Plugin Id is ommited, the first plugin that fits for the content will be used.<br>
+	You can get the Id of a contribution by opening it in the editor.<br>
+	If you access the api as "Guest", the rights to access the generated documents have to be set in the configuration file.
+</p>
+<h4>
+	Return Value
+</h4>
+<pre>PDF Document as stream.</pre>

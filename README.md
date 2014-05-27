@@ -22,6 +22,22 @@ Among the printed books we produced so far you can find
 
 To generate the printed documents, we use 3rdparty software like LaTeX or Pdflib. You can't find these plugins in this repository, we'll add a new one in the future.
 
+Installation
+------------
+
+Prerequisites: MySQL, PHP > 5.0, phpmyadmin, Apache, Mod-Sendfile (not necessary)
+
+* Export the repository
+* Put the /core/web/rf folder in your Document Root on the top level.
+* Add the .htaccess-v2 content to your .htaccess file, or simply rename it if there's none.
+* Put the /core/sys folder in your home directory. For sure someplace without direct access for your web-users.
+* Add a database with phpmyadmin and import the sql-dump.sql file.
+* Add a repository folder where Rokfor-cms can store the uploads. Normally, this is the /udb folder in your document root. The name comes from Universal Database Blugin.  
+Make sure, apache has access rights for this folder (chmod or chown)
+
+_You shold now be able to log into Rokfor CMS under the url http://example.com/rf on your webserver as superuser __root__ with the default password __1234__. Make sure to change it!_
+
+
 Todos
 -----
 

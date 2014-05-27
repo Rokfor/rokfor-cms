@@ -1,0 +1,50 @@
+#tabs li, #tree, #intro div, #content, .rfAlerts {
+/*	border: 1px solid #CCC;
+	border-bottom: 2px solid #999;
+	border-right: 2px solid #999;	*/
+  	behavior: url(/rf/css/3rdparty/PIE.htc);	
+}
+
+a.button {
+	border: 1px solid #CCC;
+	border-bottom: 2px solid #999;
+	border-right: 2px solid #999;
+}
+
+#dataform .fieldContainer {
+	background: #CCC;
+}
+
+a.button:hover {
+	border: 2px solid #EEE;	
+	border-top: 1px solid #999;
+	border-left: 1px solid #999;			
+}
+
+a.button, a.button:active, a.button:hover {
+	width: 148px;
+}
+
+a.small, a.small:active, a.small:hover {
+	width: 68px;
+}
+
+a.wide, a.wide:active, a.wide:hover {
+	width: 226px;
+}
+
+a.center, a.center:active, a.center:hover {
+	width: 246px;
+}
+
+a.medium, a.medium:hover, a.medium:active {
+	width: 105px;
+}
+
+a.mini, a.mini:hover, a.mini:active {
+	width: 46px !important;
+}
+
+hr {
+	height: 0px;
+}

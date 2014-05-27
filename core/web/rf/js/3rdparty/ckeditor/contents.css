@@ -1,0 +1,38 @@
+/*
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+body
+{
+	/* Font */
+	font: normal normal normal 15px/1.3em "Times New Roman", Times, serif;
+
+	/* Text color */
+	color: #000;
+
+	/* Remove the background color to make it transparent */
+	background-color: #fff;
+}
+
+ol,ul,dl
+{
+	/* IE7: reset rtl list margin. (#7334) */
+	*margin-right:0px;
+	/* preserved spaces for rtl list item bullets. (#6249)*/
+    padding-right:40px;
+}
+
+p {
+	margin: 0px;
+	padding: 0px;
+	margin-bottom: 1em;
+}
+
+.correx {
+	border-bottom: 1px dotted #F00;
+}
+
+.searchresult {
+	background-color: #ffff00;
+}

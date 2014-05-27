@@ -1,0 +1,34 @@
+<IfModule mod_xsendfile.c>
+	XSendFile on
+	SetEnv MOD_X_SENDFILE_ENABLED 1
+</IfModule>
+
+
+AddOutputFilterByType DEFLATE text/html text/plain text/xml
+RewriteEngine On
+RewriteBase /
+
+# Home & Storing SITEPREFIX
+RewriteRule ^rf/$ rf/main.php [L] 
+
+# Exceptions
+RewriteRule ^favicon.ico$ /rf/img/favicon.ico [L] 
+
+# Login / Logout
+RewriteRule ^rf/(Logout|Login|Expired)$ /rf/main.php?control=$1 [L]
+
+# General Access: Mode (Ajax/Api), Action, Parameter, Value1, Value2...
+# Api: generate Content on the fly
+RewriteRule ^rf/(Ajax|Api)/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)$ /rf/main.php?mode=$1&action=$2&parameter=$3&values[]=$4&values[]=$5&values[]=$6&values[]=$7 [L]
+RewriteRule ^rf/(Ajax|Api)/(.*)/(.*)/(.*)/(.*)/(.*)$ /rf/main.php?mode=$1&action=$2&parameter=$3&values[]=$4&values[]=$5&values[]=$6 [L]
+RewriteRule ^rf/(Ajax|Api)/(.*)/(.*)/(.*)/(.*)$ /rf/main.php?mode=$1&action=$2&parameter=$3&values[]=$4&values[]=$5 [L]
+RewriteRule ^rf/(Ajax|Api)/(.*)/(.*)/(.*)$ /rf/main.php?mode=$1&action=$2&parameter=$3&values[]=$4 [L]
+RewriteRule ^rf/(Ajax|Api)/(.*)/(.*)$ /rf/main.php?mode=$1&action=$2&parameter=$3 [L]
+RewriteRule ^rf/(Ajax|Api)/(.*)$ /rf/main.php?mode=$1&action=$2 [L]
+
+
+# Leave Temporary Directory (video previews) untouched
+RewriteRule ^udb/tmp(.*)$ udb/tmp$1 [L]
+
+# Controlling Uploaded Data, redirecting udb directory into script
+RewriteRule ^udb/(.*)$ /rf/main.php?mode=Ajax&action=Filecontrol&parameter=$1 [L]

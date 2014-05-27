@@ -1,0 +1,35 @@
+.mooTree_node {
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.mooTree_text {
+	padding-top: 0px;
+	height: 19px;
+	cursor: pointer;
+}
+
+.mooTree_img {
+	float: left;
+	height: 16px;
+	margin-right: 2px;
+	overflow: hidden;
+}
+
+.mooTree_selected	 {
+	background-color: #e0f0ff;
+	font-weight: bold;
+}
+
+.mooTree_recentlyadded {
+	text-decoration: underline;
+}
+
+.Close {
+	color: #39b54a;
+}
+
+.Deleted {
+	text-decoration: line-through;
+	color: #f15922;
+}

@@ -1,0 +1,289 @@
+div.smallContainer {
+	height: 348px;
+}
+
+
+div.threedslider {
+	margin-top: 3px;
+	margin-right: 5px;	
+	float:right;
+	width: 40px;
+	height: 5px;
+	background: transparent;
+	background: url('../../img/sli_small_bg.png') 0 center repeat-x;
+	font-family: "Lucida Grande", Helvetica, Arial, "Sans Serif";
+}
+ div.threedslider div.knob{
+	background: transparent;
+	width: 7px;
+	height: 7px;
+	margin-top: -1px;
+	background-image: url('../../img/sli_small_knob.png');
+}
+div.threedslider span.minValLeg {
+	float: left;
+	font-size: 8px;
+	padding-top: 2px;
+}
+div.threedslider span.maxValLeg {
+	float: right;
+	font-size: 8px;
+	padding-top: 2px;
+}
+
+
+div.slider {
+	margin: 5px;
+	width: 348px;
+	height: 30px;
+	background: transparent url('../../img/sli_bg.png')  no-repeat scroll top center;
+	position: absolute;
+}
+div.slider div.knob {
+	background: transparent;
+	width: 15px;
+	height: 20px;
+	background-image: url('../../img/sli_knob.png');
+}
+div.slider span.minValLeg {
+	float: left;
+	font-size: 10px;
+	padding-top: 18px;
+}
+div.slider span.maxValLeg {
+	float: right;
+	font-size: 10px;
+	padding-top: 18px;
+}
+
+
+div.square {
+	width: 338px;
+	height: 318px;
+	padding: 5px;		
+	background: transparent;
+	background: url('../../img/sq_bg.png') 0 center repeat-x;
+	font-family: "Lucida Grande", Helvetica, Arial, "Sans Serif";
+	font-size: 10px;
+	color: #999;	
+	position: absolute;
+}
+div.square div.knob {
+	width: 16px;
+	height: 16px;
+	background: transparent;
+	background-image: url('../../img/sq_knob.png');
+	visibility: hidden;
+}
+
+div.square div.minXLeg {
+		padding:0px;
+		margin:0px;
+		height:0px;	
+		float: left;
+		position: relative;
+		padding-top: 0px;
+		top: 143px;
+		margin-left: 3px;
+		width: 50%;
+	}
+	div.square div.maxXLeg {
+		padding:0px;
+		margin:0px;
+		height:0px;
+		position: relative;
+		float: right;
+		margin-right: 3px;
+		top: 143px;
+		width: 50%;
+		text-align:right;
+	}
+	div.square div.minYLeg {
+		padding:0px;
+		margin-top:3px;
+		padding-left:5px;
+		padding-bottom:65px;
+		margin-left:50%;
+		position: static;
+		top: 0px;
+		left: 0px;
+		text-indent:-50%;
+		text-align:center;
+	}
+	div.square div.maxYLeg {
+		padding:0px;
+		padding-top:210px;
+		padding-left:5px;
+		margin-bottom:3px;
+		margin-left:50%;
+		position: static;
+		top: 0px;
+		left: 0px;
+		text-indent:-50%;
+		text-align:center;
+	}
+
+
+div.sortable {
+	font-family: "Lucida Grande", Helvetica, Arial, "Sans Serif";
+	background: url('../../img/so_co.png');	
+	width: 338px;
+	height: 318px;
+	padding: 5px;	
+	position:absolute;		
+}
+.newTask, .recTask {
+	width: 80px;	
+}
+
+.drag-handle {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+	background: url('../../img/move.png') no-repeat center;
+	float: left;
+	margin-right: 5px;
+}
+
+.del-handle {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+	background: url('../../img/delete.png') no-repeat center;
+	float: right;
+	margin-right: 5px;
+}
+
+.sortlist {
+	list-style: none;
+	padding: 1px 0px 0px 2px;
+	margin: 0px;
+	font-size: 10px;
+	line-height: 18px;
+}
+
+.sortContainer {
+	border: 1px solid #ccc;	
+	width: 338px;
+	height: 290px;
+	overflow: auto;
+	margin: 4px 0px 4px 0px;
+	background: url('../../img/so_bg.png');
+}
+
+/* Cloud */
+
+div.cloud {
+	font-family: "Lucida Grande", Helvetica, Arial, "Sans Serif";
+	background: url('../../img/so_co.png');	
+	width: 338px;
+	height: 318px;
+	padding: 5px;		
+	font-size: 10px;
+	color: #999;
+	position:absolute;
+}
+
+div.cloud div.minXLeg {
+	padding:0px;
+	margin:0px;
+	height:0px;	
+	float: left;
+	position: relative;
+	padding-top: 0px;
+	top: 130px;
+	margin-left: 3px;
+	width: 50%;
+}
+div.cloud div.maxXLeg {
+	padding:0px;
+	margin:0px;
+	height:0px;
+	position: relative;
+	float: right;
+	margin-right: 3px;
+	top: 130px;
+	width: 50%;
+	text-align:right;
+}
+div.cloud div.minYLeg {
+	padding:0px;
+	margin-top:3px;
+	padding-left:5px;
+	padding-bottom:49px;
+	margin-left:50%;
+	position: static;
+	top: 0px;
+	left: 0px;
+	text-indent:-50%;
+	text-align:center;
+}
+div.cloud div.maxYLeg {
+	padding:0px;
+	padding-top:200px;
+	padding-left:5px;
+	margin-bottom:3px;
+	margin-left:50%;
+	position: static;
+	top: 0px;
+	left: 0px;
+	text-indent:-50%;
+	text-align:center;
+}
+
+.cloudnewTask, .cloudrecTask {
+	width: 120px;	
+}
+
+.cloud-drag-handle {
+	position: absolute;
+	cursor: pointer;
+	color: #000;
+	background:#FFF;
+	padding:0px;
+	margin:0px;
+	line-height:10px;
+	visibility:hidden;
+	border: 1px solid #CCC;
+}
+
+.cloud-del-handle {
+	cursor: pointer;
+	width: 25px;
+	height: 20px;
+	background: url('../../img/so_tr.png') no-repeat;
+	float: right;
+	margin: 2px;
+}
+
+.cloudContainer {
+	width: 338px;
+	height: 290px;
+	overflow: hidden;
+	background:#EEE;
+	margin: 4px 0px 4px 0px;
+	background: url('../../img/so_gr.png') no-repeat center;
+}
+
+/* File Chooser */
+
+select.fileChooser {
+	width: 190px;
+	float: left;
+}
+.fileChooserPreview {
+	width: 206px;
+	height: 63px;
+	border:1px solid #999;
+	margin-left: 220px;
+	padding-top:2px;
+}
+.fileChooserImage {
+	width: 66px;
+	margin-left:2px;
+	float:left;
+	padding-top:52px;
+	text-align:center;
+	font-size:9px;
+	line-height:10px;
+}
