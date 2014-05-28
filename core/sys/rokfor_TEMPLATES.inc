@@ -1973,8 +1973,16 @@ class rokfor_TEMPLATES
 					$sql = "SELECT * FROM _formats ORDER BY _name";
 					$query = @$this->rfDB->query($sql);
 					$_options['c'] = "";
+
+					$_active_books = explode('<::::::>',$_value->_forbook);
+					if (count($_active_books)==0) {
+						$_active_books = false;
+					}
+
 					while ($_i = @$this->rfDB->fetch_object($query)) {
-						$_options['c'] .= '<option value="_chapter-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_inchapter)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+						if (!$_active_books || in_array($_i->_forbook, $_active_books)) {
+							$_options['c'] .= '<option value="_chapter-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_inchapter)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';							
+						}
 					}
 
 					/* Preparing Plugin Data */
@@ -1982,7 +1990,7 @@ class rokfor_TEMPLATES
 					$query = @$this->rfDB->query($sql);
 					$_options['b'] = "";
 					while ($_i = @$this->rfDB->fetch_object($query)) {
-						$_options['b'] .= '<option value="_book-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_forbook)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+						$_options['b'] .= '<option value="_book-'.$_i->id.'" '.((in_array($_i->id,$_active_books))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
 					}
 					$retval .= '<li style="'.(($col%2<>0)?('background: #F1F5FA;'):('background: #FFFFFF;')).'"><div style="height: 54px;" class="rowToggler">&nbsp;</div><div><a href="#" class="t_add button micro green">+</a><a href="#" class="t_del button micro red">-</a></div>';
 					$retval .= '<input type="hidden" name="id" value="'.$_value->id.'">';
