@@ -34,6 +34,8 @@ Prerequisites: MySQL, PHP > 5.0, phpmyadmin, Apache, Mod-Sendfile (not necessary
 * Add a database with phpmyadmin and import the sql-dump.sql file.
 * Add a repository folder where Rokfor-cms can store the uploads. Normally, this is the /udb folder in your document root. The name comes from Universal Database Blugin.  
 Make sure, apache has access rights for this folder (chmod or chown)
+* Edit the rf_config-v2.inc file. It is mostly about connecting the MySQL Database, so you need your login and password for the MySQL Server.
+* Adapt the paths correctly in the configuration file as well. If you installed rokfor in the /rf directory in your webroot, and 
 
 You shold now be able to log into Rokfor CMS under the url http://example.com/rf on your webserver as superuser __root__ with the default password __1234__. Make sure to change it!
 
