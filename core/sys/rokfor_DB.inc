@@ -739,7 +739,7 @@ class rokfor_DB {
 	 * @return $int or false on error
 	 * @author Urs Hofer
 	 **/
-	function getElementsIdbyName ($name, $templatename = false, $chaptername = false, $forissue = false)
+	function getElementsIdbyName ($name, $templatename = false, $chaptername = false, $forissue = false, $status = false)
 	{
 		$sql = 'SELECT _contributions.id FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
@@ -749,6 +749,7 @@ class rokfor_DB {
 		(($templatename)?(' AND (_templatenames._name = "'.$templatename.'")'):(' ')).
 		(($chaptername)?(' AND (_contributions.__split__ = "'.$chaptername.'")'):(' ')).
 		(($forissue)?(' AND (_contributions._forissue = "'.$forissue.'")'):(' ')).			
+		(($status)?('AND (_contributions._status = "'.$status.'") '):('')).
 		'LIMIT 1';
 //		echo $sql;
 		
