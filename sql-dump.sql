@@ -234,6 +234,8 @@ CREATE TABLE IF NOT EXISTS `_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
+INSERT INTO `_log` (`_user`) VALUES ('AlteredDB<::::::>v2.0 beta');
+
 -- --------------------------------------------------------
 
 --
