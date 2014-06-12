@@ -335,7 +335,7 @@ class rokfor_DB {
 		/* Load User Table */
 
 		$sql = "SELECT * FROM _rights";
-		if ($this->getUserGroup() <> "root")	$sql .= " WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
+		if ($this->getUserGroup() == "user")	$sql .= " WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
 		$query = @$this->db->query($sql);
 		while ($rights = $this->db->fetch_object($query)) {
 			// Get Templates
@@ -469,7 +469,23 @@ class rokfor_DB {
 		}
 		$sql = "INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
 				VALUES ('".mysql_real_escape_string($_name)."', ".$_opentime.", ".$_closetime.", '".$_status."', '".$_config."', '".$_note."', ".$_book.", '".$_p1."', '".$_p2."', '".$_p3."', '".$_p4."', '".$_p5."', '".$_user."', '-1', ".$_sort.")";
-		$return = $this->query($sql);				
+		if ($this->query($sql)) {
+			// Add read write permission for the issue to the current user
+			$newId = $this->insert_id();
+
+
+			$sql = "SELECT * FROM _rights WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
+			$query = @$this->db->query($sql);
+			$_updaterights = array();
+			while ($rights = $this->db->fetch_object($query)) {
+				$_oldrights = explode('<::::::>',$rights->_forissue);
+				$_oldrights[] = $newId;
+				$_updaterights[$rights->id] = join('<::::::>',$_oldrights);
+			}
+			foreach ($_updaterights as $_groupid => $_rightstring) {
+				$this->db->query("UPDATE _rights SET _forissue = '".$_rightstring."' WHERE id = ".$_groupid." LIMIT 1");		
+			}
+		}
 	}		
 	
 	/**
