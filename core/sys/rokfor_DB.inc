@@ -451,6 +451,28 @@ class rokfor_DB {
 	}
 	
 	/**
+	 * Adds an Edition
+	 *
+	 * @return void
+	 * @author Urs Hofer
+	 */
+	function addEdition($_name, $_book, $_note, $_user = false, $_sort = false, $_status = 'Open', $_opentime = 0, $_closetime = 0, $_config = 0, $_p1 = "", $_p2 = "", $_p3 = "", $_p4 = "", $_p5 = "") {
+		if ($_opentime == 0) $_opentime = time();
+		if ($_closetime == 0) $_closetime = $_opentime * 2;
+		if (!$_user) $_user = $this->getUserId();
+		if (!$_sort) {
+			$_sort = 1;
+			$_e = $this->getEditions($_book);
+			if (is_array($_e)) {
+				$_sort = count($_e)+1;
+			}
+		}
+		$sql = "INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
+				VALUES ('".mysql_real_escape_string($_name)."', ".$_opentime.", ".$_closetime.", '".$_status."', '".$_config."', '".$_note."', ".$_book.", '".$_p1."', '".$_p2."', '".$_p3."', '".$_p4."', '".$_p5."', '".$_user."', '-1', ".$_sort.")";
+		$return = $this->query($sql);				
+	}		
+	
+	/**
 	 * getEditions() - gets all editions for a project with id = $id and status = $status
 	 *
 	 * @return $this->editions or false on error
@@ -574,6 +596,19 @@ class rokfor_DB {
 	}
 	
 	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 * @author Urs Hofer
+	 */
+	function renameElement($_name, $_id)
+	{
+		$sql = ("UPDATE  `_contributions` SET  `_name` =  '".mysql_escape_string($_name)."' WHERE  `_contributions`.`id` =$_id LIMIT 1 ;");
+		return ($this->query($sql));
+	}
+	
+	
+	/**
 	 * addElement() - adds an element (contribution) to the database
 	 * 			if partId and editionId are not set, the active parts/editionId will be used
 	 * 
@@ -637,6 +672,16 @@ class rokfor_DB {
 	{
  		$this->db->query("UPDATE _contributions SET _status = 'Open' WHERE id = ".$id." LIMIT 1");		
 	}
+	
+	/**
+	 * openElement() - sets the _state of an Element to Open
+	 * @return $this->parts or false on error
+	 * @author Urs Hofer
+	 **/
+	function deleteElement ($id)
+	{
+ 		$this->db->query("UPDATE  `_contributions` SET  `_status` =  'Deleted' WHERE  `_contributions`.`id` =$id LIMIT 1 ;");		
+	}	
 	
 	/**
 	 * lastmodElementUpdate($id) - sets the _moddate to current time
