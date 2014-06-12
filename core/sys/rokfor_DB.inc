@@ -324,6 +324,12 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function setUserRestriction($_state = true) {
+
+		if ($this->getUserGroup() <> "user") {
+			$this->userRestriction = false;
+			return $this->userRestriction;
+		}
+
 		$this->userRestriction = $_state;
 
 		$this->accessTable = Array(
@@ -334,8 +340,7 @@ class rokfor_DB {
 
 		/* Load User Table */
 
-		$sql = "SELECT * FROM _rights";
-		if ($this->getUserGroup() == "user")	$sql .= " WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
+		$sql = "SELECT * FROM _rights WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
 		$query = @$this->db->query($sql);
 		while ($rights = $this->db->fetch_object($query)) {
 			// Get Templates
