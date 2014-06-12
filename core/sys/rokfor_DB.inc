@@ -455,6 +455,19 @@ class rokfor_DB {
 		return false;
 	}
 	
+	
+	/**
+	 * deletes an edition
+	 *
+	 * @param string $_issueid 
+	 * @return void
+	 * @author Urs Hofer
+	 */
+	function deleteEdition($_issueid) {
+		$sql = ("DELETE FROM _issues WHERE `id` = $_issueid LIMIT 1"); 
+		return $this->query($sql);
+	}
+	
 	/**
 	 * Adds an Edition
 	 *
@@ -699,9 +712,44 @@ class rokfor_DB {
 	 * @return $this->parts or false on error
 	 * @author Urs Hofer
 	 **/
-	function deleteElement ($id)
+	function _deleteFromBinary($fieldId,$imgId=false) {
+		$_field_info = $this->getFieldData($fieldId);
+ 		if ($imgId===false) {
+			$udb_update = "";
+			$deletedArray = explode("<;;;;;;>", $_field_info->d_binary);
+		}
+		else {
+			$udb_oldnames = explode("<;;;;;;>", $_field_info->d_binary);
+			$deletedArray = array_splice($udb_oldnames, $imgId, 1);
+			$udb_update = implode ("<;;;;;;>", $udb_oldnames);
+		}
+
+		foreach ($deletedArray as $toDelete) {
+			$_filename = end(explode("<::::::>",$toDelete));
+			if (is_file(REPOSITORYDIR.'/'.$_filename)) unlink(REPOSITORYDIR.'/'.$_filename); /* Original */
+			if (is_file(REPOSITORYDIR.'/'.$_filename."-preview.jpg")) {
+				foreach (glob(REPOSITORYDIR.'/'.$_filename."-preview*") as $filename) {
+				   unlink($filename); /* Jpg Previews */
+				}
+			}
+			if (is_file(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg")) unlink(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg");	/* Jpg Preview */								
+		}
+		$this->setFieldData($udb_update,$fieldId,'_databinary');
+	}
+		
+	function deleteElement ($contribId)
 	{
- 		$this->db->query("UPDATE  `_contributions` SET  `_status` =  'Deleted' WHERE  `_contributions`.`id` =$id LIMIT 1 ;");		
+		// Delete Binaries
+		$sql = ("SELECT id from _data WHERE _forcontribution = '".$_contribId."' and _databinary <> '' ");
+		while ($todel = $this->fetch_object($this->query($sql))) {
+			$this->_deleteFromBinary($todel->id);
+		}
+		// Delete Data
+		$sql = ("DELETE from _data WHERE _forcontribution = '".$_contribId."'");
+		$this->query($sql);
+		// Delete Contribution
+		$sql = ("DELETE from _contributions WHERE id = '".$_contribId."'");
+		$this->query($sql);
 	}	
 	
 	/**
