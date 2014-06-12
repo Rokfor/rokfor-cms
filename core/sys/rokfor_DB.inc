@@ -480,7 +480,7 @@ class rokfor_DB {
 		$sql = ("UPDATE _issues SET 
 			`_name` = '".mysql_real_escape_string($_name)."',
 			 WHERE id = ".$_issueid." LIMIT 1");
-		return $this->rfDB->query($sql);		
+		return $this->query($sql);		
 	}
 	
 	/**
