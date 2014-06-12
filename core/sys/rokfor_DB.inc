@@ -740,15 +740,15 @@ class rokfor_DB {
 	function deleteElement ($contribId)
 	{
 		// Delete Binaries
-		$sql = ("SELECT id from _data WHERE _forcontribution = '".$_contribId."' and _databinary <> '' ");
+		$sql = ("SELECT id from _data WHERE _forcontribution = '".$contribId."' and _databinary <> '' ");
 		while ($todel = $this->fetch_object($this->query($sql))) {
 			$this->_deleteFromBinary($todel->id);
 		}
 		// Delete Data
-		$sql = ("DELETE from _data WHERE _forcontribution = '".$_contribId."'");
+		$sql = ("DELETE from _data WHERE _forcontribution = '".$contribId."'");
 		$this->query($sql);
 		// Delete Contribution
-		$sql = ("DELETE from _contributions WHERE id = '".$_contribId."'");
+		$sql = ("DELETE from _contributions WHERE id = '".$contribId."'");
 		$this->query($sql);
 	}	
 	
