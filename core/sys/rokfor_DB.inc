@@ -478,7 +478,7 @@ class rokfor_DB {
 	{
 		$_issueid = (int)$_issueid;
 		$sql = ("UPDATE _issues SET 
-			`_name` = '".mysql_real_escape_string($_name)."',
+			`_name` = '".mysql_real_escape_string($_name)."'
 			 WHERE id = ".$_issueid." LIMIT 1");
 		return $this->query($sql);		
 	}
