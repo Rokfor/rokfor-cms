@@ -1664,8 +1664,11 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getEditionIdbyEditionname($name) {
+	function getEditionIdbyEditionname($name, $bookid = false) {
 		$sql = ('SELECT id FROM _issues WHERE  _name = "'.$name.'"');
+		if ($bookid) {
+			$sql .= ('AND _forbook = '.$bookid);
+		}
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
 		if ($retval) return $retval->id;
