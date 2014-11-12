@@ -1399,7 +1399,7 @@ class rokfor_MAIN
 							copy(REPOSITORYDIR.'/thumbs/'.$urls[1]."-thmb.jpg", REPOSITORYDIR.'/thumbs/'.$marker.$urls[1]."-thmb.jpg");						
 						if (is_file(REPOSITORYDIR.'/'.$urls[1]."-preview.jpg"))
 							copy(REPOSITORYDIR.'/'.$urls[1]."-preview.jpg", REPOSITORYDIR.'/'.$marker.$urls[1]."-preview.jpg");						
-						$preview_counter = 0;
+						$preview_counter = 1;
 						while (is_file(REPOSITORYDIR.'/'.$urls[1]."-preview".$preview_counter.".jpg")) {
 							copy(REPOSITORYDIR.'/'.$urls[1]."-preview".$preview_counter.".jpg", REPOSITORYDIR.'/'.$marker.$urls[1]."-preview".$preview_counter.".jpg");						
 							$preview_counter++;
