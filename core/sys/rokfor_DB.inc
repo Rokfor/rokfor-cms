@@ -204,7 +204,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function newSession($user,$pass){
-		$userdb = $this->db->query("SELECT * FROM users WHERE password = '$pass' AND username = '$user'");  
+		$userdb = $this->db->query("SELECT * FROM users WHERE password = '".mysql_escape_string($pass)."' AND username = '".mysql_escape_string($user)."'");  
 		$checkusr = $this->db->fetch_object($userdb);
 		if ($checkusr->usergroup == false) {
 			return false;
@@ -234,7 +234,7 @@ class rokfor_DB {
 
 
 		// Get active session
-		if ($id) $checkses = $this->db->query_first_object('SELECT * FROM session WHERE session = "'.$id.'" LIMIT 1');
+		if ($id) $checkses = $this->db->query_first_object('SELECT * FROM session WHERE session = "'.mysql_escape_string($id).'" LIMIT 1');
 		// Return false if no session under this id
 		if (!is_object($checkses)) return(0);
 
@@ -244,7 +244,7 @@ class rokfor_DB {
 		if (!is_object($checkusr)) return(0);
 
 		if (time() - $checkses->currenttime>3600) {
-			$deleteold = $this->db->query('DELETE FROM session WHERE session = "'.$id.'"');
+			$deleteold = $this->db->query('DELETE FROM session WHERE session = "'.mysql_escape_string($id).'"');
 			return -1;
 		}
 
@@ -253,7 +253,7 @@ class rokfor_DB {
 		
 
 		//update session time
-		if (!$dont_update_time) $userdb = $this->db->query('UPDATE session SET currenttime = '.time().' WHERE session = '.$id.' LIMIT 1');
+		if (!$dont_update_time) $userdb = $this->db->query('UPDATE session SET currenttime = '.time().' WHERE session = '.mysql_escape_string($id).' LIMIT 1');
 
 		// Store in class vars
 		$this->activeSession = $checkses->session;
@@ -282,7 +282,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function cleanSessionId($id) {
-		return ($deleteold = $this->db->query('DELETE FROM session WHERE session = "'.$id.'"'));		
+		return ($deleteold = $this->db->query('DELETE FROM session WHERE session = "'.mysql_escape_string($id).'"'));		
 	}				
 	
 	
@@ -373,7 +373,7 @@ class rokfor_DB {
 			"Editions" => Array(),			
 			"Users" => Array()			
 		);
-		$sql = "SELECT * FROM _rights WHERE id =".$_group;
+		$sql = "SELECT * FROM _rights WHERE id =".intval($_group);
 		$query = @$this->db->query($sql);
 		while ($rights = $this->db->fetch_object($query)) {
 			// Get Templates
@@ -404,7 +404,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getUserNameById($id_or_name) {
-		$_name = $this->fetch_object($this->query("SELECT username FROM users WHERE id = '".$id_or_name."' || username = '".$id_or_name."' LIMIT 1"));												
+		$_name = $this->fetch_object($this->query("SELECT username FROM users WHERE id = '".mysql_escape_string($id_or_name)."' || username = '".mysql_escape_string($id_or_name)."' LIMIT 1"));												
 		return $_name->username;
 	}
 
@@ -419,7 +419,7 @@ class rokfor_DB {
 	function getProjects($reset=false, $id=false) 
 	{
 		if ($reset) $this->activeProject = NULL;
-		$sql = 'SELECT * FROM _books '.(($id)?("WHERE id = $id "):('')).'ORDER BY __sort__ ASC';
+		$sql = 'SELECT * FROM _books '.(($id)?("WHERE id = ".intval($id)." "):('')).'ORDER BY __sort__ ASC';
 		$query = @$this->db->query($sql);
 		$this->projects = array();
 		while ($row = @$this->db->fetch_object($query)) {
@@ -464,7 +464,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function deleteEdition($_issueid) {
-		$sql = ("DELETE FROM _issues WHERE `id` = $_issueid LIMIT 1"); 
+		$sql = ("DELETE FROM _issues WHERE `id` = ".intval($_issueid)." LIMIT 1"); 
 		return $this->query($sql);
 	}
 	
@@ -501,7 +501,7 @@ class rokfor_DB {
 			}
 		}
 		$sql = "INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
-				VALUES ('".mysql_real_escape_string($_name)."', ".$_opentime.", ".$_closetime.", '".$_status."', '".$_config."', '".$_note."', ".$_book.", '".$_p1."', '".$_p2."', '".$_p3."', '".$_p4."', '".$_p5."', '".$_user."', '-1', ".$_sort.")";
+				VALUES ('".mysql_escape_string($_name)."', ".$_opentime.", ".$_closetime.", '".mysql_escape_string($_status)."', '".mysql_escape_string($_config)."', '".mysql_escape_string($_note)."', ".mysql_escape_string($_book).", '".mysql_escape_string($_p1)."', '".mysql_escape_string($_p2)."', '".mysql_escape_string($_p3)."', '".mysql_escape_string($_p4)."', '".mysql_escape_string($_p5)."', '".mysql_escape_string($_user)."', '-1', ".mysql_escape_string($_sort).")";
 		if ($this->query($sql)) {
 			// Add read write permission for the issue to the current user
 			$newId = $this->insert_id();
@@ -530,8 +530,21 @@ class rokfor_DB {
 	function getEditions ($id = false, $reset = false, $status = 'open')
 	{
 		if ($reset) $this->activeEdition = NULL;
+		
+		if ($status) {
+			if ((stristr($status, "open") && stristr($status, "close")) || stristr($status, "both")) {
+				$status = 'open" || _status = "closed';
+			}
+			else if (stristr($status, "open")) {
+				$status = 'open';
+			}		
+			else if (stristr($status, "closed")) {
+				$status = 'closed';
+			}
+		}		
+		
 //		if ($this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status]) return $this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status];
-		$sql = 'SELECT * FROM _issues WHERE _forbook = '.((!$id)?($this->activeProject->id):($id)).' '.(($status)?('AND (_status = "'.$status.'")'):('')).' ORDER BY __sort__ ASC';
+		$sql = 'SELECT * FROM _issues WHERE _forbook = '.intval((!$id)?($this->activeProject->id):($id)).' '.(($status)?('AND (_status = "'.$status.'")'):('')).' ORDER BY __sort__ ASC';
 		$query = @$this->db->query($sql);
 		$this->editions = array();
 		while ($row = @$this->db->fetch_object($query)) {
@@ -579,7 +592,7 @@ class rokfor_DB {
 	function getParts ($id = false)
 	{
 //		if ($this->cache['getParts'][((!$id)?($this->activeProject->id):($id))]) return $this->cache['getParts'][((!$id)?($this->activeProject->id):($id))];
-		$sql = 'SELECT * FROM _formats WHERE _forbook = '.((!$id)?($this->activeProject->id):($id)).' ORDER BY __sort__ ASC';
+		$sql = 'SELECT * FROM _formats WHERE _forbook = '.intval((!$id)?($this->activeProject->id):($id)).' ORDER BY __sort__ ASC';
 		$query = @$this->db->query($sql);
 		$this->parts = array();
 	//	$this->activePart = NULL;
@@ -599,8 +612,8 @@ class rokfor_DB {
 	function getPartByName ($name,$projectid=false)
 	{
 //		if ($this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)]) return $this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)];
-		$sql = ('SELECT id FROM _formats WHERE _forbook = '.((!$projectid)?($this->activeProject->id):($projectid)).' 
-		AND _name = "'.$name.'"');
+		$sql = ('SELECT id FROM _formats WHERE _forbook = '.intval((!$projectid)?($this->activeProject->id):($projectid)).' 
+		AND _name = "'.mysql_escape_string($name).'"');
 		$query = @$this->db->query($sql);
 		$row = @$this->db->fetch_object($query);
 		if ($row->id) return $row->id;
@@ -652,7 +665,7 @@ class rokfor_DB {
 	 */
 	function renameElement($_name, $_id)
 	{
-		$sql = ("UPDATE  `_contributions` SET  `_name` =  '".mysql_escape_string($_name)."' WHERE  `_contributions`.`id` =$_id LIMIT 1 ;");
+		$sql = ("UPDATE  `_contributions` SET  `_name` =  '".mysql_escape_string($_name)."' WHERE  `_contributions`.`id` = ".intval($_id)." LIMIT 1 ;");
 		return ($this->query($sql));
 	}
 	
@@ -679,7 +692,7 @@ class rokfor_DB {
 		$initTime= time();
 		$sql = ("
 			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-			('', '$_templateid', '$_issueid', '".mysql_real_escape_string($_contribname)."', 'Open', $initTime, $initTime, '".$this->getUserId()."', NULL, '$_chapterid', -1, 1);
+			('', '".intval($_templateid)."', '".intval($_issueid)."', '".mysql_real_escape_string($_contribname)."', 'Open', $initTime, $initTime, '".$this->getUserId()."', NULL, '".intval($_chapterid)."', -1, 1);
 		");
 		$this->query($sql);
 		$newId = $this->insert_id();
@@ -709,7 +722,7 @@ class rokfor_DB {
 	 **/
 	function closeElement ($id)
 	{
- 		$this->db->query("UPDATE _contributions SET _status = 'Close' WHERE id = ".$id." LIMIT 1");		
+ 		$this->db->query("UPDATE _contributions SET _status = 'Close' WHERE id = ".intval($id)." LIMIT 1");		
 	}
 
 	/**
@@ -719,7 +732,7 @@ class rokfor_DB {
 	 **/
 	function openElement ($id)
 	{
- 		$this->db->query("UPDATE _contributions SET _status = 'Open' WHERE id = ".$id." LIMIT 1");		
+ 		$this->db->query("UPDATE _contributions SET _status = 'Open' WHERE id = ".intval($id)." LIMIT 1");		
 	}
 	
 	/**
@@ -755,15 +768,15 @@ class rokfor_DB {
 	function deleteElement ($contribId)
 	{
 		// Delete Binaries
-		$sql = ("SELECT id from _data WHERE _forcontribution = '".$contribId."' and _databinary <> '' ");
+		$sql = ("SELECT id from _data WHERE _forcontribution = '".intval($contribId)."' and _databinary <> '' ");
 		while ($todel = $this->fetch_object($this->query($sql))) {
 			$this->_deleteFromBinary($todel->id);
 		}
 		// Delete Data
-		$sql = ("DELETE from _data WHERE _forcontribution = '".$contribId."'");
+		$sql = ("DELETE from _data WHERE _forcontribution = '".intval($contribId)."'");
 		$this->query($sql);
 		// Delete Contribution
-		$sql = ("DELETE from _contributions WHERE id = '".$contribId."'");
+		$sql = ("DELETE from _contributions WHERE id = '".intval($contribId)."'");
 		$this->query($sql);
 	}	
 	
@@ -775,7 +788,7 @@ class rokfor_DB {
 	function lastmodElementUpdate($id)
 	{
 		$initTime= time();
- 		$this->db->query("UPDATE _contributions SET _moddate = $initTime WHERE id = ".$id." LIMIT 1");		
+ 		$this->db->query("UPDATE _contributions SET _moddate = $initTime WHERE id = ".intval($id)." LIMIT 1");		
 	}	
 	
 
@@ -792,20 +805,35 @@ class rokfor_DB {
 	{
 //		if ($this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename]) return $this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename];
 		
+		if ($status) {
+			if ((stristr($status, "Open") && stristr($status, "Close")) || stristr($status, "Both")) {
+				$status = 'Open" || _contributions._status = "Close';
+			}
+			else if (stristr($status, "Open")) {
+				$status = 'Open';
+			}		
+			else if (stristr($status, "Close")) {
+				$status = 'Close';
+			}
+			else if (stristr($status, "Deleted")) {
+				$status = 'Deleted';
+			}					
+		}
+		
 		$sql = 'SELECT _contributions.*, _issues._name as _issuename FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
-		WHERE _contributions._forissue = '.((!$ed)?($this->activeEdition->id):($ed))
+		WHERE _contributions._forissue = '.intval((!$ed)?($this->activeEdition->id):($ed))
 		.
 		((!$id && !$this->activePart->id)?(''):(
-		' AND (_contributions.__split__ = '.((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
+		' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
 		))	
 		.	
 		(($status)?(' AND (_contributions._status = "'.$status.'")'):(''))
 		.
-		(($templatename)?(' AND (_templatenames._name = "'.$templatename.'")'):('')).
+		(($templatename)?(' AND (_templatenames._name = "'.mysql_escape_string($templatename).'")'):('')).
 		(($this->userRestriction && $this->getUserGroup()=='user')?(' AND ((_templatenames._public = \'true\') OR  (_contributions.__user__ = "'.$this->getUserId().'" || _contributions.__user__ = "'.$this->getUserName().'"))'):('')).
-		(($order)?(' ORDER BY '.$order):(' ORDER BY id ASC'));
+		(($order)?(' ORDER BY '.mysql_escape_string($order)):(' ORDER BY id ASC'));
 		$query = @$this->db->query($sql);
 		$this->elements = array();
 		$this->activeElement = NULL;
@@ -826,10 +854,27 @@ class rokfor_DB {
 	 */
 	function getElementsByIssue ($_issueId, $_state = false, $_order = false, $_chapter = false) {
 		if (!$_issueId) return false;
-		$sql = 'SELECT _contributions.* FROM _contributions WHERE _contributions._forissue = '.($_issueId);
-		if ($_chapter) $sql .= " AND __split__ = $_chapter";
+		
+		if ($_state) {
+			if ((stristr($_state, "Open") && stristr($_state, "Close")) || stristr($_state, "both")) {
+				$_state = 'Open" || _contributions._status = "Close';
+			}
+			else if (stristr($_state, "Open")) {
+				$_state = 'Open';
+			}		
+			else if (stristr($_state, "Close")) {
+				$_state = 'Close';
+			}	
+			else if (stristr($status, "Deleted")) {
+				$status = 'Deleted';
+			}				
+		}
+		
+		
+		$sql = 'SELECT _contributions.* FROM _contributions WHERE _contributions._forissue = '.intval($_issueId);
+		if ($_chapter) $sql .= " AND __split__ = '".mysql_escape_string($_chapter)."'";
 		if ($_state) $sql .= " AND (_status = '$_state')";
-		if ($_order) $sql .= ' ORDER BY '.$_order;
+		if ($_order) $sql .= ' ORDER BY '.mysql_escape_string($_order);
 		$query = @$this->db->query($sql);
 		$this->elements = array();
 		while ($row = @$this->db->fetch_object($query)) $this->elements[] = $row;
@@ -852,7 +897,7 @@ class rokfor_DB {
 //		if ($this->cache['getElementsNamebyId'][$id]) return $this->cache['getElementsNamebyId'][$id];
 		
 		$sql = 'SELECT * FROM _contributions 
-		WHERE id='.$id.' LIMIT 1';
+			WHERE id='.intval($id).' LIMIT 1';
 		$query = @$this->db->query($sql);
 		$retval = false;
 		$retval = @$this->db->fetch_object($query);
@@ -872,13 +917,13 @@ class rokfor_DB {
 	{
 		$sql = 'SELECT _contributions.id FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
-		WHERE _contributions._name="'.mysql_real_escape_string($name).'" 
-		AND (_contributions._status <> "deleted")'
+		WHERE _contributions._name="'.mysql_escape_string($name).'" 
+		AND (_contributions._status <> "Deleted")'
 		.
-		(($templatename)?(' AND (_templatenames._name = "'.$templatename.'")'):(' ')).
-		(($chaptername)?(' AND (_contributions.__split__ = "'.$chaptername.'")'):(' ')).
-		(($forissue)?(' AND (_contributions._forissue = "'.$forissue.'")'):(' ')).			
-		(($status)?('AND (_contributions._status = "'.$status.'") '):('')).
+		(($templatename)?(' AND (_templatenames._name = "'.mysql_escape_string($templatename).'")'):(' ')).
+		(($chaptername)?(' AND (_contributions.__split__ = "'.mysql_escape_string($chaptername).'")'):(' ')).
+		(($forissue)?(' AND (_contributions._forissue = "'.intval($forissue).'")'):(' ')).			
+		(($status)?('AND (_contributions._status = "'.mysql_escape_string($status).'") '):('')).
 		'LIMIT 1';
 //		echo $sql;
 		
@@ -922,12 +967,12 @@ class rokfor_DB {
 //		if ($this->cache['getFieldsId'][(!$id)?($this->activeElement->id):($id)]) return $this->cache['getFieldsId'][(!$id)?($this->activeElement->id):($id)];
 
 		/* Legacy Check: If ParentNode = -1, update the order */
-		$query = $this->db->query('SELECT id FROM _data WHERE __parentnode__ = -1 AND _forcontribution = '.((!$id)?($this->activeElement->id):($id)).' LIMIT 1');
+		$query = $this->db->query('SELECT id FROM _data WHERE __parentnode__ = -1 AND _forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' LIMIT 1');
 		$row = @$this->db->fetch_object($query);
 		if ($row->id) {
 			$parentnode = -1;			
 			$count = 0;
-			$sql = 'SELECT _data.id FROM _data	WHERE _data.__parentnode__ = <%%parentnode%%> AND _data._forcontribution = '.((!$id)?($this->activeElement->id):($id)).' LIMIT 1';
+			$sql = 'SELECT _data.id FROM _data	WHERE _data.__parentnode__ = <%%parentnode%%> AND _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' LIMIT 1';
 			while ($parentnode) {
 				$query = $this->db->query(str_replace('<%%parentnode%%>', $parentnode, $sql));
 				$row = @$this->db->fetch_object($query);
@@ -944,14 +989,14 @@ class rokfor_DB {
 		_data._datainteger as d_integer,
 		_data.__parentnode__ FROM _data
 		LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
-		WHERE _data._forcontribution = '.((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
+		WHERE _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
 
 		else $sql = 'SELECT _data.id, _data._fortemplatefield as t_id,
 		_data._datatext as d_text,
 	    _data._databinary as d_binary,
 	    _data._datainteger as d_integer,
 		_data.__parentnode__ FROM _data
-		WHERE _data._forcontribution = '.((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
+		WHERE _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
 		
 		$this->fields = array();
 		$query = $this->db->query($sql);
@@ -975,7 +1020,7 @@ class rokfor_DB {
 	function getTemplateFields($id)
 	{
 		/* Legacy Check */
-		$sql = ("SELECT * from _templates WHERE _fortemplate = '$id' AND __parentnode__ = -1 LIMIT 1");
+		$sql = ("SELECT * from _templates WHERE _fortemplate = '".intval($id)."' AND __parentnode__ = -1 LIMIT 1");
 		$row = @$this->db->fetch_object(@$this->db->query($sql));
 		if ($row->id) {
 			$next = true;
@@ -984,7 +1029,7 @@ class rokfor_DB {
 				if ($row->id) {
 					$retval[] = $fields;
 				 	$this->db->query("UPDATE _templates SET __parentnode__ = NULL, __sort__ = $count WHERE id = ".$row->id." LIMIT 1");
-					$sql = ("SELECT * from _templates WHERE _fortemplate = '$id' AND __parentnode__ = ".$row->id." LIMIT 1");
+					$sql = ("SELECT * from _templates WHERE _fortemplate = '".intval($id)."' AND __parentnode__ = ".$row->id." LIMIT 1");
 					$row = @$this->db->fetch_object(@$this->db->query($sql));
 				}
 				else $next=false;
@@ -992,7 +1037,7 @@ class rokfor_DB {
 			}
 		}		
 			
-		$sql = ("SELECT * from _templates WHERE _fortemplate = '$id' ORDER BY __sort__");
+		$sql = ("SELECT * from _templates WHERE _fortemplate = '".intval($id)."' ORDER BY __sort__");
 		$query = @$this->db->query($sql);
 		$retval = array();
 		while($fields = @$this->db->fetch_object($query)) {
@@ -1025,8 +1070,8 @@ class rokfor_DB {
 		FROM _data
 		LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
 		LEFT JOIN _contributions ON _contributions.id = _data._forcontribution
-		WHERE _templates._fieldname = "'.$fieldname.'"
-		AND _data._forcontribution = '.((!$elementId)?($this->activeElement->id):($elementId)).' LIMIT 1';
+		WHERE _templates._fieldname = "'.mysql_escape_string($fieldname).'"
+		AND _data._forcontribution = '.intval((!$elementId)?($this->activeElement->id):($elementId)).' LIMIT 1';
 		$query = @$this->db->query($sql);
 		$row = @$this->db->fetch_object($query);
 		if ($row->id) {
@@ -1048,7 +1093,7 @@ class rokfor_DB {
 		$sql = ("
 			SELECT  _templates.id, _templates._fieldname, _templatenames._name as _templatename from _templates
 		   	LEFT JOIN _templatenames ON _templates._fortemplate = _templatenames.id 
-			WHERE  _templatenames._name LIKE '".$templatename."'
+			WHERE  _templatenames._name LIKE '".mysql_escape_string($templatename)."'
 			ORDER BY _templatenames._name ;
 		");	
 		$query = @$this->db->query($sql);
@@ -1096,15 +1141,15 @@ class rokfor_DB {
 				'.
 				(($issue)?('LEFT JOIN _contributions ON _data._forcontribution = _contributions.id'):(''))
 				.'
-				WHERE _data._fortemplatefield= '.$fieldid.' 
+				WHERE _data._fortemplatefield= '.intval($fieldid).' 
 				'.
-				(($issue)?('AND _contributions._forissue = '.$issue.' '):(''))
+				(($issue)?('AND _contributions._forissue = '.intval($issue).' '):(''))
 				.'
 				'.
-				(($contribution)?('AND _data._forcontribution = '.$contribution.' '):(''))
+				(($contribution)?('AND _data._forcontribution = '.intval($contribution).' '):(''))
 				.'				
 				'.
-				(($status)?('AND (_contributions._status = "'.$status.'") '):(''))
+				(($status)?('AND (_contributions._status = "'.mysql_escape_string($status).'") '):(''))
 				.'	
 				'.
 				(($group)?(' GROUP BY _data._datatext '):(''))
@@ -1189,7 +1234,7 @@ class rokfor_DB {
 			LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
 			LEFT JOIN _templatenames ON _templatenames.id = _templates._fortemplate
 			LEFT JOIN _contributions ON _data._forcontribution = _contributions.id		
-			WHERE _data.id = '.$id.' LIMIT 1';
+			WHERE _data.id = '.intval($id).' LIMIT 1';
 			$this->data = NULL;
 			$query = @$this->db->query($sql);
 			$row = @$this->db->fetch_object($query);
@@ -1212,7 +1257,7 @@ class rokfor_DB {
 	function setFieldData($data,$id,$type){
 		if (!(in_array($type, array("_datatext", "_databinary",	"_datainteger")))) die ('setFieldData: type must be either: "_datatext", "_databinary",	"_datainteger"');
 		if (!$id) die ('setFieldData: id must be set!'); 
-		$sql = "UPDATE _data SET $type = '".mysql_real_escape_string($data)."' WHERE id = $id LIMIT 1";
+		$sql = "UPDATE _data SET $type = '".mysql_escape_string($data)."' WHERE id = ".intval($id)." LIMIT 1";
 		return ($query = @$this->db->unbuffered_query($sql));
 	}
 	
@@ -1502,7 +1547,7 @@ class rokfor_DB {
 	function getTemplateNamebyId($id) {
 		$elm = $this->getElementsNamebyId($id);
 		$sql = 'SELECT * FROM _templatenames 
-		WHERE id='.$elm->_fortemplate.' LIMIT 1';
+			WHERE id='.intval($elm->_fortemplate).' LIMIT 1';
 		$query = @$this->db->query($sql);
 		$retval = false;
 		$retval = @$this->db->fetch_object($query);
@@ -1525,8 +1570,8 @@ class rokfor_DB {
 		if ($all) $sql = ("SELECT *  FROM _templatenames   ORDER BY __sort__");
 		else $sql = ("SELECT *
 				  FROM _templatenames 
-				  WHERE (_forbook LIKE '%:>$project<:%' OR _forbook LIKE '$project<:%')
-				  ".(($part=="all")?(''):("AND (_inchapter LIKE '%:>$part<:%' OR _inchapter LIKE '$part<:%')"))."				
+				  WHERE (_forbook LIKE '%:>".mysql_escape_string($project)."<:%' OR _forbook LIKE '".mysql_escape_string($project)."<:%')
+				  ".(($part=="all")?(''):("AND (_inchapter LIKE '%:>".mysql_escape_string($part)."<:%' OR _inchapter LIKE '".mysql_escape_string($part)."<:%')"))."				
 				  ORDER BY _category,_name");
 		$query = @$this->db->query($sql);		
 
@@ -1547,7 +1592,7 @@ class rokfor_DB {
 	 */
 	function getPartNamebyId($id) {
 		$elm = $this->getElementsNamebyId($id);
-		$sql = ('SELECT * FROM _formats WHERE  id = "'.$elm->__split__.'"');
+		$sql = ('SELECT * FROM _formats WHERE  id = "'.intval($elm->__split__).'"');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
 		if ($retval) return $retval;
@@ -1563,7 +1608,7 @@ class rokfor_DB {
 	 */
 	function getProjectName($id) {
 		$sql = ('SELECT _name FROM _books
-			 	WHERE  id = "'.$id.'"
+			 	WHERE  id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
@@ -1580,7 +1625,7 @@ class rokfor_DB {
 	 */
 	function getProjectId($name) {
 		$sql = ('SELECT id FROM _books
-			 	WHERE  _name = "'.$name.'"
+			 	WHERE  _name = "'.mysql_escape_string($name).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
@@ -1598,7 +1643,7 @@ class rokfor_DB {
 	function getProjectNamebyPartId($id) {
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _formats ON _books.id = _formats._forbook
-			 	WHERE  _formats.id = "'.$id.'"
+			 	WHERE  _formats.id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
@@ -1616,7 +1661,7 @@ class rokfor_DB {
 	function getProjectNamebyEditionId($id) {
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _issues ON _books.id = _issues._forbook
-			 	WHERE  _issues.id = "'.$id.'"
+			 	WHERE  _issues.id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
@@ -1633,7 +1678,7 @@ class rokfor_DB {
 	 */
 	function getEditionNamebyId($id) {
 		$elm = $this->getElementsNamebyId($id);
-		$sql = ('SELECT * FROM _issues WHERE  id = "'.$elm->_forissue.'"');
+		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($elm->_forissue).'"');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
 		if ($retval) return $retval;
@@ -1648,7 +1693,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getEditionInfo($id) {
-		$sql = ('SELECT * FROM _issues WHERE  id = "'.$id.'" LIMIT 1');
+		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($id).'" LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
 		if ($retval) return $retval;
@@ -1665,9 +1710,9 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getEditionIdbyEditionname($name, $bookid = false) {
-		$sql = ('SELECT id FROM _issues WHERE  _name = "'.$name.'"');
+		$sql = ('SELECT id FROM _issues WHERE  _name = "'.mysql_escape_string($name).'"');
 		if ($bookid) {
-			$sql .= ('AND _forbook = '.$bookid);
+			$sql .= ('AND _forbook = '.intval($bookid));
 		}
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
