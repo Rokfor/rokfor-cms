@@ -800,6 +800,7 @@ class rokfor_DB {
 	 * getElements() - gets all elements (contributions) for a part within an issue of a project
 	 * 				if $id not set, uses $this->activePart, if $status not set uses 'Close'. If status = false neglects all status info.
 	 * 				$ed: edition-id (issue-id). if not set, the active edition set with setEditionActive will be used.
+	 *                   if $ed is set to "all", all issues are looked at.
 	 * 				$order: "_name ASC" or "_newdate DESC" or "_name ASC, _moddate DESC" or false
 	 *
 	 * @return $this->parts or false on error
@@ -827,7 +828,10 @@ class rokfor_DB {
 		$sql = 'SELECT _contributions.*, _issues._name as _issuename FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
-		WHERE _contributions._forissue = '.intval((!$ed)?($this->activeEdition->id):($ed))
+		WHERE _contributions._forissue = '.
+		(($ed == '_contributions._forissue' || $ed == 'all')?('_contributions._forissue ='):(
+		intval((!$ed)?($this->activeEdition->id):($ed))
+		))
 		.
 		((!$id && !$this->activePart->id)?(''):(
 		' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
