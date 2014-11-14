@@ -861,7 +861,7 @@ class rokfor_DB {
 		
 		if ($_state) {
 			if ((stristr($_state, "Open") && stristr($_state, "Close")) || stristr($_state, "both")) {
-				$_state = 'Open" || _contributions._status = "Close';
+				$_state = "Open' || _contributions._status = 'Close";
 			}
 			else if (stristr($_state, "Open")) {
 				$_state = 'Open';
@@ -870,7 +870,7 @@ class rokfor_DB {
 				$_state = 'Close';
 			}	
 			else if (stristr($status, "Deleted")) {
-				$status = 'Deleted';
+				$_state = 'Deleted';
 			}				
 		}
 		
