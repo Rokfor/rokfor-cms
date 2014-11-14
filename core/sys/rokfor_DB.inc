@@ -833,7 +833,7 @@ class rokfor_DB {
 		intval((!$ed)?($this->activeEdition->id):($ed))
 		))
 		.
-		((!$id && !$this->activePart->id)?(''):(
+		(((!$id && !$this->activePart->id) || $id == '_contributions.__split__')?(''):(
 		' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
 		))	
 		.	
