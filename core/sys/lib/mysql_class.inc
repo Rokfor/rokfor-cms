@@ -88,6 +88,10 @@ class db {
     return $this->error;
   }
   
+  function escape($str) {
+  	return mysql_escape_string($str);
+  }
+  
   function geterrno() {
     $this->errno=mysql_errno();
     return $this->errno;
