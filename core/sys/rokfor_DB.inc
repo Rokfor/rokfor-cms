@@ -877,7 +877,7 @@ class rokfor_DB {
 		
 		$sql = 'SELECT _contributions.* FROM _contributions WHERE _contributions._forissue = '.intval($_issueId);
 		if ($_chapter) $sql .= " AND __split__ = '".$this->_esc($_chapter)."'";
-		if ($_state) $sql .= " AND (_status = '$_state')";
+		if ($_state) $sql .= " AND (_contributions._status = '$_state')";
 		if ($_order) $sql .= ' ORDER BY '.$this->_esc($_order);
 		$query = @$this->db->query($sql);
 		$this->elements = array();
