@@ -609,6 +609,9 @@ class rokfor_DB {
 
 	/**
 	 * getPartByName: returns the id of a part according to its name
+	 * if projectid is set, the parts will be only searched within the book
+	 * if it is set to false, the current will be used
+	 * if it is set to all or _forbook, all books will be searched
 	 *
 	 * @return void
 	 * @author Urs Hofer
@@ -616,7 +619,10 @@ class rokfor_DB {
 	function getPartByName ($name,$projectid=false)
 	{
 //		if ($this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)]) return $this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)];
-		$sql = ('SELECT id FROM _formats WHERE _forbook = '.intval((!$projectid)?($this->activeProject->id):($projectid)).' 
+		$sql = ('SELECT id FROM _formats WHERE _forbook = '.
+			(($projectid=="_forbook"||$projectid=="all")?
+			('_forbook'):
+			(intval((!$projectid)?($this->activeProject->id):($projectid)))).' 
 		AND _name = "'.$this->_esc($name).'"');
 		$query = @$this->db->query($sql);
 		$row = @$this->db->fetch_object($query);
