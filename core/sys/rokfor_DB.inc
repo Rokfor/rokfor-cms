@@ -829,7 +829,7 @@ class rokfor_DB {
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
 		WHERE _contributions._forissue = '.
-		(($ed == '_contributions._forissue' || $ed == 'all')?('_contributions._forissue ='):(
+		(($ed == '_contributions._forissue' || $ed == 'all')?('_contributions._forissue'):(
 		intval((!$ed)?($this->activeEdition->id):($ed))
 		))
 		.
