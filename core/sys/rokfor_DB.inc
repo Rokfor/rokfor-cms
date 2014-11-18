@@ -545,6 +545,9 @@ class rokfor_DB {
 			else if (stristr($status, "closed")) {
 				$status = 'closed';
 			}
+			else {
+				$status = 'open';
+			}
 		}		
 		
 //		if ($this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status]) return $this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status];
@@ -816,7 +819,7 @@ class rokfor_DB {
 	{
 //		if ($this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename]) return $this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename];
 		
-		if ($status) {
+		if ($status != false) {
 			if ((stristr($status, "Open") && stristr($status, "Close")) || stristr($status, "Both")) {
 				$status = 'Open" || _contributions._status = "Close';
 			}
@@ -828,16 +831,22 @@ class rokfor_DB {
 			}
 			else if (stristr($status, "Deleted")) {
 				$status = 'Deleted';
-			}					
+			}				
+			else {
+				$status = 'Close';				
+			}	
 		}
+		
+		$ed = ($ed == '_contributions._forissue' || $ed == 'all') ? 
+				'_contributions._forissue' : 
+					intval((!$ed) ? ($this->activeEdition->id) : ($ed));
+
+		
 		
 		$sql = 'SELECT _contributions.*, _issues._name as _issuename FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
-		WHERE _contributions._forissue = '.
-		(($ed == '_contributions._forissue' || $ed == 'all')?('_contributions._forissue'):(
-		intval((!$ed)?($this->activeEdition->id):($ed))
-		))
+		WHERE _contributions._forissue = '.$ed
 		.
 		(((!$id && !$this->activePart->id) || $id == '_contributions.__split__')?(''):(
 		' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
