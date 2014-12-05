@@ -1110,8 +1110,8 @@ class rokfor_MAIN
 						# in the globals - otherwise just store a jpg copy in the original resolution
 						$imagick = new Imagick(REPOSITORYDIR."/$_filename"."[0]");
 						$imagick->setBackgroundColor('white'); 
-						$imagick->setCompression(Imagick::COMPRESSION_JPEG);
-						$imagick->setCompressionQuality(defined("JPEG_COMPRESSION")?JPEG_COMPRESSION:95);	
+                        $imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+                        $imagick->setImageCompressionQuality(defined("JPEG_COMPRESSION")?JPEG_COMPRESSION:95);
 //						$imagick->profileImage ("*", NULL);
 						$imagick->setImageFormat("jpg");		
 						if ($imagick->getImageColorspace() == Imagick::COLORSPACE_CMYK) {

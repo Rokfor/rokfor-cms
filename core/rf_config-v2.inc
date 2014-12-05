@@ -120,6 +120,7 @@ define("TEXTAREAMAXLINES",		30);
 
 define("PREVIEW_WIDTH", 		450); 	// Width in Pixels of the Preview Copy of uploaded Images    
 define("PREVIEW_HEIGHT", 		300);	// Height in Pixels of the Preview Copy of uploaded Images
+define("JPEG_COMPRESSION", 		75);	// Default JPEG Compression
 
 /*
    -----------------------------------------------------------------------------------
