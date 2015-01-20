@@ -36,6 +36,7 @@ CKEDITOR.editorConfig = function( config )
 	config.stylesSet = 'my_styles';	
 	config.toolbarStartupExpanded = false; 
 	config.enterMode = CKEDITOR.ENTER_P;	
+	config.DefaultLinkTarget = '_blank';
 
 	config.keystrokes =
 	[
