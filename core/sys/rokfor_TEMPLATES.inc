@@ -205,7 +205,9 @@ class rokfor_TEMPLATES
 				$fromissue = $this->rfDB->getEditionIdbyEditionname($row['restrict_to_issue'], $_SESSION['bookid'] ? $_SESSION['bookid'] : false);			
 			}
 			
-			$restrict_to_chapter = $row['restrict_to_chapter']?$this->rfDB->getPartByName($row['restrict_to_chapter'], '_forbook'):'_contributions.__split__';
+			$restrict_to_chapter = $row['restrict_to_chapter']
+									? $this->rfDB->getPartByName($row['restrict_to_chapter'],  $_SESSION['bookid'] ? $_SESSION['bookid'] : 'all')
+									: '_contributions.__split__';
 						
 			$threeDee = $row['3d'];
 
