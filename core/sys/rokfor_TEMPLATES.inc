@@ -202,7 +202,7 @@ class rokfor_TEMPLATES
 			}			
 			else if ($row['restrict_to_issue']){
 				$restrict_to_issue = true;
-				$fromissue = $this->rfDB->getEditionIdbyEditionname($row['restrict_to_issue']);			
+				$fromissue = $this->rfDB->getEditionIdbyEditionname($row['restrict_to_issue'], $_SESSION['bookid'] ? $_SESSION['bookid'] : false);			
 			}
 			
 			$restrict_to_chapter = $row['restrict_to_chapter']?$this->rfDB->getPartByName($row['restrict_to_chapter'], '_forbook'):'_contributions.__split__';
