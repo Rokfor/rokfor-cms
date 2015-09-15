@@ -74,7 +74,7 @@ class rokfor_DB {
 	/**
 	 * @var cache of field
 	 **/
-	var $cache = array();
+	static $cache = array();
 	
 	
 	/**
@@ -208,6 +208,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function newSession($user,$pass){
+		$this->clearCache();
 		$userdb = $this->db->query("SELECT * FROM users WHERE password = '".$this->_esc($pass)."' AND username = '".$this->_esc($user)."'");  
 		$checkusr = $this->db->fetch_object($userdb);
 		if ($checkusr->usergroup == false) {
@@ -234,7 +235,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function checkSession($id, $dont_update_time = false){
-		
+		$this->clearCache();		
 
 
 		// Get active session
@@ -286,6 +287,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function cleanSessionId($id) {
+		$this->clearCache();
 		return ($deleteold = $this->db->query('DELETE FROM session WHERE session = "'.$this->_esc($id).'"'));		
 	}				
 	
@@ -468,6 +470,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function deleteEdition($_issueid) {
+		$this->clearCache();
 		$sql = ("DELETE FROM _issues WHERE `id` = ".intval($_issueid)." LIMIT 1"); 
 		return $this->query($sql);
 	}
@@ -480,6 +483,7 @@ class rokfor_DB {
 	 */
 	function renameEdition($_issueid, $_name)
 	{
+		$this->clearCache();
 		$_issueid = (int)$_issueid;
 		$sql = ("UPDATE _issues SET 
 			`_name` = '".mysql_real_escape_string($_name)."'
@@ -494,6 +498,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function addEdition($_name, $_book, $_note, $_user = false, $_sort = false, $_status = 'Open', $_opentime = 0, $_closetime = 0, $_config = 0, $_p1 = "", $_p2 = "", $_p3 = "", $_p4 = "", $_p5 = "") {
+		$this->clearCache();
 		if ($_opentime == 0) $_opentime = time();
 		if ($_closetime == 0) $_closetime = $_opentime * 2;
 		if (!$_user) $_user = $this->getUserId();
@@ -535,6 +540,9 @@ class rokfor_DB {
 	{
 		if ($reset) $this->activeEdition = NULL;
 		
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) 
+			return self::$cache[__FUNCTION__][serialize(func_get_args())];
+		
 		if ($status) {
 			if ((stristr($status, "open") && stristr($status, "close")) || stristr($status, "both")) {
 				$status = 'open" || _status = "closed';
@@ -549,8 +557,6 @@ class rokfor_DB {
 				$status = 'open';
 			}
 		}		
-		
-//		if ($this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status]) return $this->cache['getEditions'][((!$id)?($this->activeProject->id):($id))][$status];
 		$sql = 'SELECT * FROM _issues WHERE _forbook = '.intval((!$id)?($this->activeProject->id):($id)).' '.(($status)?('AND (_status = "'.$status.'")'):('')).' ORDER BY __sort__ ASC';
 		$query = @$this->db->query($sql);
 		$this->editions = array();
@@ -560,10 +566,8 @@ class rokfor_DB {
 			if (!$this->userRestriction) $this->editions[] = $row;
 			elseif (in_array($row->id, $this->accessTable["Editions"])) $this->editions[] = $row;
 		}
-		if ($this->editions)
-			return $this->editions;
-		else
-			return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->editions ? $this->editions : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 	/**
@@ -598,16 +602,14 @@ class rokfor_DB {
 	 **/
 	function getParts ($id = false)
 	{
-//		if ($this->cache['getParts'][((!$id)?($this->activeProject->id):($id))]) return $this->cache['getParts'][((!$id)?($this->activeProject->id):($id))];
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = 'SELECT * FROM _formats WHERE _forbook = '.intval((!$id)?($this->activeProject->id):($id)).' ORDER BY __sort__ ASC';
 		$query = @$this->db->query($sql);
 		$this->parts = array();
 	//	$this->activePart = NULL;
 		while ($row = @$this->db->fetch_object($query)) $this->parts[] = $row;
-		if ($this->parts)
-			return $this->parts;
-		else
-			return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->parts ? $this->parts : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 	/**
@@ -621,7 +623,7 @@ class rokfor_DB {
 	 **/
 	function getPartByName ($name,$projectid=false)
 	{
-//		if ($this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)]) return $this->cache['getPartByName'][$name][(!$projectid)?($this->activeProject->id):($projectid)];
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT id FROM _formats WHERE _forbook = '.
 			(($projectid=="_forbook"||$projectid=="all")?
 			('_forbook'):
@@ -629,8 +631,8 @@ class rokfor_DB {
 		AND _name = "'.$this->_esc($name).'"');
 		$query = @$this->db->query($sql);
 		$row = @$this->db->fetch_object($query);
-		if ($row->id) return $row->id;
-		else return (false);
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $row->id ? $row->id : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 	/**
@@ -641,13 +643,13 @@ class rokfor_DB {
 	 **/
 	function getPartById($id)
 	{
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT * FROM _formats WHERE id = '.(int)$id);
 		$query = @$this->db->query($sql);
-		$retval = false;
-		if ($retval = @$this->db->fetch_object($query)) 
-			return $retval;
-		else 
-			return (false);
+
+		$retval = @$this->db->fetch_object($query);
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;		
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 	/**
@@ -678,6 +680,7 @@ class rokfor_DB {
 	 */
 	function renameElement($_name, $_id)
 	{
+		$this->clearCache();
 		$sql = ("UPDATE  `_contributions` SET  `_name` =  '".$this->_esc($_name)."' WHERE  `_contributions`.`id` = ".intval($_id)." LIMIT 1 ;");
 		return ($this->query($sql));
 	}
@@ -692,6 +695,8 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function addElement ($_contribname,$_templateid,$_chapterid=false,$_issueid=false) {
+		$this->clearCache();
+
 		if (!$_chapterid) {
 			if (!$this->activePart) return false;
 			$_chapterid = $this->activePart;
@@ -735,6 +740,7 @@ class rokfor_DB {
 	 **/
 	function closeElement ($id)
 	{
+		$this->clearCache();
  		$this->db->query("UPDATE _contributions SET _status = 'Close' WHERE id = ".intval($id)." LIMIT 1");		
 	}
 
@@ -744,7 +750,8 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/
 	function openElement ($id)
-	{
+	{		
+		$this->clearCache();
  		$this->db->query("UPDATE _contributions SET _status = 'Open' WHERE id = ".intval($id)." LIMIT 1");		
 	}
 	
@@ -754,6 +761,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/
 	function _deleteFromBinary($fieldId,$imgId=false) {
+		$this->clearCache();
 		$_field_info = $this->getFieldData($fieldId);
  		if ($imgId===false) {
 			$udb_update = "";
@@ -780,6 +788,8 @@ class rokfor_DB {
 		
 	function deleteElement ($contribId)
 	{
+		$this->clearCache();
+		
 		// Delete Binaries
 		$sql = ("SELECT id from _data WHERE _forcontribution = '".intval($contribId)."' and _databinary <> '' ");
 		while ($todel = $this->fetch_object($this->query($sql))) {
@@ -800,6 +810,7 @@ class rokfor_DB {
 	 **/
 	function lastmodElementUpdate($id)
 	{
+		$this->clearCache();
 		$initTime= time();
  		$this->db->query("UPDATE _contributions SET _moddate = $initTime WHERE id = ".intval($id)." LIMIT 1");		
 	}	
@@ -817,8 +828,12 @@ class rokfor_DB {
 	 **/
 	function getElements ($id = false, $status = 'Close', $ed = false, $templatename = false, $order = false)
 	{
-//		if ($this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename]) return $this->cache['getElements'][(!$id)?($this->activePart->id):($id)][$status][(!$ed)?($this->activeEdition->id):($ed)][$templatename];
-		
+		if (is_array($id)) {
+			foreach ($id as &$i) {
+				$i = intval($i);
+			}
+		}
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		if ($status != false) {
 			if ((stristr($status, "Open") && stristr($status, "Close")) || stristr($status, "Both")) {
 				$status = 'Open" || _contributions._status = "Close';
@@ -840,16 +855,19 @@ class rokfor_DB {
 		$ed = ($ed == '_contributions._forissue' || $ed == 'all') ? 
 				'_contributions._forissue' : 
 					intval((!$ed) ? ($this->activeEdition->id) : ($ed));
-
-		
 		
 		$sql = 'SELECT _contributions.*, _issues._name as _issuename FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
 		WHERE _contributions._forissue = '.$ed
 		.
-		(((!$id && !$this->activePart->id) || $id == '_contributions.__split__')?(''):(
-		' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'								/* Neu: Chapter über __split__ definiert */
+		(((!$id && !$this->activePart->id) || $id == '_contributions.__split__') 
+			? ('')
+			: (
+				is_array($id)
+					? (' AND (_contributions.__split__ IN ('.join(',',$id).'))')
+					: (' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'
+			  )
 		))	
 		.	
 		(($status)?(' AND (_contributions._status = "'.$status.'")'):(''))
@@ -861,10 +879,9 @@ class rokfor_DB {
 		$this->elements = array();
 		$this->activeElement = NULL;
 		while ($row = @$this->db->fetch_object($query)) $this->elements[] = $row;
-		if ($this->elements)
-			return $this->elements;
-		else
-			return array();
+		
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->elements ? $this->elements : array();	
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 	
 
@@ -877,6 +894,7 @@ class rokfor_DB {
 	 */
 	function getElementsByIssue ($_issueId, $_state = false, $_order = false, $_chapter = false) {
 		if (!$_issueId) return false;
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		
 		if ($_state) {
 			if ((stristr($_state, "Open") && stristr($_state, "Close")) || stristr($_state, "both")) {
@@ -901,7 +919,8 @@ class rokfor_DB {
 		$query = @$this->db->query($sql);
 		$this->elements = array();
 		while ($row = @$this->db->fetch_object($query)) $this->elements[] = $row;
-		return $this->elements;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->elements;	
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 	
 	/**
@@ -917,17 +936,15 @@ class rokfor_DB {
 			$id = $this->activeElement;
 		}		
 		
-//		if ($this->cache['getElementsNamebyId'][$id]) return $this->cache['getElementsNamebyId'][$id];
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		
 		$sql = 'SELECT * FROM _contributions 
 			WHERE id='.intval($id).' LIMIT 1';
 		$query = @$this->db->query($sql);
 		$retval = false;
 		$retval = @$this->db->fetch_object($query);
-		if ($retval)
-			return $retval;
-		else
-			return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}	
 	
 	/**
@@ -938,6 +955,7 @@ class rokfor_DB {
 	 **/
 	function getElementsIdbyName ($name, $templatename = false, $chaptername = false, $forissue = false, $status = false)
 	{
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = 'SELECT _contributions.id FROM _contributions 
 		LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
 		WHERE _contributions._name="'.$this->_esc($name).'" 
@@ -952,7 +970,8 @@ class rokfor_DB {
 		
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		return $retval;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}	
 
 	/**
@@ -987,12 +1006,13 @@ class rokfor_DB {
 	function getFieldsId($id = false) {return $this->getFieldsByElement($id);}
 	function getFieldsByElement($id = false, $resolveForeign = true)
 	{
-//		if ($this->cache['getFieldsId'][(!$id)?($this->activeElement->id):($id)]) return $this->cache['getFieldsId'][(!$id)?($this->activeElement->id):($id)];
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 
 		/* Legacy Check: If ParentNode = -1, update the order */
 		$query = $this->db->query('SELECT id FROM _data WHERE __parentnode__ = -1 AND _forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' LIMIT 1');
 		$row = @$this->db->fetch_object($query);
 		if ($row->id) {
+			$this->clearCache();
 			$parentnode = -1;			
 			$count = 0;
 			$sql = 'SELECT _data.id FROM _data	WHERE _data.__parentnode__ = <%%parentnode%%> AND _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' LIMIT 1';
@@ -1030,7 +1050,8 @@ class rokfor_DB {
 				else  $this->fields[] = $row;
 			}
 		}
-		return $this->fields;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->fields;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 	
 	/**
@@ -1042,10 +1063,12 @@ class rokfor_DB {
 	 */
 	function getTemplateFields($id)
 	{
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		/* Legacy Check */
 		$sql = ("SELECT * from _templates WHERE _fortemplate = '".intval($id)."' AND __parentnode__ = -1 LIMIT 1");
 		$row = @$this->db->fetch_object(@$this->db->query($sql));
 		if ($row->id) {
+			$this->clearCache();			
 			$next = true;
 			$count = 0;
 			while($next) {
@@ -1065,8 +1088,9 @@ class rokfor_DB {
 		$retval = array();
 		while($fields = @$this->db->fetch_object($query)) {
 			if ($fields->id) $retval[] = $fields;
-		}			
-		return $retval;
+		}		
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval;			
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}	
 	
 	
@@ -1079,8 +1103,7 @@ class rokfor_DB {
 	 **/
 	function getFieldsByName ($fieldname, $elementId = false)
 	{
-//		if ($this->cache['getFieldsByName'][$fieldname][(!$elementId)?($this->activeElement->id):($elementId)]) return $this->cache['getFieldsByName'][$fieldname][(!$elementId)?($this->activeElement->id):($elementId)];
-		
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = 'SELECT _data.id, 
 		_templates.id as t_id, 
 		_templates._fieldname as t_fieldname, 		
@@ -1099,9 +1122,12 @@ class rokfor_DB {
 		$row = @$this->db->fetch_object($query);
 		if ($row->id) {
 			$row->d_text = $this->_stripslashes($row->d_text);			
-			return $row;
+			self::$cache[__FUNCTION__][serialize(func_get_args())] = $row;
 		}
-		else return false;		
+		else {
+			self::$cache[__FUNCTION__][serialize(func_get_args())] = false;
+		}
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1112,7 +1138,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getFieldNamesByTemplateName($templatename) {
-//		if ($this->cache['getFieldNamesByTemplateName'][$templatename]) return ($this->cache['getFieldNamesByTemplateName'][$templatename]);		
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ("
 			SELECT  _templates.id, _templates._fieldname, _templatenames._name as _templatename from _templates
 		   	LEFT JOIN _templatenames ON _templates._fortemplate = _templatenames.id 
@@ -1121,10 +1147,8 @@ class rokfor_DB {
 		");	
 		$query = @$this->db->query($sql);
 		while ($row = @$this->db->fetch_object($query)) $retval[] = $row;
-		if (count($retval)>=1)
-			return $retval;
-		else
-			return false;		
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = count($retval)>=1 ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 	/**
@@ -1136,7 +1160,8 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getFieldByTemplateId ($fieldid, $contribution) {
-		return reset($this->getFieldsByTemplateId ($fieldid, false, $contribution, false, false));
+        $_d = $this->getFieldsByTemplateId ($fieldid, false, $contribution, false, false);
+        return reset($_d);		
 	}
 
 
@@ -1150,47 +1175,44 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getFieldsByTemplateId ($fieldid, $issue = false, $contribution = false, $status = false, $group = true) {
-//		if ($this->cache['getFieldsById'][$fieldid]) return ($this->cache['getFieldsById'][$fieldid]);
-//		else {
-			$sql = ('SELECT _data.id, 
-				_data._datatext as d_text,
-				_data._databinary as d_binary,
-				_data._datainteger as d_integer,
-				_data._forcontribution			
-				'.
-				(($issue)?(",\n_contributions._name as _name, _contributions.id as c_id"):(''))
-				.'
-				FROM _data 
-				'.
-				(($issue)?('LEFT JOIN _contributions ON _data._forcontribution = _contributions.id'):(''))
-				.'
-				WHERE _data._fortemplatefield= '.intval($fieldid).' 
-				'.
-				(($issue)?('AND _contributions._forissue = '.intval($issue).' '):(''))
-				.'
-				'.
-				(($contribution)?('AND _data._forcontribution = '.intval($contribution).' '):(''))
-				.'				
-				'.
-				(($status)?('AND (_contributions._status = "'.$this->_esc($status).'") '):(''))
-				.'	
-				'.
-				(($group)?(' GROUP BY _data._datatext '):(''))
-				.'							
-				
-				ORDER BY _data._datatext;
-			');
-			$query = @$this->db->query($sql);
-			$retval = array();
-			while ($row = @$this->db->fetch_object($query)) {
-				$row->d_text = $this->_stripslashes($row->d_text);
-				$retval[] = $row;
-			}
-			if (count($retval)>=1)
-				return $retval;
-			else
-				return false;
-//		}
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
+
+		$sql = ('SELECT _data.id, 
+			_data._datatext as d_text,
+			_data._databinary as d_binary,
+			_data._datainteger as d_integer,
+			_data._forcontribution			
+			'.
+			(($issue)?(",\n_contributions._name as _name, _contributions.id as c_id"):(''))
+			.'
+			FROM _data 
+			'.
+			(($issue)?('LEFT JOIN _contributions ON _data._forcontribution = _contributions.id'):(''))
+			.'
+			WHERE _data._fortemplatefield= '.intval($fieldid).' 
+			'.
+			(($issue)?('AND _contributions._forissue = '.intval($issue).' '):(''))
+			.'
+			'.
+			(($contribution)?('AND _data._forcontribution = '.intval($contribution).' '):(''))
+			.'				
+			'.
+			(($status)?('AND (_contributions._status = "'.$this->_esc($status).'") '):(''))
+			.'	
+			'.
+			(($group)?(' GROUP BY _data._datatext '):(''))
+			.'							
+			
+			ORDER BY _data._datatext;
+		');
+		$query = @$this->db->query($sql);
+		$retval = array();
+		while ($row = @$this->db->fetch_object($query)) {
+			$row->d_text = $this->_stripslashes($row->d_text);
+			$retval[] = $row;
+		}
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = count($retval)>=1 ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
 
@@ -1227,44 +1249,44 @@ class rokfor_DB {
 	 **/
 	function getFieldData($id)
 	{
-		if (!$id) die (debug_print_backtrace());
-//		if (!$this->cache['getFieldData'][$id])
-//		{
-			$sql = 'SELECT _data.id as d_id, 
-			_data._forcontribution as d_forelement,
-		    _data._datatext as d_text,
-		    _data._databinary as d_binary,
-		    _data._datainteger as d_integer,
-		    _data._fortemplatefield as d_fortemplatefield,
-		    _data.__parentnode__ as d_parentnode,		
-			_templates.id as t_id,
-			_templates._fortemplate as t_fortemplate,
-			_templates._fieldname as t_fieldname,
-			_templates._fieldtype as t_fieldtype,
-			_templates._maxlines as t_maxlines,
-			_templates._textlength as t_textlength,
-			_templates._imagewidth as t_imagewidth,
-			_templates._imageheight as t_imageheight,
-			_templates._cols as t_cols,
-			_templates._colNames as t_colnames,
-			_templates._history as t_history,
-			_templates._growing as t_growing,
-			_templates._lengthInfluence as t_len_influence,
-			_templatenames._name as t_name,
-			_contributions._name as c_name,
-			_contributions.id as c_id		
-			FROM _data
-			LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
-			LEFT JOIN _templatenames ON _templatenames.id = _templates._fortemplate
-			LEFT JOIN _contributions ON _data._forcontribution = _contributions.id		
-			WHERE _data.id = '.intval($id).' LIMIT 1';
-			$this->data = NULL;
-			$query = @$this->db->query($sql);
-			$row = @$this->db->fetch_object($query);
-			$row->d_text = $this->_stripslashes($row->d_text);
-			return $this->data = $row;
-//		}
-//		else return $this->data = $this->cache['getFieldData'][$id];
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return $this->data = self::$cache[__FUNCTION__][serialize(func_get_args())];
+		
+		if (!$id) die ();
+		
+		$sql = 'SELECT _data.id as d_id, 
+		_data._forcontribution as d_forelement,
+	    _data._datatext as d_text,
+	    _data._databinary as d_binary,
+	    _data._datainteger as d_integer,
+	    _data._fortemplatefield as d_fortemplatefield,
+	    _data.__parentnode__ as d_parentnode,		
+		_templates.id as t_id,
+		_templates._fortemplate as t_fortemplate,
+		_templates._fieldname as t_fieldname,
+		_templates._fieldtype as t_fieldtype,
+		_templates._maxlines as t_maxlines,
+		_templates._textlength as t_textlength,
+		_templates._imagewidth as t_imagewidth,
+		_templates._imageheight as t_imageheight,
+		_templates._cols as t_cols,
+		_templates._colNames as t_colnames,
+		_templates._history as t_history,
+		_templates._growing as t_growing,
+		_templates._lengthInfluence as t_len_influence,
+		_templatenames._name as t_name,
+		_contributions._name as c_name,
+		_contributions.id as c_id		
+		FROM _data
+		LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
+		LEFT JOIN _templatenames ON _templatenames.id = _templates._fortemplate
+		LEFT JOIN _contributions ON _data._forcontribution = _contributions.id		
+		WHERE _data.id = '.intval($id).' LIMIT 1';
+		$this->data = NULL;
+		$query = @$this->db->query($sql);
+		$row = @$this->db->fetch_object($query);
+		$row->d_text = $this->_stripslashes($row->d_text);
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->data = $row;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 	
 	
@@ -1278,6 +1300,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function setFieldData($data,$id,$type){
+		$this->clearCache();
 		if (!(in_array($type, array("_datatext", "_databinary",	"_datainteger")))) die ('setFieldData: type must be either: "_datatext", "_databinary",	"_datainteger"');
 		if (!$id) die ('setFieldData: id must be set!'); 
 		$sql = "UPDATE _data SET $type = '".$this->_esc($data)."' WHERE id = ".intval($id)." LIMIT 1";
@@ -1568,14 +1591,16 @@ class rokfor_DB {
 	 */
 	function getTemplateObjectByElementId($id) {return $this->getTemplateNamebyId($id);}
 	function getTemplateNamebyId($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
+		
 		$elm = $this->getElementsNamebyId($id);
 		$sql = 'SELECT * FROM _templatenames 
 			WHERE id='.intval($elm->_fortemplate).' LIMIT 1';
 		$query = @$this->db->query($sql);
 		$retval = false;
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1587,6 +1612,8 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getTemplates($project=false,$part=false, $all=false) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
+		
 		$part = (!$part)?($this->activePart->id):($part);				// Chapter
 		$project = (!$project)?($this->activeProject->id):($project);	// Book
 		
@@ -1603,7 +1630,8 @@ class rokfor_DB {
 			if (!$this->userRestriction) $this->templates[] = $row;
 			elseif (in_array($row->id, $this->accessTable["Templates"])) $this->templates[] = $row;
 		}
-		return count($this->templates)>0?$this->templates:false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = count($this->templates)>0?$this->templates:false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1614,12 +1642,13 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getPartNamebyId($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$elm = $this->getElementsNamebyId($id);
 		$sql = ('SELECT * FROM _formats WHERE  id = "'.intval($elm->__split__).'"');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1630,13 +1659,14 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getProjectName($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _name FROM _books
 			 	WHERE  id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1647,13 +1677,14 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getProjectId($name) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT id FROM _books
 			 	WHERE  _name = "'.$this->_esc($name).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1664,14 +1695,15 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getProjectNamebyPartId($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _formats ON _books.id = _formats._forbook
 			 	WHERE  _formats.id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1682,14 +1714,15 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getProjectNamebyEditionId($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _issues ON _books.id = _issues._forbook
 			 	WHERE  _issues.id = "'.intval($id).'"
 				LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1700,12 +1733,13 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getEditionNamebyId($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$elm = $this->getElementsNamebyId($id);
 		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($elm->_forissue).'"');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 	/**
@@ -1716,11 +1750,12 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getEditionInfo($id) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($id).'" LIMIT 1');
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 
@@ -1733,14 +1768,15 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getEditionIdbyEditionname($name, $bookid = false) {
+		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT id FROM _issues WHERE  _name = "'.$this->_esc($name).'"');
 		if ($bookid) {
 			$sql .= ('AND _forbook = '.intval($bookid));
 		}
 		$query = @$this->db->query($sql);
 		$retval = @$this->db->fetch_object($query);
-		if ($retval) return $retval->id;
-		else return false;
+		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval->id : false;
+		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
 
@@ -1752,7 +1788,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/	
 	function clearCache() {
-		$this->cache = array();
+		self::$cache = array();
 	}
 } // END class 
 
