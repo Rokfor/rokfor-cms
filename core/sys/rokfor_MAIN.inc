@@ -2833,6 +2833,55 @@ class rokfor_MAIN
 					else echo json_encode("error in batch function. check the batch syntax in the rokfor backend.");
 				}
 				break;
+			case 'Store':
+				/* Store: Stores Content in a Text Field */
+				/* /rf/Api/Store/SessionId/BookName/IssueName/ChapterName/ContributionName/TemplateName */
+				/* Data as Json Encoded POST: [[fieldname,fielddate],...] */
+				$this->auth = $this->rfDB->checkSession($this->parameter);
+				if (!$this->auth) {
+					echo json_encode("no session stored");						
+					break;
+				}
+				else {
+					if (!$_bookid = $this->rfDB->getProjectId($this->values[0])) {
+						echo json_encode("book not found");						
+						break;
+					}
+					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($this->values[1], $_bookid)) {
+						echo json_encode("issue not found");						
+						break;
+					}
+					if (!$_chapterid = $this->rfDB->getPartByName($this->values[2], $_bookid)) {
+						echo json_encode("chapter not found");						
+						break;
+					}	
+					/* Add or use an contribution */
+					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[3], false, $_chapterid, $_issueid)) {
+						$_templateid = false;
+						foreach ($this->rfDB->getTemplates($_bookid, $_chapterid) as $_t) {
+							if ($_t->_name == $this->values[4]) $_templateid = $_t->id;
+						}
+						if (!$_templateid) {
+							echo json_encode("template not found");						
+							break;							
+						}
+						$_contribid = $this->rfDB->addElement ($this->values[3],$_templateid,$_chapterid,$_issueid);
+					}
+					$_data = json_decode($_POST["data"]);
+					$retval = array();
+					foreach ($_data as $fieldname => $value) {
+						if ($_fieldId = $this->rfDB->getFieldsByName($fieldname, $_contribid)->id) {
+							$this->rfDB->setFieldData($value,$id, '_datatext');
+							$retval[$fieldname] = "ok";
+						}
+						else {
+							$retval[$fieldname] = "not found";							
+						}
+					}
+					echo json_encode($retval);						
+					break;
+				}
+			break;
 			case 'Login':
 				/* Login: Starts a new Session */
 				/* /rf/Api/Login/Username/Pass(md5) */
