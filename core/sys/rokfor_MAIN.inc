@@ -2848,11 +2848,11 @@ class rokfor_MAIN
 						break;
 					}
 					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($this->values[1], $_bookid)) {
-						echo json_encode("issue not found");						
+						echo json_encode("issue not found within book $_bookid");						
 						break;
 					}
 					if (!$_chapterid = $this->rfDB->getPartByName($this->values[2], $_bookid)) {
-						echo json_encode("chapter not found");						
+						echo json_encode("chapter not found within book $_bookid");						
 						break;
 					}	
 					/* Add or use an contribution */
