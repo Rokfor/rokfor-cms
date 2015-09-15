@@ -2843,7 +2843,7 @@ class rokfor_MAIN
 					break;
 				}
 				else {
-					if (!$_bookid = $this->rfDB->getProjectId($this->values[0])) {
+					if (!$_bookid = $this->rfDB->getProjectId($this->values[0])->id) {
 						echo json_encode("book not found");						
 						break;
 					}
@@ -2856,7 +2856,7 @@ class rokfor_MAIN
 						break;
 					}	
 					/* Add or use an contribution */
-					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[3], false, $_chapterid, $_issueid)) {
+					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[3], false, $_chapterid, $_issueid)->id) {
 						$_templateid = false;
 						foreach ($this->rfDB->getTemplates($_bookid, $_chapterid) as $_t) {
 							if ($_t->_name == $this->values[4]) $_templateid = $_t->id;
