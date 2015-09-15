@@ -206,7 +206,7 @@ class rokfor_TEMPLATES
 			}
 			
 			$restrict_to_chapter = $row['restrict_to_chapter']
-									? $this->rfDB->getPartByName($row['restrict_to_chapter'],  $_SESSION['bookid'] ? $_SESSION['bookid'] : 'all')
+									? $this->rfDB->getPartByName($row['restrict_to_chapter'],  $_SESSION['bookid'] && $row['restrict_to_book'] === "true" ? $_SESSION['bookid'] : 'all')
 									: '_contributions.__split__';
 						
 			$threeDee = $row['3d'];
@@ -1119,6 +1119,7 @@ class rokfor_TEMPLATES
 	 * @author Urs Hofer
 	 */
 	function redirect($_url) {
+		ob_end_clean();
 		header('Location: '.SITEPREFIX.$_url);
 		die('<script>window.location="'.SITEPREFIX.$_url.'";</script>');
 	}
@@ -1228,7 +1229,7 @@ class rokfor_TEMPLATES
 				$retval .= '
 				<p class="editor_text_array">
 				<label for="field'.$_f->t_id.'_'.$_colId.'">'.$_LengthName[2].': </label> 
-				<textarea class="medium'.($_codeeditor_enabled?' code ':'').'" id="field'.$_f->t_id.'_'.$_colId.'" name="text['.$_f->d_id.'][]" '.$_rows.' cols="'.$_ta_cols.'">'.$_data[$_colId].'</textarea>
+				<textarea class="medium'.($_codeeditor_enabled?' code ':'').'" id="field'.$_f->t_id.'_'.$_colId.'" name="text['.$_f->d_id.'][]" '.$_rows.' cols="'.$_ta_cols.'">'.htmlspecialchars($_data[$_colId]).'</textarea>
  				<span>('.$_LengthName[1].' '.Zeile.')</span>
 				</p>
 				';
