@@ -2835,7 +2835,7 @@ class rokfor_MAIN
 				break;
 			case 'Store':
 				/* Store: Stores Content in a Text Field */
-				/* /rf/Api/Store/SessionId/BookName/IssueName/ChapterName/ContributionName/TemplateName */
+				/* /rf/Api/Store/SessionId/BookName/IssueName/ChapterName/TemplateName/ContributionName */
 				/* Data as Json Encoded POST: [[fieldname,fielddate],...] */
 				$this->auth = $this->rfDB->checkSession($this->parameter);
 				if (!$this->auth) {
@@ -2856,16 +2856,16 @@ class rokfor_MAIN
 						break;
 					}	
 					/* Add or use an contribution */
-					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[3], false, $_chapterid, $_issueid)->id) {
+					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[4], false, $_chapterid, $_issueid)->id) {
 						$_templateid = false;
 						foreach ($this->rfDB->getTemplates($_bookid, $_chapterid) as $_t) {
-							if ($_t->_name == $this->values[4]) $_templateid = $_t->id;
+							if ($_t->_name == $this->values[3]) $_templateid = $_t->id;
 						}
 						if (!$_templateid) {
 							echo json_encode("template not found");						
 							break;							
 						}
-						$_contribid = $this->rfDB->addElement ($this->values[3],$_templateid,$_chapterid,$_issueid);
+						$_contribid = $this->rfDB->addElement ($this->values[4],$_templateid,$_chapterid,$_issueid);
 					}
 					$_data = json_decode($_POST["data"]);
 					$retval = array();
