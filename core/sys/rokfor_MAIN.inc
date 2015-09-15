@@ -2834,48 +2834,54 @@ class rokfor_MAIN
 				}
 				break;
 			case 'Store':
-				/* Store: Stores Content in a Text Field */
-				/* /rf/Api/Store/SessionId/BookName/IssueName/ChapterName/TemplateName/ContributionName */
-				/* Data as Json Encoded POST: [[fieldname,fielddate],...] */
+				/* Store: Stores Content in a Text Field 
+	 			   /rf/Api/Store/SessionId
+				   Post Variables: 	- book(string), 
+									- issue(string), 
+									- chapter(string), 
+									- element(string),
+					 				- template(string), 
+									- data(json encoded string)
+				   JSON format data: [[fieldname 1,fielddata 1],[fieldname2,fielddata 2],...] */
 				$this->auth = $this->rfDB->checkSession($this->parameter);
 				if (!$this->auth) {
 					echo json_encode("no session stored");						
 					break;
 				}
 				else {
-					if (!$_bookid = $this->rfDB->getProjectId($this->values[0])->id) {
+					if (!$_bookid = $this->rfDB->getProjectId($_POST["book"])->id) {
 						echo json_encode("book not found");						
 						break;
 					}
-					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($this->values[1], $_bookid)) {
+					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($_POST["issue"], $_bookid)) {
 						echo json_encode("issue not found within book $_bookid");						
 						break;
 					}
-					if (!$_chapterid = $this->rfDB->getPartByName($this->values[2], $_bookid)) {
+					if (!$_chapterid = $this->rfDB->getPartByName($_POST["chapter"], $_bookid)) {
 						echo json_encode("chapter not found within book $_bookid");						
 						break;
 					}	
 					/* Add or use an contribution */
-					if (!$_contribid = $this->rfDB->getElementsIdbyName ($this->values[4], false, $_chapterid, $_issueid)->id) {
+					if (!$_contribid = $this->rfDB->getElementsIdbyName ($_POST["element"], false, $_chapterid, $_issueid)->id) {
 						$_templateid = false;
 						foreach ($this->rfDB->getTemplates($_bookid, $_chapterid) as $_t) {
-							if ($_t->_name == $this->values[3]) $_templateid = $_t->id;
+							if ($_t->_name == $_POST["template"]) $_templateid = $_t->id;
 						}
 						if (!$_templateid) {
 							echo json_encode("template not found");						
 							break;							
 						}
-						$_contribid = $this->rfDB->addElement ($this->values[4],$_templateid,$_chapterid,$_issueid);
+						$_contribid = $this->rfDB->addElement ($_POST["element"],$_templateid,$_chapterid,$_issueid);
 					}
 					$_data = json_decode($_POST["data"]);
 					$retval = array();
-					foreach ($_data as $fieldname => $value) {
-						if ($_fieldId = $this->rfDB->getFieldsByName($fieldname, $_contribid)->id) {
-							$this->rfDB->setFieldData($value,$id, '_datatext');
-							$retval[$fieldname] = "ok";
+					foreach ($_data as $value) {
+						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
+							$this->rfDB->setFieldData($value[1],$id, '_datatext');
+							$retval[$value[0]] = "ok";
 						}
 						else {
-							$retval[$fieldname] = "not found";							
+							$retval[$value[0]] = "not found";							
 						}
 					}
 					echo json_encode($retval);						
