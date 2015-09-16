@@ -2850,7 +2850,8 @@ class rokfor_MAIN
 				}
 				else {
 					if (!$_bookid = $this->rfDB->getProjectId($_POST["book"])->id) {
-						echo json_encode("book not found");						
+						echo json_encode("book not found");			
+						print_r($_POST);			
 						break;
 					}
 					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($_POST["issue"], $_bookid)) {
