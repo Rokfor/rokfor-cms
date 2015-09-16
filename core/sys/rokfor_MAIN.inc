@@ -2851,7 +2851,6 @@ class rokfor_MAIN
 				else {
 					if (!$_bookid = $this->rfDB->getProjectId($_POST["book"])->id) {
 						echo json_encode("book not found");			
-						print_r($_POST);			
 						break;
 					}
 					if (!$_issueid = $this->rfDB->getEditionIdbyEditionname($_POST["issue"], $_bookid)) {
@@ -2875,6 +2874,8 @@ class rokfor_MAIN
 						$_contribid = $this->rfDB->addElement ($_POST["element"],$_templateid,$_chapterid,$_issueid);
 					}
 					$_data = json_decode($_POST["data"]);
+					print_r($_data);			
+					
 					$retval = array();
 					foreach ($_data as $value) {
 						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
