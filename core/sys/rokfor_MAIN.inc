@@ -2878,7 +2878,7 @@ class rokfor_MAIN
 					$retval = array();
 					foreach ($_data as $value) {
 						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
-							$this->rfDB->setFieldData($value[1],$_fieldId, '_datatext');
+							$this->rfDB->setFieldData($this->_clean_from_rteditor($value[1]),$_fieldId, '_datatext');
 							$retval[$value[0]] = "ok";
 						}
 						else {
