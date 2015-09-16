@@ -2874,12 +2874,11 @@ class rokfor_MAIN
 						$_contribid = $this->rfDB->addElement ($_POST["element"],$_templateid,$_chapterid,$_issueid);
 					}
 					$_data = json_decode($_POST["data"]);
-					print_r($_data);			
 					
 					$retval = array();
 					foreach ($_data as $value) {
 						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
-							$this->rfDB->setFieldData($value[1],$id, '_datatext');
+							$this->rfDB->setFieldData($value[1],$_fieldId, '_datatext');
 							$retval[$value[0]] = "ok";
 						}
 						else {
