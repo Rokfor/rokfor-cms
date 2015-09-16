@@ -784,7 +784,7 @@ class rokfor_MAIN
 	 * @return string
 	 * @author Urs Hofer
 	 */
-	function _clean_from_rteditor($fielddata) {
+	function _clean_from_rteditor($fielddata, $trim = false) {
 		// Return immediatly if suppressed by config:
 		if (defined('STORE_HTML') && STORE_HTML) {
 			$fielddata = preg_replace('/<span[^>]*>/m', '', $fielddata);
@@ -815,7 +815,12 @@ class rokfor_MAIN
 		$fielddata = str_replace(array('?-::::::-?','?-;;;;;;-?','?--?'), array('<::::::>','<;;;;;;>','<>'), $fielddata);
 		//restore all custom signs
 		$fielddata = str_replace(array('?fn--','--fn?','?!--','--!?'),array('<fn--', '--fn>', '<!--', '--!>'), $fielddata);
-		return $fielddata;
+		
+		if ($trim)
+			return trim($fielddata);
+		else
+			return $fielddata;
+
 	}
 	
 
@@ -2878,7 +2883,7 @@ class rokfor_MAIN
 					$retval = array();
 					foreach ($_data as $value) {
 						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
-							$this->rfDB->setFieldData($this->_clean_from_rteditor($value[1]),$_fieldId, '_datatext');
+							$this->rfDB->setFieldData($this->_clean_from_rteditor($value[1], true),$_fieldId, '_datatext');
 							$retval[$value[0]] = "ok";
 						}
 						else {
