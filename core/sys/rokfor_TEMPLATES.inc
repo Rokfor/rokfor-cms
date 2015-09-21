@@ -299,6 +299,9 @@ class rokfor_TEMPLATES
 			{
 				if (!$fromtemplate) $this->buffer .= (FromTemplateErr);				
 				$_select = $this->rfDB->getElements ($restrict_to_chapter, $openstate, $restrict_to_issue?($fromissue?$fromissue:$issueid):'_contributions._forissue', $fromtemplate, '_contributions._name ASC');
+
+				print_r($_select);
+
 				$description = str_replace(array('$1'),array($fromtemplate),HistoryContributional);				
 				foreach ($_select as $key => $value) $_select[$key]->_value = $value->_name.(!$row['restrict_to_chapter']?" &rarr; ".$value->_issuename:'');						
 			}
