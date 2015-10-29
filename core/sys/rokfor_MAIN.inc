@@ -1063,6 +1063,7 @@ class rokfor_MAIN
 		}		
 		
 		/* Store Binary Data */
+		$img_exception = false;
 		foreach ($this->form['caption'] as $_id=>$_captions) {
 			/* Load current dataset */
 			$_field_info = $this->rfDB->getFieldData($_id);
@@ -1129,6 +1130,7 @@ class rokfor_MAIN
 							$imagick = new Imagick(REPOSITORYDIR."/$_filename"."[0]");
 						} catch (Exception $e) {
 							$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
+							$img_exception = true;							
 							continue;
 						}							
 						$imagick->setBackgroundColor('white'); 
@@ -1204,6 +1206,7 @@ class rokfor_MAIN
 								$imagick->writeImage (REPOSITORYDIR."/".$_filename."-preview.jpg");								
 							} catch (Exception $e) {
 								$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
+								$img_exception = true;								
 								continue;							
 							}
 						}
@@ -1212,13 +1215,15 @@ class rokfor_MAIN
 							$imagick->writeImage (REPOSITORYDIR."/thumbs/".$_filename."-thmb.jpg");							
 						} catch (Exception $e) {
 							$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
+							$img_exception = true;							
 							continue;							
 						}
 					}
 					if ($_filename) $_store_data[] = array($_caption, $_filename);
 				}
 			}
-			$this->rfDB->setFieldData($this->rfDB->_glueTableData($_store_data),$_id,'_databinary');			
+			if (!$img_exception)
+				$this->rfDB->setFieldData($this->rfDB->_glueTableData($_store_data),$_id,'_databinary');			
 
 			/* Delete unused Files */
 			foreach ($_current_data as $_todel) {
