@@ -1187,9 +1187,21 @@ class rokfor_MAIN
 							$_written = true;
 						}							
 						/* Create small Rokfor Thumbnail anyway and a jpg copy of the input file if no clone is created so far */
-						if (!$_written) $imagick->writeImage (REPOSITORYDIR."/".$_filename."-preview.jpg");								
+						if (!$_written) {
+							try {
+								$imagick->writeImage (REPOSITORYDIR."/".$_filename."-preview.jpg");								
+							} catch (Exception $e) {
+								echo ('Imagick Error: ' . $e->getMessage() . "\n");
+								continue;							
+							}
+						}
 						$imagick->thumbnailImage (150, 150, true);
-						$imagick->writeImage (REPOSITORYDIR."/thumbs/".$_filename."-thmb.jpg");
+						try {
+							$imagick->writeImage (REPOSITORYDIR."/thumbs/".$_filename."-thmb.jpg");							
+						} catch (Exception $e) {
+							echo ('Imagick Error: ' . $e->getMessage() . "\n");
+							continue;							
+						}
 					}
 					if ($_filename) $_store_data[] = array($_caption, $_filename);
 				}
