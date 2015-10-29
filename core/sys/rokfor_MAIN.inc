@@ -1113,7 +1113,12 @@ class rokfor_MAIN
 					if (stristr($_mime, 'image')||stristr($_mime, 'pdf')) {
 						# create scaled down version (if set in field settings or alternatively
 						# in the globals - otherwise just store a jpg copy in the original resolution
-						$imagick = new Imagick(REPOSITORYDIR."/$_filename"."[0]");
+						try {
+							$imagick = new Imagick(REPOSITORYDIR."/$_filename"."[0]");
+						} catch (Exception $e) {
+							echo ('Imagick Error: ' . $e->getMessage() . "\n");
+							continue;
+						}							
 						$imagick->setBackgroundColor('white'); 
                         $imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
                         $imagick->setImageCompressionQuality(defined("JPEG_COMPRESSION")?JPEG_COMPRESSION:95);
@@ -1141,6 +1146,8 @@ class rokfor_MAIN
 							}
 						}
 						$imagick->stripImage();
+
+
 			
 						/* Prepare some values */
 						$_wA = $_hA = array();
