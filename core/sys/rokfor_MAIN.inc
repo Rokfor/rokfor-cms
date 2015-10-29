@@ -688,7 +688,7 @@ class rokfor_MAIN
 	 */
 	function _alert($s)
 	{
-		echo '<script>alert(\''.$s.'\');</script>';
+		echo '<script>alert(\''.str_replace("'", "\'", $s).'\');</script>';
 	}
 	
 
