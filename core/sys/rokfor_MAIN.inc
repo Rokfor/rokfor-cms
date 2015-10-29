@@ -679,6 +679,18 @@ class rokfor_MAIN
 		$this->rfDB->query($sql);		
 	}
 	
+	
+	/**
+	 * echoing a javascript alert
+	 *
+	 * @return void
+	 * @author Urs Hofer
+	 */
+	function _alert($s)
+	{
+		echo '<script>alert(\''.$s.'\');</script>';
+	}
+	
 
 	/**
 	 * _callFieldPostProcessor calls the post processor function for a field stored in the database
@@ -1116,7 +1128,7 @@ class rokfor_MAIN
 						try {
 							$imagick = new Imagick(REPOSITORYDIR."/$_filename"."[0]");
 						} catch (Exception $e) {
-							echo ('Imagick Error: ' . $e->getMessage() . "\n");
+							$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
 							continue;
 						}							
 						$imagick->setBackgroundColor('white'); 
@@ -1191,7 +1203,7 @@ class rokfor_MAIN
 							try {
 								$imagick->writeImage (REPOSITORYDIR."/".$_filename."-preview.jpg");								
 							} catch (Exception $e) {
-								echo ('Imagick Error: ' . $e->getMessage() . "\n");
+								$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
 								continue;							
 							}
 						}
@@ -1199,7 +1211,7 @@ class rokfor_MAIN
 						try {
 							$imagick->writeImage (REPOSITORYDIR."/thumbs/".$_filename."-thmb.jpg");							
 						} catch (Exception $e) {
-							echo ('Imagick Error: ' . $e->getMessage() . "\n");
+							$this->_alert('Imagick Error: ' . $e->getMessage() . "\n");
 							continue;							
 						}
 					}
