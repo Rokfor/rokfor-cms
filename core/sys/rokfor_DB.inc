@@ -11,7 +11,100 @@
  * @author Urs Hofer
  **/
 
-if (!class_exists("db")) include(SYSDIR."/lib/mysql_class.inc");
+
+class dbaccess {
+
+  /**
+   * pdo object
+   *
+   * @var string
+   */
+  private $db;
+  
+  /**
+   * version
+   *
+   * @var string
+   */
+  var $version;
+  
+  /**
+   * application name
+   *
+   * @var string
+   */
+  var $appname;
+  
+  function dbaccess($host,$user,$pass,$dbname,$version = false) {
+    $this->db = new mysqli($host, $user, $pass, $dbname);
+    if ($this->db->connect_error) {
+      return false;
+    }
+    $this->version = $version;
+    $this->appname = "";
+    $this->show_error = false;
+    return true;
+  }
+  
+  function escape($sql) {
+    return $this->db->escape_string($str);
+  }
+  
+  function query($query_string,$limit,$offset,$showerror=1) {
+    if($limit!=0) $query_string.=" LIMIT $offset, $limit";    
+    $this->query_id = $this->db->query($query_string);
+    if ($showerror==1 && !$this->query_id) $this->error("Invalid SQL: ".$query_string);
+    return $this->query_id;
+  }
+  
+  function affected_rows($q) {
+    return $this->db->affected_rows();
+  }
+  
+  function num_rows($q = false) {
+    if ($q) {
+      $this->query_id = $q;
+    }
+    return $this->query_id->num_rows;
+  }
+  
+  function insert_id($i) {
+    return $this->db->insert_id;    
+  }
+  
+  function fetch_object($q = false) {
+    if ($q) {
+      $this->query_id = $q;
+    }
+    return $this->query_id->fetch_object();
+  }
+  
+  function query_first_object($query_string,$limit=0,$offset=0,$showerror=1) {
+    $q = $this->query($query_string,$limit,$offset,$showerror=1);
+    $returnarray = $this->fetch_object($q);
+    return $returnarray;    
+  }
+  
+  function error($errormsg) {
+    $this->errdesc = $this->db->error();
+    $this->errno   = $this->db->errno();
+    $errormsg="<b>Database error in $this->appname:</b> $errormsg\n<br>";
+    $errormsg.="<b>mysql error:</b> $this->errdesc\n<br>";
+    $errormsg.="<b>mysql error number:</b> $this->errno\n<br>";
+    $errormsg.="<b>mysql version:</b> ".$this->getversion()."\n<br>";
+    $errormsg.="<b>php version:</b> ".phpversion()."\n<br>";
+    $errormsg.="<b>Date:</b> ".date("d.m.Y @ H:i")."\n<br>";
+    $errormsg.="<b>Script:</b> ".getenv("REQUEST_URI")."\n<br>";
+    $errormsg.="<b>Referer:</b> ".getenv("HTTP_REFERER")."\n<br><br>";
+
+    if($this->show_error) {
+		$_mesg = "<p>".$errormsg."</p>";
+		$_mesg .= "<p><pre>".htmlentities(print_r($_error,true))."</pre></p>";		 
+   	    die('<div style="width:100%; height: 100%; overflow: scroll">'.$_mesg.'</div');	
+    }
+  }
+}
+
 
 class rokfor_DB {
 
@@ -124,7 +217,7 @@ class rokfor_DB {
 	
 	function rokfor_DB ($rootdir=false,$dbase=DBASE,$dbuser=DBUSER,$dbpass=DBPASS,$dbname=DBNAME) 
 	{
-		$this->db = new db($dbase,$dbuser,$dbpass,$dbname,phpversion());
+		$this->db = new dbaccess($dbase,$dbuser,$dbpass,$dbname,phpversion());
 		$this->db->appname='ROKFOR (core)';
 		$this->accessTable = array(
 			"Projects" => array(),
