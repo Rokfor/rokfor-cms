@@ -98,6 +98,13 @@ class dbaccess {
     return $this->fetch_object();
   }
   
+  function get_fields($table) {
+    $fields = $this->query('SHOW COLUMNS FROM '.$this->escape($table));
+    while ($row=$this->fetch_array($fields))
+      $result[]=$row['Field'];  
+    return $result;
+  }
+  
   function error($errormsg) {
     $this->errdesc = $this->db->error();
     $this->errno   = $this->db->errno();
