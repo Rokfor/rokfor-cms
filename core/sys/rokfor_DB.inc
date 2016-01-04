@@ -614,7 +614,7 @@ class rokfor_DB {
 		$this->clearCache();
 		$_issueid = (int)$_issueid;
 		$sql = ("UPDATE _issues SET 
-			`_name` = '".mysql_real_escape_string($_name)."'
+			`_name` = '".$this->rfDB->_esc($_name)."'
 			 WHERE id = ".$_issueid." LIMIT 1");
 		return $this->query($sql);		
 	}
@@ -838,7 +838,7 @@ class rokfor_DB {
 		$initTime= time();
 		$sql = ("
 			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-			('', '".intval($_templateid)."', '".intval($_issueid)."', '".mysql_real_escape_string($_contribname)."', 'Open', $initTime, $initTime, '".$this->getUserId()."', NULL, '".intval($_chapterid)."', -1, 1);
+			('', '".intval($_templateid)."', '".intval($_issueid)."', '".$this->rfDB->_esc($_contribname)."', 'Open', $initTime, $initTime, '".$this->getUserId()."', NULL, '".intval($_chapterid)."', -1, 1);
 		");
 		$this->query($sql);
 		$newId = $this->insert_id();

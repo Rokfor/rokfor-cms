@@ -669,7 +669,7 @@ class rokfor_MAIN
 	function _log($key,$value) {
 		$sql = ("
 			INSERT INTO `_log` (`id`, `_ip`, `_agent`, `_user`, `_date`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-			('', '".GETENV("REMOTE_ADDR")."', '".GETENV("HTTP_USER_AGENT")."', '".mysql_real_escape_string($key.'<::::::>'.$value)."', '".time()."', '".$this->rfDB->getUserId()."', NULL, NULL, -1, 1);
+			('', '".GETENV("REMOTE_ADDR")."', '".GETENV("HTTP_USER_AGENT")."', '".$this->rfDB->_esc($key.'<::::::>'.$value)."', '".time()."', '".$this->rfDB->getUserId()."', NULL, NULL, -1, 1);
 		");
 		$this->rfDB->query($sql);
 		$logId = $this->rfDB->insert_id();
@@ -1330,7 +1330,7 @@ class rokfor_MAIN
 		// Insert into Contributions
 		$sql = ("
 			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-			('', '$_templateid', '$_issueid', '".mysql_real_escape_string($_contribname)."', 'Open', $initTime, $initTime, '".$this->rfDB->getUserId()."', NULL, '$_chapterid', -1, 1);
+			('', '$_templateid', '$_issueid', '".$this->rfDB->_esc($_contribname)."', 'Open', $initTime, $initTime, '".$this->rfDB->getUserId()."', NULL, '$_chapterid', -1, 1);
 		");
 		$this->rfDB->query($sql);
 		$newId = $this->rfDB->insert_id();
@@ -1454,7 +1454,7 @@ class rokfor_MAIN
 			
 			$sql_I = ("			
 				UPDATE `_data` 
-				SET `_datatext`='".mysql_real_escape_string($oldVals->_datatext)."', `_datainteger` = '".$oldVals->_datainteger."' , `_databinary` = '".$_binary_clone."'
+				SET `_datatext`='".$this->rfDB->_esc($oldVals->_datatext)."', `_datainteger` = '".$oldVals->_datainteger."' , `_databinary` = '".$_binary_clone."'
 				WHERE _fortemplatefield = ".$oldVals->_fortemplatefield." AND _forcontribution = $contribId;
 			");
 			$this->rfDB->query($sql_I);
@@ -1473,7 +1473,7 @@ class rokfor_MAIN
 	function renameContribution($contribId,$newName) {
 		if ($contribId<>$_SESSION['contribid']) return false;	// Something bad happened: the function is not called by the current open contribution
 		$sql = ("
-			UPDATE  `_contributions` SET  `_name` =  '".mysql_real_escape_string($newName)."' WHERE  `id` =$contribId LIMIT 1 ;
+			UPDATE  `_contributions` SET  `_name` =  '".$this->rfDB->_esc($newName)."' WHERE  `id` =$contribId LIMIT 1 ;
 		");
 		$this->rfDB->query($sql);				
 		$this->buffer .= "ok";		
@@ -1757,10 +1757,10 @@ class rokfor_MAIN
 				$sql = ("UPDATE _books SET `__sort__` = -1"); $this->rfDB->query($sql);						
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
 					if ($_row[0] == "added") {
-						$sql = ("INSERT INTO _books (`_name`, `__user__`, `__parentnode__`, `__sort__`) VALUES ('".mysql_real_escape_string($_row[1])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+						$sql = ("INSERT INTO _books (`_name`, `__user__`, `__parentnode__`, `__sort__`) VALUES ('".$this->rfDB->_esc($_row[1])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
 					} else {
-						$sql = ("UPDATE _books SET `_name` = '".mysql_real_escape_string($_row[1])."', `__sort__` =  ".$__sort__." WHERE id = ".$_row[0]." LIMIT 1");
+						$sql = ("UPDATE _books SET `_name` = '".$this->rfDB->_esc($_row[1])."', `__sort__` =  ".$__sort__." WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}
 				}
@@ -1772,10 +1772,10 @@ class rokfor_MAIN
 				$sql = ("UPDATE _formats SET `__sort__` = -1 WHERE _forbook = ".$_id); $this->rfDB->query($sql);
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
 					if ($_row[0] == "added") {
-						$sql = ("INSERT INTO _formats (`_name`, `_forbook`, `__user__`, `__parentnode__`, `__sort__`) VALUES ('".mysql_real_escape_string($_row[1])."', ".$_id.", '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+						$sql = ("INSERT INTO _formats (`_name`, `_forbook`, `__user__`, `__parentnode__`, `__sort__`) VALUES ('".$this->rfDB->_esc($_row[1])."', ".$_id.", '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
 					} else {
-						$sql = ("UPDATE _formats SET `_name` = '".mysql_real_escape_string($_row[1])."', `__sort__` =  ".$__sort__." WHERE id = ".$_row[0]." LIMIT 1");
+						$sql = ("UPDATE _formats SET `_name` = '".$this->rfDB->_esc($_row[1])."', `__sort__` =  ".$__sort__." WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}			
 				}
@@ -1810,16 +1810,16 @@ class rokfor_MAIN
 					}
 					if ($_row[0] == "added") {
 						$sql = ("INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
- 						VALUES ('".mysql_real_escape_string($_row[1])."', ".time().", ".strtotime($_row[3]).", '".$_row[5]."', '".$_row[6]."', '".mysql_real_escape_string($_row[2])."',".$_id.", '".$_plugins['_singleplugin']."', '".$_plugins['_allplugin']."', '".$_plugins['_rtfplugin']."', '".$_plugins['_xmlplugin']."', '".$_plugins['_narrationplugin']."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+ 						VALUES ('".$this->rfDB->_esc($_row[1])."', ".time().", ".strtotime($_row[3]).", '".$_row[5]."', '".$_row[6]."', '".$this->rfDB->_esc($_row[2])."',".$_id.", '".$_plugins['_singleplugin']."', '".$_plugins['_allplugin']."', '".$_plugins['_rtfplugin']."', '".$_plugins['_xmlplugin']."', '".$_plugins['_narrationplugin']."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
 					} else {
 						$sql = ("UPDATE _issues SET 
-							`_name` = '".mysql_real_escape_string($_row[1])."',
+							`_name` = '".$this->rfDB->_esc($_row[1])."',
 							`__sort__` =  ".$__sort__.",
 							`_closedate` =  '".strtotime($_row[3])."',
 							`_status` =  '".$_row[5]."',
 							`__config__` =  '".$_row[6]."',
-							`_infotext` =  '".mysql_real_escape_string($_row[2])."',
+							`_infotext` =  '".$this->rfDB->_esc($_row[2])."',
 							`_singleplugin` =  '".$_plugins['_singleplugin']."',
 							`_allplugin` =  '".$_plugins['_allplugin']."',
 							`_rtfplugin` =  '".$_plugins['_rtfplugin']."',
@@ -1848,7 +1848,7 @@ class rokfor_MAIN
 										
 					if ($_row[0] == "added") {
 						$sql = ("INSERT INTO _templatenames (_name, _helptext, _helpimage, _inchapter, _forbook, _category, _public, __user__, __parentnode__ , __sort__) 
- 						VALUES ('".mysql_real_escape_string($_row[1])."','".mysql_real_escape_string($_row[2])."','".mysql_real_escape_string($_row[3])."','".$_chapters."','".$_books."', '".mysql_real_escape_string($_row[4])."','".mysql_real_escape_string($_row[7])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+ 						VALUES ('".$this->rfDB->_esc($_row[1])."','".$this->rfDB->_esc($_row[2])."','".$this->rfDB->_esc($_row[3])."','".$_chapters."','".$_books."', '".$this->rfDB->_esc($_row[4])."','".$this->rfDB->_esc($_row[7])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
 						/* Clone Fields for the New Template */
 						$_newTemplateId = $this->rfDB->insert_id();
@@ -1900,14 +1900,14 @@ class rokfor_MAIN
 						
 					} else {
 						$sql = ("UPDATE _templatenames SET 
-							`_name` = '".mysql_real_escape_string($_row[1])."',
+							`_name` = '".$this->rfDB->_esc($_row[1])."',
 							`__sort__` =  ".$__sort__.",
-							`_helptext` =  '".mysql_real_escape_string($_row[2])."',
-							`_helpimage` =  '".mysql_real_escape_string($_row[3])."',
+							`_helptext` =  '".$this->rfDB->_esc($_row[2])."',
+							`_helpimage` =  '".$this->rfDB->_esc($_row[3])."',
 							`_inchapter` =  '".$_chapters."',
 							`_forbook` =  '".$_books."',
-							`_category` =  '".mysql_real_escape_string($_row[4])."',
-							`_public` =  '".mysql_real_escape_string($_row[7])."'
+							`_category` =  '".$this->rfDB->_esc($_row[4])."',
+							`_public` =  '".$this->rfDB->_esc($_row[7])."'
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}			
@@ -1941,16 +1941,16 @@ class rokfor_MAIN
 							`__sort__`) 
 						VALUES (
 							'".$_id."', 
-							'".mysql_real_escape_string($_row[1])."', 
-							'".mysql_real_escape_string($_row[2])."', 
-							'".mysql_real_escape_string($_row[3])."', 
-						 	'".mysql_real_escape_string($_row[7])."',
+							'".$this->rfDB->_esc($_row[1])."', 
+							'".$this->rfDB->_esc($_row[2])."', 
+							'".$this->rfDB->_esc($_row[3])."', 
+						 	'".$this->rfDB->_esc($_row[7])."',
 							'".$_row[8]."', 
 							'".$_row[9]."', 
 							'".$_row[10]."', 
 							'".$_row[11]."', 
 							'".$_row[12]."',
-							'".mysql_real_escape_string($_row[4])."', 
+							'".$this->rfDB->_esc($_row[4])."', 
 							'".$_row[5]."',
 							'".$_row[6]."', 
 							'".$_row[13]."', 
@@ -1961,16 +1961,16 @@ class rokfor_MAIN
 					} else {
 						$sql = ("UPDATE _templates SET 
 							`_fortemplate`		='".$_id."', 
-							`_fieldname`        ='".mysql_real_escape_string($_row[1])."',
-							`_helpdescription`  ='".mysql_real_escape_string($_row[2])."',
-							`_helpimage`        ='".mysql_real_escape_string($_row[3])."',
-							`_fieldtype`        ='".mysql_real_escape_string($_row[7])."',
+							`_fieldname`        ='".$this->rfDB->_esc($_row[1])."',
+							`_helpdescription`  ='".$this->rfDB->_esc($_row[2])."',
+							`_helpimage`        ='".$this->rfDB->_esc($_row[3])."',
+							`_fieldtype`        ='".$this->rfDB->_esc($_row[7])."',
 							`_maxlines`         ='".$_row[8]."', 
 							`_textlength`       ='".$_row[9]."', 
 							`_imagewidth`       ='".$_row[10]."', 
 							`_imageheight`      ='".$_row[11]."', 
 							`_cols`             ='".$_row[12]."',
-							`_colNames`         ='".mysql_real_escape_string($_row[4])."',
+							`_colNames`         ='".$this->rfDB->_esc($_row[4])."',
 							`_history`          ='".$_row[5]."',
 							`_growing`          ='".$_row[6]."', 
 							`_lengthInfluence`  ='".$_row[13]."', 
@@ -1990,13 +1990,13 @@ class rokfor_MAIN
 				$this->rfDB->query($sql);						
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
 					if ($_row[0] == "added") {
-						$sql = ("INSERT INTO users (`username`, `password`, `usergroup`) VALUES ('".mysql_real_escape_string($_row[1])."', '".md5($_row[2])."', '".mysql_real_escape_string($_row[3])."')");
+						$sql = ("INSERT INTO users (`username`, `password`, `usergroup`) VALUES ('".$this->rfDB->_esc($_row[1])."', '".md5($_row[2])."', '".$this->rfDB->_esc($_row[3])."')");
 						$this->rfDB->query($sql);
 					} else {
 						$sql = ("SELECT password FROM users WHERE id = ".$_row[0]." LIMIT 1");
 						$_oldpw = $this->rfDB->fetch_object($this->rfDB->query($sql));
 						$_pw = ($_row[2]==$_oldpw->password)?($_oldpw->password):(md5($_row[2]));						
-						$sql = ("UPDATE users SET `username` = '".mysql_real_escape_string($_row[1])."', `password` = '".$_pw."', `usergroup` = '".mysql_real_escape_string($_row[3])."' WHERE id = ".$_row[0]." LIMIT 1");
+						$sql = ("UPDATE users SET `username` = '".$this->rfDB->_esc($_row[1])."', `password` = '".$_pw."', `usergroup` = '".$this->rfDB->_esc($_row[3])."' WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}
 				}			
@@ -2037,22 +2037,22 @@ class rokfor_MAIN
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
-							'".mysql_real_escape_string($_row[1])."', 
-							'".mysql_real_escape_string($_templates)."', 
-							'".mysql_real_escape_string($_issues)."', 
-						 	'".mysql_real_escape_string($_books)."',
-						 	'".mysql_real_escape_string($_users)."',
+							'".$this->rfDB->_esc($_row[1])."', 
+							'".$this->rfDB->_esc($_templates)."', 
+							'".$this->rfDB->_esc($_issues)."', 
+						 	'".$this->rfDB->_esc($_books)."',
+						 	'".$this->rfDB->_esc($_users)."',
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
 					} else {
 						$sql = ("UPDATE _rights SET 
-							`_group` 		= '".mysql_real_escape_string($_row[1])."', 
-							`_fortemplate`	= '".mysql_real_escape_string($_templates)."', 
-							`_forissue`		= '".mysql_real_escape_string($_issues)."', 
-							`_forbook`		= '".mysql_real_escape_string($_books)."',
-							`_foruser`		= '".mysql_real_escape_string($_users)."',
+							`_group` 		= '".$this->rfDB->_esc($_row[1])."', 
+							`_fortemplate`	= '".$this->rfDB->_esc($_templates)."', 
+							`_forissue`		= '".$this->rfDB->_esc($_issues)."', 
+							`_forbook`		= '".$this->rfDB->_esc($_books)."',
+							`_foruser`		= '".$this->rfDB->_esc($_users)."',
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
@@ -2074,20 +2074,20 @@ class rokfor_MAIN
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
-							'".mysql_real_escape_string($_row[1])."', 
-							'".mysql_real_escape_string($_row[2])."', 
-							'".mysql_real_escape_string($_row[3])."', 
-						 	'".mysql_real_escape_string($_row[4])."',
+							'".$this->rfDB->_esc($_row[1])."', 
+							'".$this->rfDB->_esc($_row[2])."', 
+							'".$this->rfDB->_esc($_row[3])."', 
+						 	'".$this->rfDB->_esc($_row[4])."',
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
 					} else {
 						$sql = ("UPDATE _plugins SET 
-							`_name` 		= '".mysql_real_escape_string($_row[1])."', 
-							`_callback`		= '".mysql_real_escape_string($_row[2])."', 
-							`_config`		= '".mysql_real_escape_string($_row[3])."', 
-							`_page`			= '".mysql_real_escape_string($_row[4])."', 
+							`_name` 		= '".$this->rfDB->_esc($_row[1])."', 
+							`_callback`		= '".$this->rfDB->_esc($_row[2])."', 
+							`_config`		= '".$this->rfDB->_esc($_row[3])."', 
+							`_page`			= '".$this->rfDB->_esc($_row[4])."', 
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
@@ -2114,18 +2114,18 @@ class rokfor_MAIN
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
-							'".mysql_real_escape_string($_row[1])."', 
-							'".mysql_real_escape_string($_row[3])."', 
-							'".mysql_real_escape_string($_templates)."', 
+							'".$this->rfDB->_esc($_row[1])."', 
+							'".$this->rfDB->_esc($_row[3])."', 
+							'".$this->rfDB->_esc($_templates)."', 
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
 					} else {
 						$sql = ("UPDATE _fieldpostprocessor SET 
-							`_name` 		= '".mysql_real_escape_string($_row[1])."', 
-							`_code`			= '".mysql_real_escape_string($_row[3])."', 
-							`_forfield`		= '".mysql_real_escape_string($_templates)."', 
+							`_name` 		= '".$this->rfDB->_esc($_row[1])."', 
+							`_code`			= '".$this->rfDB->_esc($_row[3])."', 
+							`_forfield`		= '".$this->rfDB->_esc($_templates)."', 
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
@@ -2154,22 +2154,22 @@ class rokfor_MAIN
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
-							'".mysql_real_escape_string($_row[1])."', 
-							'".mysql_real_escape_string($_row[2])."', 
-							'".mysql_real_escape_string($_templates)."', 
-							'".mysql_real_escape_string($_row[4])."', 
-							'".mysql_real_escape_string($_row[5])."', 
+							'".$this->rfDB->_esc($_row[1])."', 
+							'".$this->rfDB->_esc($_row[2])."', 
+							'".$this->rfDB->_esc($_templates)."', 
+							'".$this->rfDB->_esc($_row[4])."', 
+							'".$this->rfDB->_esc($_row[5])."', 
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
 					} else {
 						$sql = ("UPDATE _batch SET 
-							`_name` 		= '".mysql_real_escape_string($_row[1])."', 
-							`_description`	= '".mysql_real_escape_string($_row[2])."', 
-							`_forbook`		= '".mysql_real_escape_string($_templates)."', 
-							`_precode`		= '".mysql_real_escape_string($_row[4])."', 
-							`_postcode`		= '".mysql_real_escape_string($_row[5])."',    							
+							`_name` 		= '".$this->rfDB->_esc($_row[1])."', 
+							`_description`	= '".$this->rfDB->_esc($_row[2])."', 
+							`_forbook`		= '".$this->rfDB->_esc($_templates)."', 
+							`_precode`		= '".$this->rfDB->_esc($_row[4])."', 
+							`_postcode`		= '".$this->rfDB->_esc($_row[5])."',    							
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
