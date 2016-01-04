@@ -112,6 +112,14 @@ class db {
     return $result;
   }
   
+  function get_field($q = false, $field){
+    if ($q) {
+      $this->query_id = $q;
+    }
+    $arr = $this->query_id->fetch_array();
+    return $arr[$field] ? $arr[$field] : false;
+  }
+  
   function error($errormsg) {
     $this->errdesc = $this->db->error();
     $this->errno   = $this->db->errno();
