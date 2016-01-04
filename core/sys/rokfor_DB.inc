@@ -93,6 +93,13 @@ class dbaccess {
     return $this->query_id->fetch_object();
   }
   
+  function fetch_array($q = false) {
+    if ($q) {
+      $this->query_id = $q;
+    }
+    return $this->query_id->fetch_array();    
+  }
+  
   function query_first_object($query_string, $limit=0, $offset=0, $showerror=1) {
     $this->query($query_string, $limit, $offset, $showerror);
     return $this->fetch_object();
