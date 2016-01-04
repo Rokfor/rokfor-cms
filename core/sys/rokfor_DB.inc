@@ -11,7 +11,7 @@
  * @author Urs Hofer
  **/
 
-class dbaccess {
+class db {
 
   /**
    * pdo object
@@ -41,7 +41,7 @@ class dbaccess {
    */
   var $appname;
   
-  function dbaccess($host,$user,$pass,$dbname,$version = false) {
+  function db($host,$user,$pass,$dbname,$version = false) {
     $this->db = new mysqli($host, $user, $pass, $dbname);
     if ($this->db->connect_error) {
       $this->error("Error Connecting mysqli");
@@ -244,7 +244,7 @@ class rokfor_DB {
 	
 	function rokfor_DB ($rootdir=false,$dbase=DBASE,$dbuser=DBUSER,$dbpass=DBPASS,$dbname=DBNAME) 
 	{
-		$this->db = new dbaccess($dbase,$dbuser,$dbpass,$dbname,phpversion());
+		$this->db = new db($dbase,$dbuser,$dbpass,$dbname,phpversion());
 		$this->db->appname='ROKFOR (core)';
 		$this->accessTable = array(
 			"Projects" => array(),
