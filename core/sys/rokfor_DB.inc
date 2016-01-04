@@ -93,6 +93,13 @@ class db {
     return $this->query_id->fetch_object();
   }
   
+  function fetch_assoc($q = false) {
+    if ($q) {
+      $this->query_id = $q;
+    }
+    return $this->query_id->fetch_assoc();
+  }
+  
   function fetch_array($q = false) {
     if ($q) {
       $this->query_id = $q;
