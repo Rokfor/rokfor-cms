@@ -64,6 +64,13 @@ class dbaccess {
     return $this->query_id;
   }
   
+  function unbuffered_query($query_string,$limit = 0, $offset = 0, $showerror = 1) {
+    if($limit != 0) $query_string.= " LIMIT $offset, $limit";    
+    $this->query_id = $this->db->query($query_string, MYSQLI_USE_RESULT);
+    if ($showerror==1 && !$this->query_id) $this->error("Invalid SQL: ".$query_string);
+    return $this->query_id;
+  }
+  
   function affected_rows($q) {
     return $this->db->affected_rows();
   }
