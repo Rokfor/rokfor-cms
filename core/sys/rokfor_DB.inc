@@ -271,6 +271,7 @@ class rokfor_DB {
 			"Editions" => array(),			
 			"Templates" => array()
 		);
+    $this->db->show_error = true;
 	}
 	
 	function _esc($_str) {
