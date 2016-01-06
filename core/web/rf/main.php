@@ -15,6 +15,11 @@ include(((CLI===true)?$argv[1]:getenv("DOCUMENT_ROOT")).'/../rf_config-v2.inc');
 include(SYSDIR.'/rokfor_MAIN.inc');					/* Main Lib */
 include(SYSDIR.'/translation/'.LANGUAGE.'.inc');	/* German translation */
 
+if (defined("DEVELOP_MODE")) {
+  error_reporting(E_ALL || ~E_NOTICE);
+  ini_set('display_errors','On');
+}
+
 /**
  * Create Rokfor Instance
  */
