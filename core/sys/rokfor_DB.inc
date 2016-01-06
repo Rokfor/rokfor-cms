@@ -41,6 +41,13 @@ class db {
    */
   var $appname;
   
+  /**
+   * throw error exceptions if set to true
+   *
+   * @var string
+   */
+  var $show_error;
+  
   function db($host,$user,$pass,$dbname,$version = false) {
     $this->db = new mysqli($host, $user, $pass, $dbname);
     if ($this->db->connect_error) {
@@ -127,11 +134,9 @@ class db {
     return $arr[$field] ? $arr[$field] : false;
   }
   
-  function error($errormsg) {
-    $this->errdesc = $this->db->error();
-    $this->errno   = $this->db->errno();
+  function error($errormsg = "") {
     $errormsg="<b>Database error in $this->appname:</b> $errormsg\n<br>";
-    $errormsg.="<b>mysql error:</b> $this->errdesc\n<br>";
+    $errormsg.="<b>mysql error:</b> $this->db->$errno\n<br>";
     $errormsg.="<b>mysql error number:</b> $this->errno\n<br>";
     $errormsg.="<b>mysql version:</b> ".$this->getversion()."\n<br>";
     $errormsg.="<b>php version:</b> ".phpversion()."\n<br>";
