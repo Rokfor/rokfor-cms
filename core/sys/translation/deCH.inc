@@ -259,46 +259,47 @@ if (!defined("IssueAllowAllPdf"))		define("IssueAllowAllPdf","Alle PDFs");				//
 */
 
 if (!defined("CallbackPreMessage"))	define("CallbackPreMessage", '/*
-This is the batch_preprocessing function. It is called by the batch processor action and will display
-the form elements for a batch function, if necessary. <form> Tags are inserted automatically.
-Parameters:
+batch preprocessing function. Passed Parameters:
 &$_db		(mysql class)
 &$_rokforDB (rokfor db)
 &$issueid	(int)
 &$bookid	(int)
+
+form elements in the return string are passed to the postprocessor.
+
 */
 return ("HTML String");');
 
 if (!defined("CallbackAfterMessage")) define("CallbackAfterMessage", '/*
-This is the batch_postprocessing function. It handles the requests of the corresponding batch function.
-Parameters:
-&$_db		(mysql class)
-&$_rokforDB (rokfor db)
-&$issueid	(int)
-&$bookid	(int)
-&$batchid	(int)
-&$batchpost	(_POST array)
-&$contribs	(results of rfDB->getElements)
-&$templates (results of rfDB->getTemplates)
+batch postprocessing function. Passed Parameters:
+&$_db
+&$_rokforDB
+&$issueid
+&$bookid
+&$batchid
+&$batchpost
+&$contribs
+&$templates
+&$_caller
+
+$batchpost contains the whole $_POST array.
+
 */
 return ("HTML Code shown in popup.");');
 
 if (!defined("CallbackFieldAlert")) define('CallbackFieldAlert', '
 /* 
-   CALLBACK CODE
-   Parameter:
-   &$db: MySQL Database Class
-   &$data: Filename for Binaries, Arrays for Tables and 
-           Multi Line Texts, Integer oder String
-   &$_field_info: Array with Information about the 
-           Field (Compatibility Mode)
-   &$rfDB: Rokfor Database Class
-   &$_field_info_as_object: Complete Field 
-           Info (from rfDB->getFieldData)
+  Field Processor Parameter:
 
-   Return: return($string/$array/$integer)
-   If no return code is added, it will automatically assume 
-   that you modified $data and will return this value.
+  &$dbMySQL Database Class
+  &$data: Field Data
+  &$_field_info: Field Specifications as Arraay
+  &$rfDB: Rokfor Database Class
+  &$_field_info_as_object: Field Specifications as Object (from rfDB->getFieldData)
+
+  - Modify $data in this function
+  - If your result is stored in a different variable than $data, add return($yourvar);
+  - return($data) is added automatically
 */
 ');
 

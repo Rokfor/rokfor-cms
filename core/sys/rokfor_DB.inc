@@ -79,7 +79,7 @@ class db {
   }
   
   function affected_rows($q) {
-    return $this->db->affected_rows();
+    return $this->db->affected_rows;
   }
   
   function num_rows($q = false) {
@@ -274,13 +274,14 @@ class rokfor_DB {
     $this->db->show_error = true;
 	}
 	
-	function _esc($_str) {
+	function _esc($_str) 
+  {
 		return $this->db->escape($_str);
 	}
 	
 	
-	function _stripslashes($_str) {
-	//	return $_str;
+	function _stripslashes($_str)
+  {
 		if (get_magic_quotes_gpc()) {return stripslashes($_str);}
 		else return $_str;
 	}
@@ -292,7 +293,8 @@ class rokfor_DB {
 	 * @return query
 	 * @author Urs Hofer
 	 */
-	function query($q) {
+	function query($q) 
+  {
 		return $this->db->query($q);
 	}
 
@@ -303,7 +305,8 @@ class rokfor_DB {
 	 * @return query
 	 * @author Urs Hofer
 	 */
-	function affected_rows($q) {
+	function affected_rows($q)
+  {
 		return $this->db->affected_rows($q);
 	}
               
@@ -314,7 +317,8 @@ class rokfor_DB {
 	 * @return query
 	 * @author Urs Hofer
 	 */
-	function num_rows($q) {
+	function num_rows($q) 
+  {
 		return $this->db->num_rows($q);
 	}
 
@@ -325,7 +329,8 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function insert_id($i = false) {
+	function insert_id($i = false)
+  {
 		return $this->db->insert_id($i);
 	}
 
@@ -336,7 +341,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function fetch_object($link) {		
+	function fetch_object($link)
+  {		
 		return $this->db->fetch_object($link);
 	}
 
@@ -348,7 +354,8 @@ class rokfor_DB {
 	 * @return 
 	 * @author Urs Hofer
 	 */
-	function newSession($user,$pass){
+	function newSession($user,$pass)
+  {
 		$this->clearCache();
 		$userdb = $this->db->query("SELECT * FROM users WHERE password = '".$this->_esc($pass)."' AND username = '".$this->_esc($user)."'");  
 		$checkusr = $this->db->fetch_object($userdb);
@@ -375,7 +382,8 @@ class rokfor_DB {
 	 * @return int
 	 * @author Urs Hofer
 	 */
-	function checkSession($id, $dont_update_time = false){
+	function checkSession($id, $dont_update_time = false)
+  {
 		$this->clearCache();		
 
 
@@ -416,7 +424,8 @@ class rokfor_DB {
 	 * @return int
 	 * @author Urs Hofer
 	 */
-	function getSessionId() {
+	function getSessionId()
+  {
 		return $this->activeSession;
 	}
 	
@@ -427,7 +436,8 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function cleanSessionId($id) {
+	function cleanSessionId($id)
+  {
 		$this->clearCache();
 		return ($deleteold = $this->db->query('DELETE FROM session WHERE session = "'.$this->_esc($id).'"'));		
 	}				
@@ -439,7 +449,8 @@ class rokfor_DB {
 	 * @return string
 	 * @author Urs Hofer
 	 */
-	function getUserName() {
+	function getUserName()
+  {
 		return $this->activeUsername;
 	}
 	
@@ -449,7 +460,8 @@ class rokfor_DB {
 	 * @return string
 	 * @author Urs Hofer
 	 */
-	function getUserGroup() {
+	function getUserGroup()
+  {
 		return $this->activeUsergroup;
 	}
 	
@@ -459,7 +471,8 @@ class rokfor_DB {
 	 * @return int
 	 * @author Urs Hofer
 	 */
-	function getUserId() {
+	function getUserId()
+  {
 		return $this->activeUserId;
 	}
 	
@@ -470,15 +483,13 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function setUserRestriction($_state = true) {
-
+	function setUserRestriction($_state = true)
+  {
 		if ($this->getUserGroup() <> "user") {
 			$this->userRestriction = false;
 			return $this->userRestriction;
 		}
-
 		$this->userRestriction = $_state;
-
 		$this->accessTable = Array(
 			"Projects" => Array(),
 			"Editions" => Array(),			
@@ -487,25 +498,65 @@ class rokfor_DB {
 
 		/* Load User Table */
 
-		$sql = "SELECT * FROM _rights WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
+		$sql = "SELECT _rightid FROM R_rights_foruser WHERE _userid = ".$this->getUserId();
 		$query = $this->db->query($sql);
 		while ($rights = $this->db->fetch_object($query)) {
+      
 			// Get Templates
-			foreach (explode('<::::::>',$rights->_fortemplate) as $singletmpId) {
-				if ($singletmpId && !in_array($singletmpId,$this->accessTable["Templates"])) $this->accessTable["Templates"][] = $singletmpId; 
+      $sql = "SELECT _templateid FROM R_rights_fortemplate WHERE _rightid = " . $rights->_rightid;
+      $_query = $this->db->query($sql);
+			while ($_r = $this->db->fetch_object($_query)) {
+        $this->accessTable["Templates"][] = $_r->_templateid; 
 			}
 			// Get Books
-			foreach (explode('<::::::>',$rights->_forbook) as $singletmpId) {
-				if ($singletmpId && !in_array($singletmpId,$this->accessTable["Projects"])) $this->accessTable["Projects"][] = $singletmpId; 
+      $sql = "SELECT _bookid FROM R_rights_forbook WHERE _rightid = " . $rights->_rightid;
+      $_query = $this->db->query($sql);
+			while ($_r = $this->db->fetch_object($_query)) {
+        $this->accessTable["Projects"][] = $_r->_bookid; 
 			}
+
 			// Get Issues
-			foreach (explode('<::::::>',$rights->_forissue) as $singletmpId) {
-				if ($singletmpId && !in_array($singletmpId,$this->accessTable["Editions"])) $this->accessTable["Editions"][] = $singletmpId; 
+      $sql = "SELECT _issueid FROM R_rights_forissue WHERE _rightid = " . $rights->_rightid;
+      $_query = $this->db->query($sql);
+			while ($_r = $this->db->fetch_object($_query)) {
+        $this->accessTable["Editions"][] = $_r->_issueid; 
 			}
+
 		}
 
 	}
+  
+  /**
+   * undocumented function
+   *
+   * @return void
+   * @author Urs Hofer
+   */
+  function getCrossRef($id, $field, $ref, $table)
+  {
+    $retval = array();
+    if (is_numeric($id)) {
+      $sql = "SELECT $ref FROM $table WHERE $field = $id";
+      $_query = $this->db->query($sql);
+  		while ($_r = $this->db->fetch_object($_query)) {
+        array_push($retval, $_r->$ref);
+  		}
+    }
+    return $retval;
+  }
 	
+  /**
+   * undocumented function
+   *
+   * @return void
+   * @author Urs Hofer
+   */
+  function addCrossRef($id, $field, $refid, $reffield, $table)
+  {
+		$sql = ("INSERT INTO $table ($field, $reffield) VALUES ($id, $refid)");
+		$this->db->query($sql);
+  }
+  
 	/**
 	 * returns the rights per group, does not store anything class wide
 	 *
@@ -513,7 +564,8 @@ class rokfor_DB {
 	 * @return array
 	 * @author Urs Hofer
 	 */
-	function showGroupRights($_group) {
+	function showGroupRights($_group)
+  {
 		$_accessTable = Array(
 			"Templates" => Array(),
 			"Projects" => Array(),
@@ -521,25 +573,30 @@ class rokfor_DB {
 			"Users" => Array()			
 		);
 		$sql = "SELECT * FROM _rights WHERE id =".intval($_group);
-		$query = $this->db->query($sql);
-		while ($rights = $this->db->fetch_object($query)) {
-			// Get Templates
-			foreach (explode('<::::::>',$rights->_fortemplate) as $singletmpId) {
-				$_accessTable["Templates"][] = $singletmpId;
-			}
-			// Get Books
-			foreach (explode('<::::::>',$rights->_forbook) as $singletmpId) {
-				$_accessTable["Projects"][] = $singletmpId;
-			}
-			// Get Issues
-			foreach (explode('<::::::>',$rights->_forissue) as $singletmpId) {
-				$_accessTable["Editions"][] = $singletmpId;
-			}
-			// Get Users
-			foreach (explode('<::::::>',$rights->_foruser) as $singletmpId) {
-				$_accessTable["Users"][] = $singletmpId;
-			}			
-		}
+    $rights = $this->db->query_first_object($sql);
+    foreach ($_accessTable as $key => &$table) {
+      $sql = "";
+      switch ($key) {
+        case 'Templates':
+          $sql = "SELECT _templateid FROM R_rights_fortemplate WHERE _rightid = " . $rights->id;
+          break;
+        case 'Projects':
+          $sql = "SELECT _bookid FROM R_rights_forbook WHERE _rightid = " . $rights->id;
+          break;
+        case 'Editions':
+          $sql = "SELECT _issueid FROM R_rights_forissue WHERE _rightid = " . $rights->id;
+          break;
+        case 'Users':
+          $sql = "SELECT _userid FROM R_rights_foruser WHERE _rightid = " . $rights->id;
+          break;
+      }
+      if ($sql) {
+        $_query = $this->db->query($sql);
+        while ($_r = $this->db->fetch_array($_query)) {
+          array_push($table, $_r[0]); 
+        }      
+      }
+    }
 		return $_accessTable;
 	}
 
@@ -551,7 +608,9 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 */
 	function getUserNameById($id_or_name) {
-		$_name = $this->fetch_object($this->query("SELECT username FROM users WHERE id = '".$this->_esc($id_or_name)."' || username = '".$this->_esc($id_or_name)."' LIMIT 1"));												
+		$_name = $this->db->query_first_object("SELECT username FROM users 
+      WHERE id = '".$this->_esc($id_or_name)."'
+      OR username = '".$this->_esc($id_or_name)."' LIMIT 1");
 		return $_name->username;
 	}
 
@@ -610,7 +669,8 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function deleteEdition($_issueid) {
+	function deleteEdition($_issueid)
+  {
 		$this->clearCache();
 		$sql = ("DELETE FROM _issues WHERE `id` = ".intval($_issueid)." LIMIT 1"); 
 		return $this->query($sql);
@@ -634,6 +694,8 @@ class rokfor_DB {
 	
 	/**
 	 * Adds an Edition
+	 * 
+	 * Plugins are not updated !!!
 	 *
 	 * @return void
 	 * @author Urs Hofer
@@ -650,23 +712,47 @@ class rokfor_DB {
 				$_sort = count($_e)+1;
 			}
 		}
-		$sql = "INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
-				VALUES ('".$this->_esc($_name)."', ".$_opentime.", ".$_closetime.", '".$this->_esc($_status)."', '".$this->_esc($_config)."', '".$this->_esc($_note)."', ".$this->_esc($_book).", '".$this->_esc($_p1)."', '".$this->_esc($_p2)."', '".$this->_esc($_p3)."', '".$this->_esc($_p4)."', '".$this->_esc($_p5)."', '".$this->_esc($_user)."', '-1', ".$this->_esc($_sort).")";
+		$sql = "INSERT INTO _issues (
+        `_name`, 
+        `_opendate`, 
+        `_closedate`, 
+        `_status`, 
+        `__config__`, 
+        `_infotext`, 
+        `_forbook`,
+        `__user__`, 
+        `__parentnode__`, 
+        `__sort__`) 
+      VALUES (
+        '".$this->_esc($_name)."', 
+        ".$_opentime.", 
+        ".$_closetime.", 
+        '".$this->_esc($_status)."', 
+        '".$this->_esc($_config)."', 
+        '".$this->_esc($_note)."', 
+        ".$this->_esc($_book).", 
+        '".$this->_esc($_user)."', 
+        '-1', 
+        ".$this->_esc($_sort).")";
+    
+    // Plugin References:
+    // `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`
+    // '".$this->_esc($_p1)."', '".$this->_esc($_p2)."', '".$this->_esc($_p3)."', '".$this->_esc($_p4)."', '".$this->_esc($_p5)."',
+    
 		if ($this->query($sql)) {
 			// Add read write permission for the issue to the current user
 			$newId = $this->insert_id();
-
-
-			$sql = "SELECT * FROM _rights WHERE (_foruser LIKE '%:>".$this->getUserId()."<:%' OR _foruser LIKE '".$this->getUserId()."<:%') ";
+			$sql = "SELECT _rights.* FROM _rights
+        LEFT JOIN R_rights_foruser ON _rights.id = _rightid
+        WHERE _userid = ".$this->getUserId();
 			$query = $this->db->query($sql);
-			$_updaterights = array();
 			while ($rights = $this->db->fetch_object($query)) {
-				$_oldrights = explode('<::::::>',$rights->_forissue);
-				$_oldrights[] = $newId;
-				$_updaterights[$rights->id] = join('<::::::>',$_oldrights);
-			}
-			foreach ($_updaterights as $_groupid => $_rightstring) {
-				$this->db->query("UPDATE _rights SET _forissue = '".$_rightstring."' WHERE id = ".$_groupid." LIMIT 1");		
+				$this->db->query("INSERT INTO _issues (
+          `_rightid`, 
+          `_issueid`) 
+        VALUES (
+          ".$rights->id.", 
+          ".$newId.")");		
 			}
 		}
 	}		
@@ -826,6 +912,22 @@ class rokfor_DB {
 		return ($this->query($sql));
 	}
 	
+  /**
+   * Determine is a field type is json or not
+   *
+   * 
+   * @return void
+   * @author Urs Hofer
+   */
+  function isJsonField($fieldid)
+  {
+    /*
+    ================
+    TODO
+    ================
+    */
+    return true;
+  }
 	
 	/**
 	 * addElement() - adds an element (contribution) to the database
@@ -835,7 +937,8 @@ class rokfor_DB {
  	 * @return id of the new contribution or false on error
 	 * @author Urs Hofer
 	 */
-	function addElement ($_contribname,$_templateid,$_chapterid=false,$_issueid=false) {
+	function addElement ($_contribname,$_templateid,$_chapterid=false,$_issueid=false)
+  {
 		$this->clearCache();
 
 		if (!$_chapterid) {
@@ -850,7 +953,7 @@ class rokfor_DB {
 
 		$initTime= time();
 		$sql = ("
-			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
+			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `_forchapter`, `__parentnode__`, `__sort__`) VALUES 
 			('', '".intval($_templateid)."', '".intval($_issueid)."', '".$this->_esc($_contribname)."', 'Open', $initTime, $initTime, '".$this->getUserId()."', NULL, '".intval($_chapterid)."', -1, 1);
 		");
 		$this->query($sql);
@@ -865,8 +968,8 @@ class rokfor_DB {
 		$parentNode = 0;
 		foreach ($_fields as $fields) {
 			$sql_I = ("			
-				INSERT INTO `_data` (`id`, `_forcontribution`, `_fortemplatefield`, `_datatext`, `_databinary`, `_datainteger`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-				('', '$newId', '".$fields->id."', NULL, NULL, NULL, '".$this->getUserId()."', NULL, NULL, -2, $parentNode);
+				INSERT INTO `_data` (`id`, `_forcontribution`, `_fortemplatefield`, `_content`, `_isjson`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
+				('', '$newId', '".$fields->id."', NULL, ".$this->isJsonField($fields->id).", '".$this->getUserId()."', NULL, NULL, -2, $parentNode);
 			");
 			$this->query($sql_I);
 			$parentNode++;
@@ -891,7 +994,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/
 	function openElement ($id)
-	{		
+	{
 		$this->clearCache();
  		$this->db->query("UPDATE _contributions SET _status = 'Open' WHERE id = ".intval($id)." LIMIT 1");		
 	}
@@ -901,21 +1004,33 @@ class rokfor_DB {
 	 * @return $this->parts or false on error
 	 * @author Urs Hofer
 	 **/
-	function _deleteFromBinary($fieldId,$imgId=false) {
+	function trashElement ($id)
+	{
+		$this->clearCache();
+ 		$this->db->query("UPDATE _contributions SET _status = 'Deleted' WHERE id = ".intval($id)." LIMIT 1");		
+	}  
+  
+	/**
+	 * _deleteFromBinary() - deletes files from a bild field
+	 * 
+	 * @return $this->parts or false on error
+	 * @author Urs Hofer
+	 **/
+	function _deleteFromBinary($fieldId,$imgId=false)
+  {
 		$this->clearCache();
 		$_field_info = $this->getFieldData($fieldId);
  		if ($imgId===false) {
 			$udb_update = "";
-			$deletedArray = explode("<;;;;;;>", $_field_info->d_binary);
+			$deletedArray = $_field_info->d_content;
 		}
 		else {
-			$udb_oldnames = explode("<;;;;;;>", $_field_info->d_binary);
+			$udb_oldnames = $_field_info->d_content;
 			$deletedArray = array_splice($udb_oldnames, $imgId, 1);
-			$udb_update = implode ("<;;;;;;>", $udb_oldnames);
 		}
 
 		foreach ($deletedArray as $toDelete) {
-			$_filename = end(explode("<::::::>",$toDelete));
+			$_filename = end($toDelete);
 			if (is_file(REPOSITORYDIR.'/'.$_filename)) unlink(REPOSITORYDIR.'/'.$_filename); /* Original */
 			if (is_file(REPOSITORYDIR.'/'.$_filename."-preview.jpg")) {
 				foreach (glob(REPOSITORYDIR.'/'.$_filename."-preview*") as $filename) {
@@ -924,28 +1039,36 @@ class rokfor_DB {
 			}
 			if (is_file(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg")) unlink(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg");	/* Jpg Preview */								
 		}
-		$this->setFieldData($udb_update,$fieldId,'_databinary');
+		$this->setFieldData($udb_oldnames,$fieldId,'_databinary');
 	}
 		
+	/**
+	 * deleteElement() - deletes a contribution and due to the cascade all related fields
+	 * 
+	 * @return $this->parts or false on error
+	 * @author Urs Hofer
+	 **/    
 	function deleteElement ($contribId)
 	{
 		$this->clearCache();
-		
 		// Delete Binaries
-		$sql = ("SELECT id from _data WHERE _forcontribution = '".intval($contribId)."' and _databinary <> '' ");
-		while ($todel = $this->fetch_object($this->query($sql))) {
+		$sql = ("SELECT _data.id from _data 
+      LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
+      WHERE _data._forcontribution = '".intval($contribId)."'
+      AND _templates._fieldtype = 'Bild'");
+    $_q = $this->query($sql);
+		while ($todel = $this->fetch_object($_q)) {
 			$this->_deleteFromBinary($todel->id);
 		}
-		// Delete Data
-		$sql = ("DELETE from _data WHERE _forcontribution = '".intval($contribId)."'");
-		$this->query($sql);
 		// Delete Contribution
 		$sql = ("DELETE from _contributions WHERE id = '".intval($contribId)."'");
 		$this->query($sql);
+    // Data will be deleted automatically due to mysql cascade
 	}	
 	
 	/**
 	 * lastmodElementUpdate($id) - sets the _moddate to current time
+	 * 
 	 * @return $this->parts or false on error
 	 * @author Urs Hofer
 	 **/
@@ -956,7 +1079,6 @@ class rokfor_DB {
  		$this->db->query("UPDATE _contributions SET _moddate = $initTime WHERE id = ".intval($id)." LIMIT 1");		
 	}	
 	
-
 	/**
 	 * getElements() - gets all elements (contributions) for a part within an issue of a project
 	 * 				if $id not set, uses $this->activePart, if $status not set uses 'Close'. If status = false neglects all status info.
@@ -1002,12 +1124,12 @@ class rokfor_DB {
 		LEFT JOIN _issues ON _issues.id = _contributions._forissue
 		WHERE _contributions._forissue = '.$ed
 		.
-		(((!$id && !$this->activePart->id) || $id == '_contributions.__split__') 
+		(((!$id && !$this->activePart->id) || $id == '_contributions._forchapter') 
 			? ('')
 			: (
 				is_array($id)
-					? (' AND (_contributions.__split__ IN ('.join(',',$id).'))')
-					: (' AND (_contributions.__split__ = '.intval((!$id)?($this->activePart->id):($id)).')'
+					? (' AND (_contributions._forchapter IN ('.join(',',$id).'))')
+					: (' AND (_contributions._forchapter = '.intval((!$id)?($this->activePart->id):($id)).')'
 			  )
 		))	
 		.	
@@ -1024,8 +1146,7 @@ class rokfor_DB {
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->elements ? $this->elements : array();	
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
-	
-
+  
 	/**
 	 * getElementsByIssue - returns all contributions of an issue (unsorted) as array of objects
 	 * 
@@ -1033,10 +1154,10 @@ class rokfor_DB {
 	 * @return array
 	 * @author Urs Hofer
 	 */
-	function getElementsByIssue ($_issueId, $_state = false, $_order = false, $_chapter = false) {
+	function getElementsByIssue ($_issueId, $_state = false, $_order = false, $_chapter = false)
+  {
 		if (!$_issueId) return false;
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
-		
 		if ($_state) {
 			if ((stristr($_state, "Open") && stristr($_state, "Close")) || stristr($_state, "both")) {
 				$_state = "Open' || _contributions._status = 'Close";
@@ -1051,10 +1172,8 @@ class rokfor_DB {
 				$_state = 'Deleted';
 			}				
 		}
-		
-		
 		$sql = 'SELECT _contributions.* FROM _contributions WHERE _contributions._forissue = '.intval($_issueId);
-		if ($_chapter) $sql .= " AND __split__ = '".$this->_esc($_chapter)."'";
+		if ($_chapter) $sql .= " AND _forchapter = '".$this->_esc($_chapter)."'";
 		if ($_state) $sql .= " AND (_contributions._status = '$_state')";
 		if ($_order) $sql .= ' ORDER BY '.$this->_esc($_order);
 		$query = $this->db->query($sql);
@@ -1076,7 +1195,6 @@ class rokfor_DB {
 			if (!$this->activeElement) return false;
 			$id = $this->activeElement;
 		}		
-		
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		
 		$sql = 'SELECT * FROM _contributions 
@@ -1103,11 +1221,10 @@ class rokfor_DB {
 		AND (_contributions._status <> "Deleted")'
 		.
 		(($templatename)?(' AND (_templatenames._name = "'.$this->_esc($templatename).'")'):(' ')).
-		(($chaptername)?(' AND (_contributions.__split__ = "'.$this->_esc($chaptername).'")'):(' ')).
+		(($chaptername)?(' AND (_contributions._forchapter = "'.$this->_esc($chaptername).'")'):(' ')).
 		(($forissue)?(' AND (_contributions._forissue = "'.intval($forissue).'")'):(' ')).			
 		(($status)?('AND (_contributions._status = "'.$this->_esc($status).'") '):('')).
 		'LIMIT 1';
-//		echo $sql;
 		
 		$query = $this->db->query($sql);
 		$retval = $this->db->fetch_object($query);
@@ -1144,7 +1261,10 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/
 
-	function getFieldsId($id = false) {return $this->getFieldsByElement($id);}
+	function getFieldsId($id = false)
+  {
+    return $this->getFieldsByElement($id);
+  }
 	function getFieldsByElement($id = false, $resolveForeign = true)
 	{
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
@@ -1168,17 +1288,15 @@ class rokfor_DB {
 		}
 		
 		if ($resolveForeign) $sql = 'SELECT _data.id,_templates.id as t_id, _templates._fieldname, _templates._fieldtype, 
-		_data._datatext as d_text,
-		_data._databinary as d_binary,
-		_data._datainteger as d_integer,
+		_data._content as d_content,
+    _data._isjson as d_isjson,
 		_data.__parentnode__ FROM _data
 		LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
 		WHERE _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
 
 		else $sql = 'SELECT _data.id, _data._fortemplatefield as t_id,
-		_data._datatext as d_text,
-	    _data._databinary as d_binary,
-	    _data._datainteger as d_integer,
+		_data._content as d_content,
+    _data._isjson as d_isjson,
 		_data.__parentnode__ FROM _data
 		WHERE _data._forcontribution = '.intval((!$id)?($this->activeElement->id):($id)).' ORDER BY _data.__sort__';
 		
@@ -1186,7 +1304,7 @@ class rokfor_DB {
 		$query = $this->db->query($sql);
 		while ($row = $this->db->fetch_object($query)) {
 			if ($row->id) {
-				$row->d_text = $this->_stripslashes($row->d_text);
+        $this->cloneLegacyValues($row);
 				if ($resolveForeign) $this->fields[$row->_fieldname] = $row;
 				else  $this->fields[] = $row;
 			}
@@ -1222,8 +1340,7 @@ class rokfor_DB {
 				else $next=false;
 				$count++;
 			}
-		}		
-			
+		}			
 		$sql = ("SELECT * from _templates WHERE _fortemplate = '".intval($id)."' ORDER BY __sort__");
 		$query = $this->db->query($sql);
 		$retval = array();
@@ -1233,7 +1350,6 @@ class rokfor_DB {
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval;			
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}	
-	
 	
 	/**
 	 * getFieldsByName - returns the id of a field in an element/contribution
@@ -1250,9 +1366,8 @@ class rokfor_DB {
 		_templates._fieldname as t_fieldname, 		
 		_templates._fieldtype as t_fieldtype, 	
 		_templates._colNames as t_colnames,				
-		_data._datatext as d_text,
-	    _data._databinary as d_binary,
-	    _data._datainteger as d_integer,
+		_data._content as d_content,
+    _data._isjson as d_isjson,
 		_contributions._name as c_name
 		FROM _data
 		LEFT JOIN _templates ON _templates.id = _data._fortemplatefield
@@ -1262,7 +1377,7 @@ class rokfor_DB {
 		$query = $this->db->query($sql);
 		$row = $this->db->fetch_object($query);
 		if ($row->id) {
-			$row->d_text = $this->_stripslashes($row->d_text);			
+      $this->cloneLegacyValues($row);			
 			self::$cache[__FUNCTION__][serialize(func_get_args())] = $row;
 		}
 		else {
@@ -1278,7 +1393,8 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function getFieldNamesByTemplateName($templatename) {
+	function getFieldNamesByTemplateName($templatename)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ("
 			SELECT  _templates.id, _templates._fieldname, _templatenames._name as _templatename from _templates
@@ -1300,9 +1416,10 @@ class rokfor_DB {
 	 * 
 	 * @author Urs Hofer
 	 */
-	function getFieldByTemplateId ($fieldid, $contribution) {
-        $_d = $this->getFieldsByTemplateId ($fieldid, false, $contribution, false, false);
-        return reset($_d);		
+	function getFieldByTemplateId ($fieldid, $contribution) 
+  {
+    $_d = $this->getFieldsByTemplateId ($fieldid, false, $contribution, false, false);
+    return reset($_d);		
 	}
 
 
@@ -1315,13 +1432,13 @@ class rokfor_DB {
 	 * 
 	 * @author Urs Hofer
 	 */
-	function getFieldsByTemplateId ($fieldid, $issue = false, $contribution = false, $status = false, $group = true) {
+	function getFieldsByTemplateId ($fieldid, $issue = false, $contribution = false, $status = false, $group = true) 
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 
 		$sql = ('SELECT _data.id, 
-			_data._datatext as d_text,
-			_data._databinary as d_binary,
-			_data._datainteger as d_integer,
+			_data._content as d_content,
+			_data._isjson as d_isjson,
 			_data._forcontribution			
 			'.
 			(($issue)?(",\n_contributions._name as _name, _contributions.id as c_id"):(''))
@@ -1341,48 +1458,23 @@ class rokfor_DB {
 			(($status)?('AND (_contributions._status = "'.$this->_esc($status).'") '):(''))
 			.'	
 			'.
-			(($group)?(' GROUP BY _data._datatext '):(''))
+			(($group)?(' GROUP BY _data._content '):(''))
 			.'							
-			
-			ORDER BY _data._datatext;
+			ORDER BY _data._content;
 		');
 		$query = $this->db->query($sql);
 		$retval = array();
 		while ($row = $this->db->fetch_object($query)) {
-			$row->d_text = $this->_stripslashes($row->d_text);
+      $this->cloneLegacyValues($row);			      
 			$retval[] = $row;
 		}
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = count($retval)>=1 ? $retval : false;
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];
 	}
 
-
 	/**
 	 * getFieldData - get data of a field with template infos
 	 * $id for a field is strictly required
-	 *
-	 *  Returned Data Object:	
-	 * 
-	 * 	(
-	 * 	    [d_id] => Int
-	 * 	    [d_forelement] => Int
-	 * 	    [d_text] => String
-	 * 	    [d_binary] => String
-	 * 	    [d_integer] => Int
-	 * 	    [t_id] => Int
-	 * 	    [t_fortemplate] => Int
-	 * 	    [t_fieldname] => String
-	 * 	    [t_fieldtype] => String
-	 * 	    [t_maxlines] => Int
-	 * 	    [t_textlength] => Int
-	 * 	    [t_imagewidth] => Int
-	 * 	    [t_imageheight] => Int
-	 * 	    [t_cols] => Int
-	 * 	    [t_colnames] => String
-	 * 	    [t_history] => String
-	 * 	    [t_growing] => String
-	 * 	    [t_len_influence] => String
-	 * 	)
 	 * 	
 	 * 	
 	 * @return $this->data
@@ -1396,11 +1488,10 @@ class rokfor_DB {
 		
 		$sql = 'SELECT _data.id as d_id, 
 		_data._forcontribution as d_forelement,
-	    _data._datatext as d_text,
-	    _data._databinary as d_binary,
-	    _data._datainteger as d_integer,
-	    _data._fortemplatefield as d_fortemplatefield,
-	    _data.__parentnode__ as d_parentnode,		
+    _data._content as d_content,
+    _data._isjson as d_isjson,
+    _data._fortemplatefield as d_fortemplatefield,
+    _data.__parentnode__ as d_parentnode,		
 		_templates.id as t_id,
 		_templates._fortemplate as t_fortemplate,
 		_templates._fieldname as t_fieldname,
@@ -1425,26 +1516,52 @@ class rokfor_DB {
 		$this->data = NULL;
 		$query = $this->db->query($sql);
 		$row = $this->db->fetch_object($query);
-		$row->d_text = $this->_stripslashes($row->d_text);
+    if ($row->d_isjson)
+      $row->d_content = json_decode($row->d_content);
+    else
+      $row->d_content = $this->_stripslashes($row->d_content);
+    
+    /* Legacy */
+    $this->cloneLegacyValues($row);
+    
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = $this->data = $row;
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
-	
+
+  /**
+   * undocumented function
+   *
+   * @return void
+   * @author Urs Hofer
+   */
+  function cloneLegacyValues(&$row)
+  {
+      $row->d_text    =
+      $row->d_integer =
+      $row->d_binary  = $row->d_content;
+      $row->d_text    = $this->_stripslashes($row->d_text);
+  }
 	
 	/**
 	 * setFieldData sets the value of a field
 	 *
-	 * @param string $data 
+	 * @param mixed $data 
 	 * @param int $id 
-	 * @param string $type 	
+	 * @param string $type (obsolete)
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function setFieldData($data,$id,$type){
+	function setFieldData($data,$id,$type)
+  {
 		$this->clearCache();
-		if (!(in_array($type, array("_datatext", "_databinary",	"_datainteger")))) die ('setFieldData: type must be either: "_datatext", "_databinary",	"_datainteger"');
 		if (!$id) die ('setFieldData: id must be set!'); 
-		$sql = "UPDATE _data SET $type = '".$this->_esc($data)."' WHERE id = ".intval($id)." LIMIT 1";
+    
+//    $sql = "SELECT _isjson FROM _data WHERE id = ".intval($id)." LIMIT 1";
+//    $isjson = $this->db->query_first_object($sql)->_isjson;
+    
+    $isjson = (is_array($data) || is_object($data)) ? 1 : 0;
+    
+		$sql = "UPDATE _data SET _content = '".$this->_esc($isjson ? json_encode($data) : $data)."', _isjson = $isjson WHERE id = ".intval($id)." LIMIT 1";
 		return ($query = $this->db->unbuffered_query($sql));
 	}
 	
@@ -1457,8 +1574,7 @@ class rokfor_DB {
 	function getCloudData($fieldId,$xmin=-100,$xmax=100,$ymin=-100,$ymax=100)
 	{
 		$this->getFieldData($fieldId);
-		$rawdata = $this->data->d_text;
-		return $this->_splitCloudData($rawdata,$xmin,$xmax,$ymin,$ymax);
+		return $this->_splitCloudData($this->data->d_content,$xmin,$xmax,$ymin,$ymax);
 	}	
 
 	/**
@@ -1471,7 +1587,7 @@ class rokfor_DB {
 	 * @author Urs Hofer
 	 **/
 	
-	function _splitCloudData($rawdata,$xmin=-100,$xmax=100,$ymin=-100,$ymax=100)
+	function _splitCloudData($data,$xmin=-100,$xmax=100,$ymin=-100,$ymax=100)
 	{
 		
 		/**
@@ -1485,8 +1601,8 @@ class rokfor_DB {
 		
 		
 		$return  = array();		
-		foreach ($this->_splitClean("<;;;;;;>", $rawdata) as $entry) {
-			list($key,$x,$y) = $this->_splitClean("<::::::>", $entry);
+		foreach ($data as $entry) {
+			list($key,$x,$y) = $entry;
 			//if (array_key_exists($key, $return))
 			//{
 			//	$count = 1;
@@ -1522,7 +1638,7 @@ class rokfor_DB {
 		}
 		return $return;
 	}
-
+  
 	/**
 	 * _splitClean
 	 * like explode, but cleans the final array from empty results
@@ -1536,8 +1652,8 @@ class rokfor_DB {
 		$expl = explode($_pattern, $_string);
 		foreach ($expl as $val) if ($val<>"") $ret[] = $val;
 		return $ret;
-	}
-	
+	}  
+
 	/**
 	 * getSliderData - gets Data for a Slider, normalizes the value, returns it. 
 	 *
@@ -1547,7 +1663,7 @@ class rokfor_DB {
 	function getSliderData($fieldId,$xmin=0,$xmax=100)
 	{
 		$this->getFieldData($fieldId);
-		return (($xmax - $xmin)/100*$this->data->d_integer)+$xmin;
+		return (($xmax - $xmin)/100*$this->data->d_content)+$xmin;
 	}
 	
 	/**
@@ -1559,7 +1675,7 @@ class rokfor_DB {
 	function getMatrixData($fieldId,$xmin=-100,$xmax=100,$ymin=-100,$ymax=100)
 	{
 		$this->getFieldData($fieldId);
-		list($x,$y) = explode("<::::::>", $this->data->d_text);
+		list($x,$y) = $this->data->d_content;
 		return array((($xmax - $xmin)/FRNTEND_MATRIX_X*$x)+$xmin, (($ymax - $ymin)/FRNTEND_MATRIX_Y*$y)+$ymin);
 	}
 	
@@ -1572,7 +1688,7 @@ class rokfor_DB {
 	function getWordlistData ($fieldId)
 	{
 		$this->getFieldData($fieldId);
-		return ($this->_splitWordListData($this->data->d_text));
+		return $this->data->d_content;
 	}	
 	
 	/**
@@ -1582,9 +1698,9 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function _splitWordListData($_rawdata) {
-		if (substr($_rawdata, -8)=='<;;;;;;>') $_rawdata = substr($_rawdata, 0, -8);
-		return (explode("<;;;;;;>", $_rawdata));
+	function _splitWordListData($_rawdata)
+  {
+		return json_decode($_rawdata);
 	}
 	
 	/**
@@ -1594,7 +1710,8 @@ class rokfor_DB {
 	 * @return string
 	 * @author Urs Hofer
 	 */
-	function _prepare_for_rtfediting($fielddata) {
+	function _prepare_for_rtfediting($fielddata) 
+  {
 		if (defined('STORE_HTML') && STORE_HTML) {
 			return $fielddata;
 		}
@@ -1662,9 +1779,9 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function _splitTextListData($_rawdata) {
-		if (substr($_rawdata, -8)=='<::::::>') $_rawdata = substr($_rawdata, 0, -8);
-		return (explode("<::::::>", $_rawdata));
+	function _splitTextListData($_rawdata) 
+  {
+		return json_decode($_rawdata);
 	}
 
 	/**
@@ -1676,24 +1793,9 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function _splitTableData($_rawdata,$_force_col_count=false) {
-		$_array = explode('<;;;;;;>',$_rawdata);
-		$_retval = Array();
-		foreach ($_array as $_i) if ($_i) {
-			$_row = array();
-			if ($_force_col_count>0) {
-				$_row_raw = explode('<::::::>',$_i);				
-				for ($i=0; $i < $_force_col_count; $i++) { 
-					$_row[$i] = $_row_raw[$i]?$_row_raw[$i]:"";
-				}
-			}
-			else {
-				$_row = explode('<::::::>',$_i);
-			}
-			foreach ($_row as &$_cell) $_cell = str_replace(array("&lt;::::::&gt;","&lt;;;;;;;&gt;"), array("<::::::>","<;;;;;;>"), $_cell);
-			$_retval[] = $_row;
-		}
-		return ($_retval);
+	function _splitTableData($_rawdata,$_force_col_count=false) 
+  {
+		return json_decode($_rawdata);
 	}
 
 	/**
@@ -1703,10 +1805,9 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function _glueTableData($_data) {
-		$_retval = Array();
-		foreach ($_data as $_i) if (is_array($_i)) $_retval[] = implode('<::::::>',str_replace(array("<::::::>","<;;;;;;>"), array("&lt;::::::&gt;","&lt;;;;;;;&gt;"), $_i));		
-		return (implode('<;;;;;;>',$_retval));
+	function _glueTableData($_data) 
+  {
+		return json_encode($_data);
 	}
 
 
@@ -1717,7 +1818,8 @@ class rokfor_DB {
 	 * @return void
 	 * @author Urs Hofer
 	 */
-	function array_empty($mixed) {
+	function array_empty($mixed) 
+  {
 		if(empty($mixed[0])) return false;
 		else return true;
 	}
@@ -1752,20 +1854,23 @@ class rokfor_DB {
 	 * @return array
 	 * @author Urs Hofer
 	 */
-	function getTemplates($project=false,$part=false, $all=false) {
+	function getTemplates($project=false,$part=false, $all=false) 
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
-		
-		$part = (!$part)?($this->activePart->id):($part);				// Chapter
+		$part    = (!$part)?($this->activePart->id):($part);				// Chapter
 		$project = (!$project)?($this->activeProject->id):($project);	// Book
 		
 		if ($all) $sql = ("SELECT *  FROM _templatenames   ORDER BY __sort__");
-		else $sql = ("SELECT *
-				  FROM _templatenames 
-				  WHERE (_forbook LIKE '%:>".$this->_esc($project)."<:%' OR _forbook LIKE '".$this->_esc($project)."<:%')
-				  ".(($part=="all")?(''):("AND (_inchapter LIKE '%:>".$this->_esc($part)."<:%' OR _inchapter LIKE '".$this->_esc($part)."<:%')"))."				
-				  ORDER BY _category,_name");
+    else $sql = ("SELECT _templatenames.* FROM _templatenames
+          LEFT OUTER JOIN R_templatenames_forbook
+            ON _templatenames.id = R_templatenames_forbook._templateid
+          LEFT OUTER JOIN R_templatenames_inchapter
+            ON _templatenames.id = R_templatenames_inchapter._templateid
+          WHERE R_templatenames_forbook._bookid = ".$this->_esc($project)."
+          ".(($part=="all")?(''):("AND R_templatenames_inchapter._chapterid = ".$this->_esc($part)))."				
+          ORDER BY _templatenames._category,_templatenames._name
+      ");
 		$query = $this->db->query($sql);		
-
 		$this->templates = array();
 		while ($row = $this->db->fetch_object($query)) {
 			if (!$this->userRestriction) $this->templates[] = $row;
@@ -1782,10 +1887,11 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getPartNamebyId($id) {
+	function getPartNamebyId($id) 
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$elm = $this->getElementsNamebyId($id);
-		$sql = ('SELECT * FROM _formats WHERE  id = "'.intval($elm->__split__).'"');
+		$sql = ('SELECT * FROM _formats WHERE  id = "'.intval($elm->_forchapter).'"');
 		$query = $this->db->query($sql);
 		$retval = $this->db->fetch_object($query);
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval : false;
@@ -1799,7 +1905,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getProjectName($id) {
+	function getProjectName($id)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _name FROM _books
 			 	WHERE  id = "'.intval($id).'"
@@ -1817,7 +1924,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getProjectId($name) {
+	function getProjectId($name) 
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT id FROM _books
 			 	WHERE  _name = "'.$this->_esc($name).'"
@@ -1835,7 +1943,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getProjectNamebyPartId($id) {
+	function getProjectNamebyPartId($id)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _formats ON _books.id = _formats._forbook
@@ -1854,7 +1963,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getProjectNamebyEditionId($id) {
+	function getProjectNamebyEditionId($id)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT _books._name, _books.id FROM _books
 				LEFT JOIN _issues ON _books.id = _issues._forbook
@@ -1873,7 +1983,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getEditionNamebyId($id) {
+	function getEditionNamebyId($id)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$elm = $this->getElementsNamebyId($id);
 		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($elm->_forissue).'"');
@@ -1890,7 +2001,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getEditionInfo($id) {
+	function getEditionInfo($id)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT * FROM _issues WHERE  id = "'.intval($id).'" LIMIT 1');
 		$query = $this->db->query($sql);
@@ -1899,8 +2011,6 @@ class rokfor_DB {
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
 
-
-
 	/**
 	 * Returns the edition id by Editionname
 	 *
@@ -1908,7 +2018,8 @@ class rokfor_DB {
 	 * @return object
 	 * @author Urs Hofer
 	 */
-	function getEditionIdbyEditionname($name, $bookid = false) {
+	function getEditionIdbyEditionname($name, $bookid = false)
+  {
 		if (self::$cache[__FUNCTION__][serialize(func_get_args())]) return self::$cache[__FUNCTION__][serialize(func_get_args())];
 		$sql = ('SELECT id FROM _issues WHERE  _name = "'.$this->_esc($name).'"');
 		if ($bookid) {
@@ -1919,8 +2030,6 @@ class rokfor_DB {
 		self::$cache[__FUNCTION__][serialize(func_get_args())] = $retval ? $retval->id : false;
 		return self::$cache[__FUNCTION__][serialize(func_get_args())];		
 	}
-
-
 
 	/**
 	 * clearCache - resets the data cache

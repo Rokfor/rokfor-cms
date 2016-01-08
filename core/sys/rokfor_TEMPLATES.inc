@@ -207,7 +207,7 @@ class rokfor_TEMPLATES
 			
 			$restrict_to_chapter = $row['restrict_to_chapter']
 									? $this->rfDB->getPartByName($row['restrict_to_chapter'],  $_SESSION['bookid'] && $row['restrict_to_book'] === "true" ? $_SESSION['bookid'] : 'all')
-									: '_contributions.__split__';
+									: '_contributions._forchapter';
 						
 			$threeDee = $row['3d'];
 
@@ -260,7 +260,7 @@ class rokfor_TEMPLATES
 				foreach ($__select as $select) {
 					if ($field->t_fieldname) $_select[] = $this->rfDB->getFieldsByName ($field->t_fieldname, $select->id);
 				}				
-				foreach ($_select as $key => $value) $_select[$key]->_value = $value->d_text;		
+				foreach ($_select as $key => $value) $_select[$key]->_value = $value->d_content;		
 
 			}
 			// Lädt alle Daten eines anderen Feldes eines anderen Templates in die History
@@ -274,7 +274,7 @@ class rokfor_TEMPLATES
 				foreach ($__select as $select) {
 					if ($fromfield) $_select[] = $this->rfDB->getFieldsByName ($fromfield, $select->id);
 				}				
-				foreach ($_select as $key => $value) $_select[$key]->_value = $value->d_text;			
+				foreach ($_select as $key => $value) $_select[$key]->_value = $value->d_content;			
 			}
 			// Lädt alle Daten eines anderen Feldes eines anderen Templates in die History
 			if ($history_command == "cloud") 
@@ -284,7 +284,7 @@ class rokfor_TEMPLATES
 				$_select = array();
 				foreach ($__select as $select) {
 					if ($field->t_fieldname) $_value = $this->rfDB->getFieldsByName ($field->t_fieldname, $select->id);
-					$words = explode('<;;;;;;>',$_value->d_text);
+					$words = explode('<;;;;;;>',$_value->d_content);
 					foreach ($words as $_words) {
 						$keyword = explode('<::::::>', $_words);
 						if ($keyword[0]) {
@@ -441,15 +441,26 @@ class rokfor_TEMPLATES
 				<title>Rokfor '.VERSION.file_get_contents(SYSDIR.'/version.txt').'</title>
 				<link rel="icon" href="/favicon.ico" type="image/x-icon">				
 				<link rel="shortcut icon" href="/favicon.ico">				
-				<link rel="stylesheet" href="./js/min/?g=css" type="text/css" >
-
+        <link rel="stylesheet" href="./js/min/?g=css" type="text/css" >
 				<!--[if lt IE 9]>
 					<link rel="stylesheet" href="./css/main/master.ltie9.css" type="text/css" media="screen" title="no title" charset="utf-8">
 			        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 			    <![endif]-->
 
 				<script type="text/javascript" src="./js/constants.php"  charset="utf-8"></script>	
-				<script type="text/javascript" src="./js/min/?g=js"  charset="utf-8"></script>	
+        <script type="text/javascript" src="./js/min/?g=js"  charset="utf-8"></script>
+				<!--<script type="text/javascript" src="/rf/js/3rdparty/mootools-core.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/mootools-more.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/mootree.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/nutabs.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/string.utf8.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/string.md5.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/interface/rfGUI.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/interface/rfCALLBACKS.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/Datepicker/Picker.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/Datepicker/Picker.Attach.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/3rdparty/Datepicker/Picker.Date.js"  charset="utf-8"></script>
+    		<script type="text/javascript" src="/rf/js/main.js"  charset="utf-8"></script>-->
 				'.
 				$_e
 				.'		
@@ -718,24 +729,22 @@ class rokfor_TEMPLATES
 		if ($this->rfDB->num_rows($_bc)>0) {
 			while ($_fnct_data = $this->rfDB->fetch_object($_bc)) {
 				$_batches .= '<a class="batches button grey wide">'.$_fnct_data->_name.'</a><div class="toggle"><p>'.$_fnct_data->_description.'</p>';
-				foreach ($this->rfDB->_splitTextListData($_fnct_data->_forbook) as $_bookId) {
+				foreach ($this->rfDB->getCrossRef($_fnct_data->id, '_batchid', '_bookid', 'R_batch_forbook') as $_bookId) {
 					$_book = $this->rfDB->getProjects(false,$_bookId);
 					if ($_book[0]->id) if ($_issues = $this->rfDB->getEditions($_book[0]->id)) {
 						foreach ($_issues as $_issue) {
-							$temp_db = tempnam("/tmp", "rokfor_dbconf_");
-							$fnc_head = '<?php function batch_preprocessing_'.$_cnt.'_'.$_issue->id.'_'.$_fnct_data->id.'($_db,$_rokforDB,$issueid,$bookid) {';
-							$fnc_foot = '} ?>';
-							file_put_contents($temp_db, $fnc_head.$this->_stripslashes($_fnct_data->_precode).$fnc_foot);
-							require($temp_db);
-							unlink($temp_db);
-							$olderror=error_reporting(E_ERROR);
-		   					$_callback = call_user_func("batch_preprocessing_".$_cnt.'_'.$_issue->id."_".$_fnct_data->id, $this->rfDB->db, $this->rfDB, $_issue->id,$_book[0]->id);
-							$_cnt++;
-							error_reporting($olderror);
-							if ($_callback===false) {
-								$_err = error_get_last();
-								$_callback = BatchPreError.": ".$_err['message'].' on line '.$_err['line'];         
-						    }
+              $_fnct = create_function(
+                '&$_db,&$_rokforDB,&$issueid,&$bookid', 
+                $this->_stripslashes($_fnct_data->_precode)
+              );
+              if ($_fnct) {
+                $_callback = $_fnct($this->rfDB->db, $this->rfDB, $_issue->id,$_book[0]->id);
+          			$ret = true;  
+              }
+          		else {
+          			$_callback = BatchPreError.": ".$_err['message'].' on line '.$_err['line'];       
+          			$ret = false;  
+          		}
 							$_batches .= '<form id="batchform_'.$_issue->id.'_'.$_fnct_data->id.'" class="batchform">
 							<p>'.$_book[0]->_name.': '.$_issue->_name.'</p>							
 								<p> 
@@ -1021,7 +1030,6 @@ class rokfor_TEMPLATES
 		if ($_f->t_fieldtype<>"*Ausgeschaltet*") {
 			if (in_array($_f->t_fieldtype, array("TypologySlider","TypologyMatrix","TypologyKeyword","TypologyCloud"))) $_floating = "floating";
 			$_renderer = "_".$_f->t_fieldtype;
-
 			$this->buffer .= ('<div class="fieldContainer '.$_floating.'"><p><a class="button mini blue" href="#" onclick="rfgui.contextHelp('.$_f->t_id.');">'.Help.'</a></p>
 			<div id="toggler-'.$_f->t_id.'" class="fieldToggler"></div>
 			'.$this->$_renderer($_f).'
@@ -1141,20 +1149,20 @@ class rokfor_TEMPLATES
 		$retval = ""; 
 		$showDate = stristr($_f->t_colnames,"integer")?false:true;
 		if ($showDate) {
-		   	if ($_f->d_integer <= 0) $_f->d_integer = time();
+		   	if ($_f->d_content <= 0) $_f->d_content = time();
 		   	$retval .= '<label>'.Datefield."</label>: ";
 			$_count = 1;
 			foreach (array("j" => array(1,31,"."),"n" => array(1,12,"."),"Y" => array(1950,2050," / "),"H" => array(0,24,"."),"i" => array(0,59," ".Timefield)) as $_dateselector=>$_minmax) {
 				if (!$dateformat || strstr($dateformat, $_dateselector)) {
 				   	$retval .= '<select name="number['.$_f->d_id.']['.$_count.']">';
-					for ($l=$_minmax[0]; $l <=$_minmax[1] ; $l++) $retval .= '<option value="'.$l.'" '.(($l == date($_dateselector, $_f->d_integer))?(' selected="selected" '):('')).'>'.$l.'</option>';
+					for ($l=$_minmax[0]; $l <=$_minmax[1] ; $l++) $retval .= '<option value="'.$l.'" '.(($l == date($_dateselector, $_f->d_content))?(' selected="selected" '):('')).'>'.$l.'</option>';
 					$retval .= "</select>".$_minmax[2];
 				}
 				else $retval .= '<input type="hidden" value="1" name="number['.$_f->d_id.']['.$_count.']">';
 				$_count++;
 			}
 		}
-		else $retval .= '<input name="number['.$_f->d_id.']" value="'.$_f->d_integer.'">';			
+		else $retval .= '<input name="number['.$_f->d_id.']" value="'.$_f->d_content.'">';			
 		return ('<h3>'.$_f->t_fieldname.'</h3><div>
 		'.$retval.'
 		</div>');
@@ -1171,16 +1179,14 @@ class rokfor_TEMPLATES
 		list($default,$history_command,$fromtemplate,$fromfield,$fixedvalues,$restrict_to_issue,$threeDee,$historydata,$description) = $this->_parseLegends($_f->t_colnames);
 		if (stristr($_f->t_colnames,'multiple=true')) $_multi = 'multiple="multiple"';
 		/* Process multiple data */
-		$_data = array();
-		if (stristr($_f->d_text,'<::::::>')) $_data = $this->rfDB->_splitTextListData($_f->d_text);
-		else $_data[] = $_f->d_text;
+		$_data = !is_array($_f->d_content) ? array($_f->d_content) : $_f->d_content;
 		
 		if (!$history_command) $history .= '<option disabled>'.HistoryDisabled.'</option>';
 		else foreach ($historydata as $select) {
 			$history .= '<option value="'.$select->id.'" '.((in_array($select->id, $_data))?('selected="selected"'):('')).'>'.$select->_value.'</option>';
 		}
 
-		return ('<p class="status">'.$description.'</p><h3>'.$_f->t_fieldname.'</h3><div>
+		return ('<p class="status">'.print_r($_f->d_content,true).$description.'</p><h3>'.$_f->t_fieldname.'</h3><div>
 		<select '.$_multi.' class="'.($_multi?'big':'medium').'" name="text['.$_f->d_id.']'.(($_multi)?('[]'):('')).'">
 		<option value="-1" '.((in_array(-1, $_data)||!isset($_data[0]))?('selected="selected"'):('')).'>'.SelectDisabled.'</option>
 		'.$history.'
@@ -1214,17 +1220,19 @@ class rokfor_TEMPLATES
 			$_codeeditor_enabled = true;
 			$_f->t_colnames = str_ireplace('codeeditor=true', '', $_f->t_colnames);
 		}
+    
+    $_data = $_f->d_content;
+    
 		// If Colnames: Mehrere Felder erzeugen.
 		$_columns = explode(";",$_f->t_colnames);
 		if (count($_columns)>1) {
 			$_editor = "ARRAY";
-			$_data = explode("<::::::>",htmlspecialchars_decode($_f->d_text));
 			$_f->t_maxlines = '[';
 			foreach ($_columns as $_colId=>$_colName) {
 				//Getting Maxlines
 				preg_match("/<(.*)>(.*)/", $_colName, $_LengthName);
 				$_LengthName[1]==0 ? $_ta_rows = 1 : $_ta_rows = $_LengthName[1];
-				$_ta_cols = ceil($_f->d_textlength / $_ta_rows); 
+				$_ta_cols = ceil($_f->d_contentlength / $_ta_rows); 
 				$_rows = ' rows = "'.$_ta_rows.'" style="height:'.($_ta_rows*1.3).'em;" ';
 				$retval .= '
 				<p class="editor_text_array">
@@ -1242,22 +1250,22 @@ class rokfor_TEMPLATES
 			$_editor = (!$_rtfeditor_disabled&&defined("EDITOR"))?EDITOR:"TEXTAREA";			
 			// Prepare Data
 			if ($_editor=="TEXTAREA") {
-				$_f->d_text = htmlspecialchars($_f->d_text);
+				$_f->d_content = htmlspecialchars($_f->d_content);
 			}
 			else {
 				// Spell Checking - only for rtf editor!
 				if (defined('ENABLE_SPELLCHECK') && ENABLE_SPELLCHECK && !$this->searchstring)	{
-					$_f->d_text = $this->_spellCheck($_f->d_text);
+					$_f->d_content = $this->_spellCheck($_f->d_content);
 				}				
-				if ($this->searchstring) $_f->d_text = $this->_mark_search_results($this->searchstring,$_f->d_text);				
+				if ($this->searchstring) $_f->d_content = $this->_mark_search_results($this->searchstring,$_f->d_content);				
 				// HTML Conversion
-				$_f->d_text = $this->_prepare_for_rtfediting($_f->d_text);				
+				$_f->d_content = $this->_prepare_for_rtfediting($_f->d_content);				
 			}
 			// Max Rows of Textarea: either Maxlines or (textlength / 80) or 30 Lines max.
 			if ($_f->t_maxlines>0) $_rows = ' rows = "'.$_f->t_maxlines.'" style="height:'.($_f->t_maxlines*1.3).'em;" ';
 			else  $_rows = ' rows = "'.((ceil($_f->t_textlength/80)>TEXTAREAMAXLINES)?(TEXTAREAMAXLINES):(ceil($_f->t_textlength/80))).'" ';
 			// Create Textarea
-			$retval = '<textarea id="field'.$_f->t_id.'" '.$_rows.' class="big'.($_codeeditor_enabled?' code ':'').'" name="text['.$_f->d_id.']">'.$_f->d_text.'</textarea>';
+			$retval = '<textarea id="field'.$_f->t_id.'" '.$_rows.' class="big'.($_codeeditor_enabled?' code ':'').'" name="text['.$_f->d_id.']">'.$_f->d_content.'</textarea>';
 			// Add Javascript if necessary
 			if (!$_rtfeditor_disabled) {
 				switch ($_editor) {
@@ -1297,8 +1305,8 @@ class rokfor_TEMPLATES
 				<select name="history'.$_f->d_id.'" onchange="rfgui.pasteHistory(this,\'field'.$_f->t_id.'\','.count($_columns).',\''.$_editor.'\')" class="medium">';
 				$_h  = $this->rfDB->getFieldsByTemplateId($_f->t_id, $_full_history?false:$_SESSION['issueid']);
 				foreach ($_h as $_s) {
-					$_hist_text = htmlentities(($_full_history?'':$_s->_name.": ").str_replace("<::::::>"," ",$_s->d_text));
-					$retval .= '<option value="'.addslashes(htmlentities(utf8_decode(rawurldecode($_s->d_text)))).'" '.((($_s->id == $_f->d_id))?('selected="selected"'):('')).'>'.
+					$_hist_text = htmlentities(($_full_history?'':$_s->_name.": ").str_replace("<::::::>"," ",$_s->d_content));
+					$retval .= '<option value="'.addslashes(htmlentities(utf8_decode(rawurldecode($_s->d_content)))).'" '.((($_s->id == $_f->d_id))?('selected="selected"'):('')).'>'.
 					((strlen($_hist_text)<80)?(trim($_hist_text)):(trim(substr($_hist_text,0,80))."..."))
 					.'</option>';
 				}
@@ -1320,8 +1328,7 @@ class rokfor_TEMPLATES
 		$data = Array();
 		$default = explode(';',$_f->t_colnames);
 		// Overwrite if no old data with default values...
-		if ($_f->d_text) $data = $this->rfDB->_splitTableData($_f->d_text,$_f->t_cols);
-		else $data[0] = $default;
+    $data = $_f->d_content ? $_f->d_content : $default;
 	
 
 		// Getting Field Sizes
@@ -1359,16 +1366,17 @@ class rokfor_TEMPLATES
 		<ul id="field'.$_f->t_id.'">
 		'.$retval.'
 		</ul>
-		<input type="hidden" name="table['.$_f->d_id.']" value="'.htmlspecialchars($_f->d_text).'" id="table'.$_f->t_id.'">
+		<input type="hidden" name="table['.$_f->d_id.']" value="'.htmlspecialchars(json_encode($_f->d_content)).'" id="table'.$_f->t_id.'">
 		<p class="editor_text_array history">'.(($_f->t_growing=="Ja")?('<a href="#" id="tbladd'.$_f->t_id.'" class="button mini blue medium">'.Insert.'</a>'):('')).'</p>		
 		</div>');		
 	}
 	
 	function _Bild($_f) {
 		/* Load Data */
-		$data =  array();
-		$data = $this->rfDB->_splitTableData($_f->d_binary);
-		if (!$data[0][1]) $data[0][0]=$data[0][1]="";
+		$data =  $_f->d_content;
+		if (!is_array($data[0])) {
+      $data = [["",""]];
+    }
 		$retval = '';
 
 		/* Cycle thru Data */
@@ -1409,7 +1417,7 @@ class rokfor_TEMPLATES
 			$options = '<option value="false" selected>-DESELECTED-</option>\n';
 			$history = $_select = array();
 			foreach ($this->rfDB->getFieldsByTemplateId($_f->t_id,$_SESSION['issueid']) as $select) {
-				$history[] = $select->d_text;
+				$history[] = $select->d_content;
 			}
 
 
@@ -1421,7 +1429,7 @@ class rokfor_TEMPLATES
 					$options .= '<optgroup label="'.str_replace($_f->t_colnames, "", $name).'">\n';
 			    }
 				else if (!(substr($object->getFilename(), 0,1)==".")) {
-					if ($name==$_f->d_text) $options .= '<option value="'.$name.'" selected>'.$object->getFilename()."</option>\n";
+					if ($name==$_f->d_content) $options .= '<option value="'.$name.'" selected>'.$object->getFilename()."</option>\n";
 					else if (!in_array($name, $history)) $options .= '<option value="'.$name.'">'.$object->getFilename()."</option>\n";
 					else $options .= '<option value="'.$name.'" disabled="disabled">'.$object->getFilename()."</option>\n";				
 				}
@@ -1431,273 +1439,13 @@ class rokfor_TEMPLATES
 	    	$retval .= '<select onkeydown="rfgui.previewAnimated(this);" onchange="rfgui.previewAnimated(this);" class="medium" name="text['.$_f->d_id.']">';
 			$retval .= $options;
 			$retval .= '</select>';
-			$retval .= '<p class="status">'.File.': '.end(explode("/", ($_f->d_text))).'&nbsp;<a class="button green mini floatright" href="#" onclick="rfgui.previewVideo(\''.base64_encode($_f->d_text).'\');">'.Preview.'</a></p>';
+			$retval .= '<p class="status">'.File.': '.end(explode("/", ($_f->d_content))).'&nbsp;<a class="button green mini floatright" href="#" onclick="rfgui.previewVideo(\''.base64_encode($_f->d_content).'\');">'.Preview.'</a></p>';
 
 		return ('<h3>'.$_f->t_fieldname.'</h3><div>
 		'.$retval.'
 		</div>');
 	}
 	
-	function _MetaMatrix($_f) {
-			$retval = ""; 
-			list($default,$history_command,$fromtemplate,$fromfield,$fixedvalues,$restrict_to_issue,$threeDee,$historydata,$description) = $this->_parseLegends(($_f->t_colnames)."\nhistory=contributional");
-			// Alle Contributions eines Templates Laden
-			$_object_in_db = array();
-			foreach ($historydata as $_obdata) {
-				$_object_in_db[$_obdata->_value] = $_obdata->_value;
-			}
-			// Data: JSON Encode
-			
-			
-			if (!$_json = json_decode($_f->d_text, true)) {
-
-				// Errordefinitionen
-				$json_errors = array(
-				    JSON_ERROR_NONE => 'Es ist kein Fehler aufgetreten',
-				    JSON_ERROR_DEPTH => 'Die maximale Stacktiefe wurde erreicht',
-				    JSON_ERROR_CTRL_CHAR => 'Steuerzeichenfehler, möglicherweise fehlerhaft kodiert',
-				    JSON_ERROR_SYNTAX => 'Syntaxfehler',
-				);
-
-				// Zeige die Fehler für unterschiedliche Verschachtelungstiefen
-			    echo 'Letzter Fehler : ', $json_errors[json_last_error()], PHP_EOL, PHP_EOL;
-			}			
-			
-			
-			// Keine Dims? Eine machen...
-			if (!is_array($_json)) $_json["Dimension"]["Objects"] = $_json["Dimension"]["Keywords"] = $_json["Dimension"]["Nodes"] = array();		
-			// Durch alle Dims laufen
-			foreach ($_json as $_dim=>&$_data) {
-				$_object_in_db_dim = $_object_in_db;
-				// Data mit vorhandenem abgleichen	
-				$_tdata = array();
-				$_oldobs = array();
-				
-				if (is_array($_data["Objects"])) 
-
-					// Case 1: Den Objekten hinzufügen, wenn in der Datenbank vorhanden
-					foreach ($_data["Objects"] as $ob_key=>&$_obdata) {
-						if (in_array($_obdata[0], $_object_in_db_dim)) {
-							$_tdata[] = $_obdata;
-						}
-						$_oldobs[] = $_obdata[0];
-					}
-
-					// Case 2: Objekte neu hinzufügen, die in der Datenbank sind, aber nicht in der Matrix
-					foreach ($_object_in_db_dim as $newob) {
-						if (!in_array($newob, $_oldobs)) {
-							$_tdata[] = array($newob,array(1,1),false);
-						}
-					}
-
-					
-//				else $_json->$_dim->Objects = array();
-				$_data["Objects"] = $_tdata;
-				// Falls nicht vorhanden, dazufügen
-//				foreach ($_object_in_db_dim as $newob) array_push($_data["Objects"], array($newob,array(1,1),false));
-
-				// Get Preview
-				if (is_array($_data["Objects"]))
-					foreach ($_data["Objects"] as &$_obdata) {
-						$p_u = "";
-						if ($fromfield && $_cid = $this->rfDB->getElementsIdbyName($_obdata[0])->id) {
-							$prev_data = $this->rfDB->getFieldsByName ($fromfield, $_cid);
-							$p_u = "d_text-".$prev_data->id;
-						}
-
-		/*				else if (in_array($prev_data->_fieldtype,array('Bild'))) {
-							// Create image preview - TODO
-							$p_u = '';				
-						} 
-						else {
-							// Create Text Preview - TODO
-							$p_u = '';				
-						} */
-						$_obdata[2] = $p_u;
-					}
-			}
-
-
-			$retval .= ('<div id="meta-'.$_f->t_id.'" class="ontology"></div><input class="saveVal" type="hidden" value=\''.(json_encode($_json)).'\' id="save'.$_f->t_id.'" name="text['.$_f->d_id.']">');
-
-			$this->_domready('$(\'meta-'.$_f->t_id.'\').makeOntology({
-				dataid: \'save'.$_f->t_id.'\',
-			});');
-	
-			return ('<h3>'.$_f->t_fieldname.'</h3><div class="ontologycontainer">
-			'.$retval.'
-			</div>');	
-	}
-
-	/**
-	 * targetMatrix: automatic-cinema widget (used to define narrative targets)
-	 *
-	 * @param dataobject $_f 
-	 * @return string
-	 * @author Urs Hofer
-	 */
-	function _TargetMatrix($_f) {
-		$_json = array();
-		$retval = ""; 
-		list($default,$history_command,$fromtemplate,$fromfield,$fixedvalues,$restrict_to_issue,$threeDee,$historydata,$description) = $this->_parseLegends(($_f->t_colnames)."\nhistory=contributional");
-
-		// Split off the Metadata-Relation
-		if (count($this->rfDB->_splitTextListData($_f->d_text))>1) list($_storedRelation,$_f->d_text) = $this->rfDB->_splitTextListData($_f->d_text);
-		$history = ($this->customcontrol[$_f->d_id])?($this->customcontrol[$_f->d_id]):($_storedRelation);
-
-		// Decode Data from DB
-		$_stored = json_decode($_f->d_text);
-
-		// POST customControls[value]
-		$_selector = TimeMatrixMeta.': <select name="customControl['.$_f->d_id.']" onchange="rfgui.customAction(this, this.options[this.selectedIndex].value)" id="customControls">';
-		foreach ($historydata as $select) {
-			$_selector .= '<option '.(($history==$select->id)?('selected="selected"'):('')).' value="'.$select->id.'">'.$select->_value.'</option>';			
-		}
-		$_selector .= '</select>';
-		if ($fromfield && $history) $prev_data = json_decode($this->_stripslashes($this->rfDB->getFieldsByName($fromfield, $history)->d_text));
-
-		echo $history;
-
-		// Analyzing JSON Structures
-		if ($prev_data) foreach ($prev_data as $_dim => $_data)  {
-			foreach ($_data->Keywords as $_kw) {
-				$_json[$_dim]['Keywords'][$_kw[0]] = $_kw[1];
-			}
-			$_json[$_dim]['Target'] = (
-				!is_array($_stored->$_dim->Target)||
-				$_stored->$_dim->Target[0] < 0 ||
-				$_stored->$_dim->Target[0] > 100 ||				
-				$_stored->$_dim->Target[1] < 0 ||
-				$_stored->$_dim->Target[1] > 100
-				)?(array(10,10,1)):($_stored->$_dim->Target);
-		}
-
-		$retval .= ($_selector.'<div id="target-'.$_f->t_id.'" class="targetmatrix"></div><input class="saveVal" type="hidden" value=\''.$history.'<::::::>'.(json_encode($_json)).'\' id="save'.$_f->t_id.'" name="text['.$_f->d_id.']">');
-		$this->_domready('$(\'target-'.$_f->t_id.'\').makeTarget({
-			dataid: \'save'.$_f->t_id.'\',
-		});
-		');
-		
-		return ('<h3>'.$_f->t_fieldname.'&nbsp;</h3><div class="ontologycontainer">
-		'.$retval.'
-		</div>');
-	}
-	
-	/**
-	 * timeMatrix: automatic-cinema widget (used in style definition)
-	 *
-	 * @param dataobject $_f
-	 * @return string
-	 * @author Urs Hofer
-	 */
-	function _TimeMatrix($_f) {
-		$retval = ""; 
-		$_relations = $this->_parseLegends($_f->t_colnames);
-
-		// Split off the Metadata-Relation
-		if (count($this->rfDB->_splitTextListData($_f->d_text))>1) list($_storedRelation,$_f->d_text) = $this->rfDB->_splitTextListData($_f->d_text);		
-		$_storedRelation = $this->customcontrol[$_f->d_id]?$this->customcontrol[$_f->d_id]:$_storedRelation;
-		// SplitS: Dimensions of the Data
-		$_splits = array();
-		foreach ($_relations as $_relationdata) {
-
-			// Define Type based upon the setting in the t_colname
-			
-			if 		($_relationdata[1]=="fixed") 		$_type=2;
-			else if ($_relationdata[4][0] == "Channel") $_type=1;
-			else if ($_relationdata[4][0] == "Content") $_type=3;
-			else if ($_relationdata[4][0] == "Physics") $_type=4;
-			
-			switch ($_type) {
-
-				// Channels
-				
-				case 1: 
-					# Channels: Complete Split of Data
-					if (is_array($_relationdata[7])) {
-						foreach ($_relationdata[7] as $_obdata) {
-							if ($_obdata->_name) {
-								$_splits[] = $_obdata->_name;
-							}
-						}
-					}
-					break;
-				case 2:
-					# Fixed values (fixed)
-					if (is_array($_relationdata[7])) {
-						$_object_in_db[] = array("key"=>$_relationdata[7][0]->_value.(($_relationdata[0][0])?('|'.$_relationdata[0][0]):('')).(($_relationdata[0][1])?('|'.$_relationdata[0][1]):('')),"from"=>array(1,1), "type"=>$_type);
-					}
-					break;
-				case 3:
-					# Dimensions (metamatrix/other)
-					if (is_array($_relationdata[7])) {
-						$_selector = TimeMatrixMeta.': <select name="customControl['.$_f->d_id.']" onchange="rfgui.customAction(this, this.options[this.selectedIndex].value)" id="customControls">';
-						foreach ($_relationdata[7] as $_obdata) {
-							if (!$_storedRelation || !$this->rfDB->getFieldsByName($_relationdata[2], $_storedRelation)) $_storedRelation = $_obdata->id;							
-							if ($_obdata->id==$_storedRelation) {
-
-								foreach (json_decode($this->_stripslashes($this->rfDB->getFieldsByName($_relationdata[2], $_obdata->id)->d_text)) as $_dim => $_data)  {
-									$_object_in_db[] = array("key"=>$_dim.(($_relationdata[0][0])?('|'.$_relationdata[0][0]):('')).(($_relationdata[0][1])?('|'.$_relationdata[0][1]):('')),"from"=>array(1,1), "type"=>$_type);								
-								}
-							}
-							$_selector .= '<option '.(($_storedRelation==$_obdata->id)?('selected="selected"'):('')).' value="'.$_obdata->id.'">'.$_obdata->_name.'</option>';			
-						}
-						$_selector .= '</select>';													
-					}					
-					break;					
-				case 4:
-					# Characteristics (table/other)
-					if (is_array($_relationdata[7])) {
-						foreach ($_relationdata[7] as $_obdata) {
-							foreach (explode('<;;;;;;>', $_obdata->_value) as $_row) {
-								if($_row) {
-									/* Store it under the key name, since we cicle here for every contribution (because tables can differ) */
-									$_object_in_db[reset(explode('<::::::>', $_row))] = array("key"=>reset(explode('<::::::>', $_row)).(($_relationdata[0][0])?('|'.$_relationdata[0][0]):('')).(($_relationdata[0][1])?('|'.$_relationdata[0][1]):('')),"from"=>array(1,1), "type"=>$_type);
-								}
-							}
-						}
-					}					
-					break;
-			}
-		}
-
-
-		// Data: JSON Encode
-		$_json = json_decode($_f->d_text,true);	
-		$_newjson = array();
-		$add = true;	
-
-
-		foreach ($_splits as $_dimension) {
-
-			foreach ($_object_in_db as $_akey=>$_adata) {
-				if (is_array($_json[$_dimension])) foreach ($_json[$_dimension] as $_jkey=>$_data) {
-					$add = true;
-					// Existierende Werte behalten...
-					if ($_adata['key']==$_data['key'] && $_adata['type']==$_data['type']) {
-						$_newjson[$_dimension][] = $_json[$_dimension][$_jkey]; $add = false; break;
-					}
-				}
-				// Neue hinzufügen...
-				if ($add) {
-					$_newjson[$_dimension][] = $_adata;
-				}
-			}
-
-		}		
-		
-		$retval .= ($_selector.'<div id="time-'.$_f->t_id.'" class="cloudmatrix"></div><input class="saveVal" type="hidden" value=\''.$_storedRelation.'<::::::>'.(json_encode($_newjson)).'\' id="save'.$_f->t_id.'" name="text['.$_f->d_id.']">');
-		$this->_domready('$(\'time-'.$_f->t_id.'\').makeCloud({
-			dataid: \'save'.$_f->t_id.'\',
-		});
-		');
-	
-		return ('<h3>'.$_f->t_fieldname.'&nbsp;</h3><div class="ontologycontainer">
-		'.$retval.'
-		</div>');
-	}
-	
-
 	function _TypologyKeyword($_f) {
 		$retval = $history = ""; 
 		$histArr = Array();
@@ -1742,7 +1490,7 @@ class rokfor_TEMPLATES
 				'.$history.'
 			</select>
 			<div class="sortContainer"><ol class="sortlist"></ol></div>
-			<input class="saveVal" type="hidden" value="'.$_f->d_text.'" name="text['.$_f->d_id.']">
+			<input class="saveVal" type="hidden" value=\''.json_encode($_f->d_content).'\' name="text['.$_f->d_id.']">
 		</div></div>');
 
 
@@ -1759,7 +1507,7 @@ class rokfor_TEMPLATES
 		$retval .= ('<div><div id="slider-'.$_f->d_id.'" class="slider">
 		<span class="minValLeg">'.$default[0].'</span>
 		<span class="maxValLeg">'.$default[1].'</span>
-		<div class="knob"><input class="saveVal" type="hidden" value="'.($_f->d_integer===NULL?50:$_f->d_integer).'"  name="number['.$_f->d_id.']"></div>
+		<div class="knob"><input class="saveVal" type="hidden" value="'.($_f->d_content===NULL?50:$_f->d_content).'"  name="number['.$_f->d_id.']"></div>
 		</div></div>');
 
 		$this->_domready('rfgui.addSlider(\'slider-'.$_f->d_id.'\');');
@@ -1771,14 +1519,14 @@ class rokfor_TEMPLATES
 	function _TypologyMatrix($_f) {
 		$retval = ""; 
 		$default = $this->_parseLegends($_f->t_colnames,$_f);
-		if ($_f->d_text=='') $_f->d_text = "50<::::::>50";		
+		if ($_f->d_content=='') $_f->d_content = array(50,50);		
 		$retval .= ('<div class="smallContainer">
 		<div id="matrix-'.$_f->d_id.'" class="square">
 			<div class="minXLeg">'.$default[0].'</div>
 			<div class="maxXLeg">'.$default[1].'</div>
 			<div class="minYLeg">'.$default[2].'</div>
 			<div class="maxYLeg">'.$default[3].'</div>
-			<div class="knob"><input class="saveVal" type="hidden" value="'.$_f->d_text.'" name="text['.$_f->d_id.']"></div>
+			<div class="knob"><input class="saveVal" type="hidden" \''.json_encode($_f->d_content).'\' name="text['.$_f->d_id.']"></div>
 		</div>
 		</div>');
 
@@ -1812,7 +1560,7 @@ class rokfor_TEMPLATES
 					$id_value_obj[0][] = "'".$select->_value."':".$select->id;
 					$id_value_obj[1][] = $select->id.":'".$select->_value."'";
 				}			
-				$history .= '<option value="'.$select->id.'" '.(($select->id==$_f->d_text)?('selected="selected"'):('')).'>'.$select->_value.'</option>';
+				$history .= '<option value="'.$select->id.'" '.(($select->id==$_f->d_content)?('selected="selected"'):('')).'>'.$select->_value.'</option>';
 			}
 		}
 		
@@ -1840,7 +1588,7 @@ class rokfor_TEMPLATES
 					<div class="minYLeg">'.$default[2].'</div>
 					<div class="maxYLeg">'.$default[3].'</div>
 			</div>
-			<input class="saveVal" type="hidden" value="'.$_f->d_text.'" name="text['.$_f->d_id.']">
+			<input class="saveVal" type="hidden" value=\''.json_encode($_f->d_content).'\' name="text['.$_f->d_id.']">
 			<input class="threeDee" type="hidden" value="0">
 			</div></div>');
 		$this->_domready('rfgui.addTopic(\'keyword-'.$_f->d_id.'\', '.(($addField)?('true'):('false')).''.(($_resolve_foreign)?(' ,[{'.join(',',$id_value_obj[0]).'},{'.join(',',$id_value_obj[1]).'}]'):('')).');');
@@ -1926,12 +1674,17 @@ class rokfor_TEMPLATES
 					$_options['x'] = '<optgroup label="'.XMLPlugin.'">';
 					$_options['n'] = '<optgroup label="'.NarrationPlugin.'">';
 					while ($_i = @$this->rfDB->fetch_object($query)) {
-						$_options['s'] .= '<option value="_singleplugin-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_singleplugin)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
-						$_options['a'] .= '<option value="_allplugin-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_allplugin)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
-						$_options['r'] .= '<option value="_rtfplugin-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_rtfplugin)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
-						$_options['x'] .= '<option value="_xmlplugin-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_xmlplugin)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
-						$_options['n'] .= '<option value="_narrationplugin-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_narrationplugin)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
-					}
+           $_check = $this->rfDB->getCrossRef($_value->id, '_issueid', '_pluginid', 'R_issues_singleplugin');
+						$_options['s'] .= '<option value="_singleplugin-'.$_i->id.'" '.((in_array($_i->id,$_check))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+            $_check = $this->rfDB->getCrossRef($_value->id, '_issueid', '_pluginid', 'R_issues_allplugin');
+						$_options['a'] .= '<option value="_allplugin-'.$_i->id.'" '.((in_array($_i->id,$_check))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+            $_check = $this->rfDB->getCrossRef($_value->id, '_issueid', '_pluginid', 'R_issues_rtfplugin');
+						$_options['r'] .= '<option value="_rtfplugin-'.$_i->id.'" '.((in_array($_i->id,$_check))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+            $_check = $this->rfDB->getCrossRef($_value->id, '_issueid', '_pluginid', 'R_issues_xmlplugin');
+						$_options['x'] .= '<option value="_xmlplugin-'.$_i->id.'" '.((in_array($_i->id,$_check))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+            $_check = $this->rfDB->getCrossRef($_value->id, '_issueid', '_pluginid', 'R_issues_narrationplugin');
+						$_options['n'] .= '<option value="_narrationplugin-'.$_i->id.'" '.((in_array($_i->id,$_check))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';
+          }
 					$_options['s'] .= '</optgroup>';
 					$_options['a'] .= '</optgroup>';
 					$_options['r'] .= '</optgroup>';	
@@ -1977,14 +1730,15 @@ class rokfor_TEMPLATES
 					$query = @$this->rfDB->query($sql);
 					$_options['c'] = "";
 
-					$_active_books = explode('<::::::>',$_value->_forbook);
+          $_active_books = $this->rfDB->getCrossRef($_value->id, '_templateid', '_bookid', 'R_templatenames_forbook');
 					if (count($_active_books)==0) {
 						$_active_books = false;
 					}
 
+          $_active_chapter = $this->rfDB->getCrossRef($_value->id, '_templateid', '_chapterid', 'R_templatenames_inchapter');
 					while ($_i = @$this->rfDB->fetch_object($query)) {
 						if (!$_active_books || in_array($_i->_forbook, $_active_books)) {
-							$_options['c'] .= '<option value="_chapter-'.$_i->id.'" '.((in_array($_i->id,explode('<::::::>',$_value->_inchapter)))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';							
+							$_options['c'] .= '<option value="_chapter-'.$_i->id.'" '.((in_array($_i->id,$_active_chapter))?('selected="selected"'):('')).'>'.$_i->_name.'</option>';							
 						}
 					}
 
@@ -2027,8 +1781,7 @@ class rokfor_TEMPLATES
 			
 				$_fieldtypes = array ("Text","Bild","Tabelle","Zahl","TypologySlider",
 				"TypologyMatrix","TypologyKeyword",	"TypologyCloud",
-				"TypologySelect","FilePicker","MetaMatrix",			
-				"TimeMatrix","TargetMatrix","*Ausgeschaltet*");
+				"TypologySelect","FilePicker","*Ausgeschaltet*");
 
 				$_header = '<span style="width:100px;">Feldname</span>
 				<span style="width:100px;">Helptext</span>
@@ -2113,21 +1866,19 @@ class rokfor_TEMPLATES
 						$retval .= '<textarea style="width:100px; height: 60px;">'.htmlspecialchars($_i->_group).'</textarea>';
 						if ($_i->id<>'added') $_rights = $this->rfDB->showGroupRights($_i->id);
 						$sql = array(
-							"SELECT id,_name FROM _templatenames ORDER BY __sort__",
-							"SELECT id,_name FROM _books ORDER BY __sort__",
-							"SELECT id,_name FROM _issues ORDER BY __sort__",		
-							"SELECT id,username as _name FROM users ORDER BY username"
+							"Templates" => "SELECT id,_name FROM _templatenames ORDER BY __sort__",
+							"Projects"  => "SELECT id,_name FROM _books ORDER BY __sort__",
+							"Editions"  => "SELECT id,_name FROM _issues ORDER BY __sort__",		
+							"Users"     => "SELECT id,username as _name FROM users ORDER BY username"
 						);
-						foreach ($sql as $_sql) {
-							$_right = @current($_rights);
-							$_rightcat = @key($_rights);
+						foreach ($sql as $key=>$_sql) {
+							$_right = $_rights[$key];
 							$_q = $this->rfDB->query($_sql);
 							$retval .= '<select style="width:150px;" class="multiselect" multiple="multiple">';
 							while ($_row = $this->rfDB->fetch_object($_q)) {
-								$retval .= '<option value="_'.$_rightcat.'-'.$_row->id.'" '.((is_array($_right) && in_array($_row->id,$_right))?('selected="selected"'):('')).'>'.$_row->_name.'</option>';
+								$retval .= '<option value="_'.$key.'-'.$_row->id.'" '.(in_array($_row->id,$_right)?('selected="selected"'):('')).'>'.$_row->_name.'</option>';
 							}
 							$retval .= '</select>';							
-							next($_rights);
 						}
 						$retval .= '</li>';
 					}
@@ -2178,8 +1929,9 @@ class rokfor_TEMPLATES
 							$sql_b = "SELECT * FROM _books ORDER BY _name";
 							$query_b = @$this->rfDB->query($sql_b);
 							$_options = "";
+              $_check = $this->rfDB->getCrossRef($_i->id, '_batchid', '_bookid', 'R_batch_forbook');
 							while ($_b = @$this->rfDB->fetch_object($query_b)) {
-								$_options .= '<option value="_book-'.$_b->id.'" '.((in_array($_b->id,explode('<::::::>',$_i->_forbook)))?('selected="selected"'):('')).'>'.$_b->_name.'</option>';
+								$_options .= '<option value="_book-'.$_b->id.'" '.((in_array($_b->id,$_check))?('selected="selected"'):('')).'>'.$_b->_name.'</option>';
 							}
 
 							$retval .= '<li style="'.(($col%2<>0)?('background: #F1F5FA;'):('background: #FFFFFF;')).'"><div style="height: 160px;" class="rowToggler">&nbsp;</div><div><a href="#" class="t_add button micro green">+</a><a href="#" class="t_del button micro red">-</a></div>';
@@ -2213,8 +1965,10 @@ class rokfor_TEMPLATES
 						$sql_f = "SELECT * FROM _templates ORDER BY _fieldname";
 						$query_f = @$this->rfDB->query($sql_f);
 						$_options = "";
+            $_check = $this->rfDB->getCrossRef($_i->id, '_postprocessorid', '_templateid', 'R_fieldpostprocessor_forfield');
+            
 						while ($_b = @$this->rfDB->fetch_object($query_f)) {
-							$_options .= '<option value="_field-'.$_b->id.'" '.((in_array($_b->id,explode('<::::::>',$_i->_forfield)))?('selected="selected"'):('')).'>'.$_b->_fieldname.'</option>';
+							$_options .= '<option value="_field-'.$_b->id.'" '.((in_array($_b->id,$_check))?('selected="selected"'):('')).'>'.$_b->_fieldname.'</option>';
 						}
 
 						$retval .= '<li style="'.(($col%2<>0)?('background: #F1F5FA;'):('background: #FFFFFF;')).'"><div style="height: 160px;" class="rowToggler">&nbsp;</div><div><a href="#" class="t_add button micro green">+</a><a href="#" class="t_del button micro red">-</a></div>';
@@ -2258,19 +2012,17 @@ class rokfor_TEMPLATES
 				# Load all books & chapters for the template of this contribution
 				$sql = "SELECT * FROM _templatenames WHERE id = ".$_contribInfo->_fortemplate;
 				$_t = @$this->rfDB->fetch_object(@$this->rfDB->query($sql));
-				$_chapter_allowed = explode('<::::::>',$_t->_inchapter);
-				
+				$_chapter_allowed = $this->rfDB->getCrossRef($_t->id, '_templateid', '_chapterid', 'R_templatenames_inchapter');
+        $_books = $this->rfDB->getCrossRef($_t->id, '_templateid', '_bookid', 'R_templatenames_forbook');
 				# cycle thru all issues of a the books
-				foreach (explode('<::::::>',$_t->_forbook) as $_bookid) {
-					if ($_bookid) {
-						$_issues = @$this->rfDB->getEditions ($_bookid);
-						$_chapters = @$this->rfDB->getParts ($_bookid);
-						foreach ($_issues as $_issue) {
-							foreach ($_chapters as $_chapter) {
-								if (in_array($_chapter->id, $_chapter_allowed)) $this->buffer .= '<option value="'.$_bookid.'-'.$_issue->id.'-'.$_chapter->id.'">'.$this->rfDB->getProjectName($_bookid)->_name.' &gt; '.$_issue->_name.' &gt; '.$_chapter->_name.'</option>';						
-							}
-						}
-					}
+				foreach ($_books as $_bookid) {
+          $_issues = @$this->rfDB->getEditions ($_bookid);
+          $_chapters = @$this->rfDB->getParts ($_bookid);
+          foreach ($_issues as $_issue) {
+          	foreach ($_chapters as $_chapter) {
+          		if (in_array($_chapter->id, $_chapter_allowed)) $this->buffer .= '<option value="'.$_bookid.'-'.$_issue->id.'-'.$_chapter->id.'">'.$this->rfDB->getProjectName($_bookid)->_name.' &gt; '.$_issue->_name.' &gt; '.$_chapter->_name.'</option>';						
+          	}
+          }
 				}
 				$this->buffer .= '</select><br/>';
 
@@ -2359,7 +2111,7 @@ class rokfor_TEMPLATES
 				$_contrib = $this->rfDB->getElementsNamebyId($_id);
 				$_issues = $this->rfDB->getEditionInfo($_contrib->_forissue);
 				$_plugins = array();				
-				foreach ($this->rfDB->_splitTextListData($_issues->_singleplugin) as $_plugid) {
+				foreach ($this->rfDB->getCrossRef($_issues->id, '_issueid', '_pluginid', 'R_issues_singleplugin') as $_plugid) {
 					$sql = "SELECT * FROM _plugins WHERE id = $_plugid";
 					$query = @$this->rfDB->query($sql);
 					$_plug = @$this->rfDB->fetch_object($query);
@@ -2452,7 +2204,12 @@ class rokfor_TEMPLATES
 				/* Getting all generators & Plugins into a sorted array */
 				$_issues = $this->rfDB->getEditionInfo($_id);
 				$_srcplugs = $_plugins = array();
-				$_srcplugs = array_merge($this->rfDB->_splitTextListData($_issues->_allplugin), $this->rfDB->_splitTextListData($_issues->_xmlplugin), $this->rfDB->_splitTextListData($_issues->_rtfplugin), $this->rfDB->_splitTextListData($_issues->_narrationplugin));
+				$_srcplugs = array_merge(
+          $this->rfDB->getCrossRef($_issues->id, '_issueid', '_pluginid', 'R_issues_allplugin'),
+          $this->rfDB->getCrossRef($_issues->id, '_issueid', '_pluginid', 'R_issues_xmlplugin'),
+          $this->rfDB->getCrossRef($_issues->id, '_issueid', '_pluginid', 'R_issues_rtfplugin'),
+          $this->rfDB->getCrossRef($_issues->id, '_issueid', '_pluginid', 'R_issues_narrationplugin')
+        );
 				foreach ($_srcplugs as $_plugid) if ($_plugid) {
 					$sql = "SELECT * FROM _plugins WHERE id = $_plugid";
 					$query = @$this->rfDB->query($sql);

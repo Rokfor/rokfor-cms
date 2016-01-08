@@ -45,10 +45,6 @@ if(!function_exists('parse_ini_string')){
 }
 
 
-
-
-
-
 class rokfor_MAIN
 {
 	/**
@@ -181,94 +177,6 @@ class rokfor_MAIN
 		);
 	}
 	
-	
-	/**
-	 * does some mysql maintenance after login
-	 *
-	 * @return void
-	 * @author Urs Hofer
-	 */
-	private function _mysqlMaintenanceFunction() {
-		
-		// Check for contributions - chapter consistency
-		
-		$sql = ("SELECT _templatenames._inchapter as _inchapter,_contributions.id FROM _contributions 
-					LEFT JOIN _templatenames ON _templatenames.id = _contributions._fortemplate
-					WHERE _contributions.__split__ IS null || _contributions.__split__ = 'Null' || _contributions.__split__ = 'NULL'");
-		$ch_c = $this->rfDB->query($sql);
-		while ($ch_cc = $this->rfDB->fetch_object($ch_c)) {
-			$chId = $this->rfDB->_splitTextListData($ch_cc->_inchapter);
-			$sql = ("UPDATE _contributions SET __split__ = '".$chId[0]."' WHERE id = ".$ch_cc->id." LIMIT 1");
-			$this->rfDB->query($sql);
-			echo "done";
-		}		
-		
-
-		
-		// Updates: Only do them if there is no version mark in the log database
-		
-		$sql = ("SELECT _user FROM _log 
-		WHERE _user LIKE 'AlteredDB<%' 
-		ORDER BY _date DESC, id DESC LIMIT 1");
-		$logId = $this->rfDB->fetch_object($this->rfDB->query($sql));		
-		if ($logId->_user && end(explode('<::::::>',$logId->_user))==VERSION) return;
-		
-		$sql = ('
-
-		ALTER TABLE  `_data` CHANGE  `_forcontribution`  `_forcontribution` INT( 32 ) NULL DEFAULT NULL ,
-		CHANGE  `_fortemplatefield`  `_fortemplatefield` INT( 32 ) NULL DEFAULT NULL		//
-		
-		ALTER TABLE  `_contributions` CHANGE  `_fortemplate`  `_fortemplate` INT( 32 ) NULL DEFAULT NULL ,
-		CHANGE  `_forissue`  `_forissue` INT( 32 ) NULL DEFAULT NULL //
-		
-		ALTER TABLE  `_templates` CHANGE  `_fortemplate`  `_fortemplate` INT( 32 ) NULL DEFAULT NULL //
-		
-		ALTER TABLE  `_formats` CHANGE  `_forbook`  `_forbook` INT( 32 ) NULL DEFAULT NULL //
-		
-		ALTER TABLE  `_issues` CHANGE  `_forbook`  `_forbook` INT( 32 ) NULL DEFAULT NULL //		
-		
-		DROP TRIGGER IF EXISTS `Delete Data after Contributions Delete`;//
-		DROP TRIGGER IF EXISTS `Delete Contributions after Issues Delete`;//
-		DROP TRIGGER IF EXISTS `Delete Template Fields after Template Delete`;//
-		DROP TRIGGER IF EXISTS `Delete Data after Template Delete`;//
-		DROP TRIGGER IF EXISTS `Delete Chapter or Issue after Book Delete`;//
-
-		CREATE TRIGGER `Delete Data after Contributions Delete` AFTER DELETE ON `_contributions`
-		FOR EACH ROW BEGIN
-		DELETE FROM _data WHERE _forcontribution = OLD.id;
-		END//
-
-		CREATE TRIGGER `Delete Contributions after Issues Delete` AFTER DELETE ON `_issues`
-		FOR EACH ROW BEGIN
-		DELETE FROM _contributions WHERE _forissue = OLD.id;
-		END//
-
-		CREATE TRIGGER `Delete Template Fields after Template Delete` AFTER DELETE ON `_templatenames`
-		FOR EACH ROW BEGIN
-		DELETE FROM _templates WHERE _fortemplate = OLD.id;
-		END//
-
-		CREATE TRIGGER `Delete Data after Template Delete` AFTER DELETE ON `_templates`
-		FOR EACH ROW BEGIN
-		DELETE FROM _data WHERE _fortemplatefield = OLD.id;
-		END//
-
-		CREATE TRIGGER `Delete Chapter or Issue after Book Delete` AFTER DELETE ON `_books`
-		FOR EACH ROW BEGIN
-		DELETE FROM _formats WHERE _forbook = OLD.id;
-		DELETE FROM _issues WHERE _forbook = OLD.id;
-		END//
-
-		ALTER TABLE  `users` CHANGE  `id`  `id` INT( 32 ) NOT NULL AUTO_INCREMENT//		
-
-		ALTER TABLE  `users` ADD PRIMARY KEY(`id`)		
-		');
-		foreach (explode('//', $sql) as $value) {
-			$this->rfDB->query($value);
-		}
-		$this->_log("AlteredDB",VERSION);
-	}
-	
 	/**
 	 * escaping a string for use as a xml parameter
 	 *
@@ -323,7 +231,6 @@ class rokfor_MAIN
 			if ($this->auth = $this->rfDB->newSession($_POST['uname'],$_POST['pass']))
 			{
 				$_SESSION['sessionid'] = $this->rfDB->getSessionId();
-				$this->_mysqlMaintenanceFunction(); // Do once after Login some mySQL Maintenance checks.
 				$this->updateSessionVars(false);
 				$this->rfTPL->redirect('/');
 			}
@@ -361,8 +268,6 @@ class rokfor_MAIN
 			$this->buffer .= $user->username." [".Since." ".(round((time()-$user->currenttime)/60))." ".Minutes."] ";
 		}
 	}
-	
-	
 	
 	/**
 	 * postController: do some action with the post data
@@ -650,11 +555,11 @@ class rokfor_MAIN
 
 		$_SESSION['issuename'] 	= $this->rfDB->getEditionNamebyId($_currentContrib->id)->_name;
 		
-		$_SESSION['chapterid'] 	= $_currentContrib->__split__;
+		$_SESSION['chapterid'] 	= $_currentContrib->_forchapter;
 		$_SESSION['chaptername'] = $this->rfDB->getPartNamebyId($_currentContrib->id)->_name;
 
-		$_SESSION['bookname'] = $this->rfDB->getProjectNamebyPartId($_currentContrib->__split__)->_name;
-		$_SESSION['bookid']	  = $this->rfDB->getProjectNamebyPartId($_currentContrib->__split__)->id;
+		$_SESSION['bookname'] = $this->rfDB->getProjectNamebyPartId($_currentContrib->_forchapter)->_name;
+		$_SESSION['bookid']	  = $this->rfDB->getProjectNamebyPartId($_currentContrib->_forchapter)->id;
 	}
 	
 	/**
@@ -718,50 +623,24 @@ class rokfor_MAIN
 		$_field_info["_colNames"] 			= $_field_info_object->t_colnames;
 		$_field_info["_contribId"] 			= $_field_info_object->c_id;
 		
-		/* Prepare Data for Tables &  */
-		if (stristr($data, '<::::::>') && stristr($data, '<;;;;;;>'))
-			$data_processd = $this->rfDB->_splitTableData($data);
-		else if  (stristr($data, $_glue='<;;;;;;>'))
-			$data_processd = $this->rfDB->_splitWordListData($data);
-		else if  (stristr($data, $_glue='<::::::>'))
-			$data_processd = $this->rfDB->_splitTextListData($data);
-		else 
-			$data_processd = $data;
-		
 		// Postprocessing callbacks stored in the database...
 		$_fnct_data = array();
 		$name_neu = false;						
-		$sql_cb = "SELECT * FROM _fieldpostprocessor WHERE (_forfield LIKE '%:>".$_field_info_object->d_fortemplatefield."<:%' OR _forfield LIKE '".$_field_info_object->d_fortemplatefield."<:%') LIMIT 1";
-		$_fnct_data = $this->rfDB->fetch_object($this->rfDB->query($sql_cb));
-
-
-
-		if ($_fnct_data->_code<>"") {
-			if (!function_exists('_postprocessing_callback'.$dataId)) {
-				$_fnct = '<?php function _postprocessing_callback'.$dataId.'($db,$data,$_field_info, $rfDB, $_field_info_as_object)
-				{
-				'.$this->_stripslashes($_fnct_data->_code).'
-				return($data);
-				} ?>';
-				$temp_db = tempnam("/tmp", "rokfor_post_");
-				file_put_contents($temp_db, $_fnct);
-				require($temp_db);
-				unlink($temp_db);
-			}
-			$data_processd = call_user_func('_postprocessing_callback'.$dataId, $this->rfDB->db, $data_processd,$_field_info, $this->rfDB, $_field_info_object);
-			if ($data_processd !== false) {
-				if (is_array($data_processd)) {
-					if (is_array($data_processd[0])) return $this->rfDB->_glueTableData($data_processd);
-					else return (implode($_glue,$data_processd));
-				}
-				else {
-					return ($data_processd);
-				}
-			}
-			else {
-				die(CallbackExecutionError);
-			}
-		}
+		$sql_cb = "SELECT _fieldpostprocessor.* FROM _fieldpostprocessor
+        LEFT JOIN R_fieldpostprocessor_forfield ON R_fieldpostprocessor_forfield._postprocessorid = _fieldpostprocessor.id
+        WHERE R_fieldpostprocessor_forfield._templateid = ".$_field_info_object->d_fortemplatefield;
+    $_cbq = $this->rfDB->query($sql_cb);
+    while ($_fnct_data = $this->rfDB->fetch_object($_cbq)) {
+  		if ($_fnct_data->_code<>"") {
+        $_fnct = create_function('&$db, &$data, &$_field_info, &$rfDB, &$_field_info_as_object', $this->_stripslashes($_fnct_data->_code).' return($data);');
+        if ($_fnct) {
+          $data = $_fnct($this->rfDB->db, $data,$_field_info, $this->rfDB, $_field_info_object);
+        }
+  			else {
+          $this->rfTPL->_domready("alert('Execution of postprocessor failed:\n$_fnct_data->_name');");          
+  			}
+  		}
+    }
 		return $data;
 	}	
 	
@@ -796,7 +675,8 @@ class rokfor_MAIN
 	 * @return string
 	 * @author Urs Hofer
 	 */
-	function _clean_from_rteditor($fielddata, $trim = false) {
+	function _clean_from_rteditor($fielddata, $trim = false) 
+  {
 		// Return immediatly if suppressed by config:
 		if (defined('STORE_HTML') && STORE_HTML) {
 			$fielddata = preg_replace('/<span[^>]*>/m', '', $fielddata);
@@ -850,22 +730,20 @@ class rokfor_MAIN
 		$all = $this->rfDB->query($sql);			
 		$this->buffer = '<b>'.RunBatch.' '.$_POST["function_id"].'</b>';
 		$fncts = $this->rfDB->fetch_object($all);
-		$temp_db = tempnam("/tmp", "rokfor_dbconf_");
-		$fnc_head = '<?php function batch_postprocessing'.$_POST["function_id"].'($_db,$_rokforDB,$issueid,$bookid,$batchid,$batchpost, $contribs, $templates, $_caller) {';
-		$fnc_foot = '} ?>';			
-		file_put_contents($temp_db, $fnc_head.$this->_stripslashes($fncts->_postcode).$fnc_foot);
-		require($temp_db);
-		unlink($temp_db);
-		$_contribs = $this->rfDB->getElements('_contributions.__split__', false, $_POST["issue_id"]);
-		$_templates = $this->rfDB->getTemplates($_POST["book_id"],"all");
-		$olderror=error_reporting(E_ERROR);
-		$_callback = call_user_func("batch_postprocessing".$_POST["function_id"], $this->rfDB->db,$this->rfDB,$_POST["issue_id"],$_POST["book_id"],$_POST["function_id"],$_POST, $_contribs, $_templates, $this);
-		error_reporting($olderror);
-		if ($_callback===false) {
-			$_err = error_get_last();
+		$_contribs = $this->rfDB->getElements('_contributions._forchapter', false, $_POST["issue_id"]);
+		$_templates = $this->rfDB->getTemplates($_POST["book_id"],"all");    
+    $_fnct = create_function(
+      '&$_db,&$_rokforDB,&$issueid,&$bookid,&$batchid,&$batchpost,&$contribs,&$templates,&$_caller', 
+      $fncts->_postcode
+    );
+    if ($_fnct) {
+      $_callback = $_fnct($this->rfDB->db,$this->rfDB,$_POST["issue_id"],$_POST["book_id"],$_POST["function_id"],$_POST, $_contribs, $_templates, $this);
+			$ret = true;  
+    }
+		else {
 			$_callback = BatchPostError.": ".$_err['message'].' on line '.$_err['line'];       
 			$ret = false;  
-	    }
+		}
 		$this->buffer .= '<div class="batchcallback">'.$_callback.'</div>';		
 		return $ret;			
 	}
@@ -902,7 +780,7 @@ class rokfor_MAIN
 
 		if ($_POST['searchrange']=='issue') {
 			foreach ($_POST['issues'] as $_issueid) {
-				foreach ($this->rfDB->getElements('_contributions.__split__', 'Open', $_issueid) as $_contribs) {
+				foreach ($this->rfDB->getElements('_contributions._forchapter', 'Open', $_issueid) as $_contribs) {
 					$_contribtosearch[] = $_contribs->id;
 					$_bookname[$_contribs->id] = $this->rfDB->getProjectNamebyEditionId($_issueid)->_name;
 					$_issuename[$_contribs->id] = $this->rfDB->getEditionInfo($_issueid)->_name;
@@ -913,7 +791,7 @@ class rokfor_MAIN
 			foreach ($this->rfDB->getProjects(false) as $_book) {
 				$_eds = $this->rfDB->getEditions($_book->id);
 				if ($_eds) foreach ($_eds as $_issue) {
-					foreach ($this->rfDB->getElements('_contributions.__split__', 'Open', $_issue->id) as $_contribs) {
+					foreach ($this->rfDB->getElements('_contributions._forchapter', 'Open', $_issue->id) as $_contribs) {
 						$_contribtosearch[] = $_contribs->id;
 						$_bookname[$_contribs->id] = $_book->_name;
 						$_issuename[$_contribs->id] = $_issue->_name;
@@ -955,13 +833,13 @@ class rokfor_MAIN
 					# code...$_datatext = str_replace($searchstring, '<span comment="rokfor_temp" style="background-color: #ffff00;">'.$searchstring.'</span comment="rokfor_temp">', $_datatext);
 					$_c = 0;
 					
-					if ($_field->_fieldtype == "Bild") $_r = preg_replace($_regexp, $_POST['replace'], $_field->d_binary, -1, $_c);	// Substitute
-					else $_r = preg_replace($_regexp, $_POST['replace'], $_field->d_text, -1, $_c);	// Substitute
+					if ($_field->_fieldtype == "Bild") $_r = preg_replace($_regexp, $_POST['replace'], $_field->d_content, -1, $_c);	// Substitute
+					else $_r = preg_replace($_regexp, $_POST['replace'], $_field->d_content, -1, $_c);	// Substitute
 					if ($_r===NULL) {
 						$this->buffer .= NotValidRegexp."<br/>Error Code: ".($this->_pcre_error_decode())."<br/>".CheckSyntax.": <b>$_regexp</b><br/>";
 						return;
 					}
-					if ($_POST['replaceaction']==1) $this->rfDB->setFieldData($_r,$_field->id,$_field->_fieldtype == "Bild"?"_databinary":"_datatext");									// Store
+					if ($_POST['replaceaction']==1) $this->rfDB->setFieldData($_r,$_field->id);									// Store
 					$_found[$_contribs] += $_c;											// Add counts
 
 				}
@@ -1040,14 +918,14 @@ class rokfor_MAIN
 		$this->_log("Store",$_currentContrib->id);		
 		$sql = ("UPDATE `_contributions` SET  `_moddate` =  '".time()."' WHERE  `_contributions`.`id` =".$_currentContrib->id." LIMIT 1;");				
 		$this->rfDB->query($sql);		
-	
+		$this->buffer .= '<html><head><script type="text/javascript" src="/rf/js/3rdparty/mootools-core.js"  charset="utf-8"></script>';
 		/* Store Table Data */
 		if (count($this->form["table"])>0) {
 			foreach ($this->form["table"] as $_id=>$_data) {
 				// Call Postprocessors stored in Database
 				$_data = $this->_callFieldPostProcessor($_id,$_data);
 				// Save and update 
-				$this->rfDB->setFieldData($_data,$_id,'_datatext');
+				$this->rfDB->setFieldData($_data,$_id);
 			}
 		}
 		
@@ -1058,7 +936,7 @@ class rokfor_MAIN
 				else $tstamp = $_data;
 				// Call Postprocessor
 				$tstamp = $this->_callFieldPostProcessor($_id,intval($tstamp));
-				$this->rfDB->setFieldData($tstamp,$_id,'_datainteger');
+				$this->rfDB->setFieldData($tstamp,$_id);
 			}
 		}		
 		
@@ -1067,7 +945,7 @@ class rokfor_MAIN
 		foreach ($this->form['caption'] as $_id=>$_captions) {
 			/* Load current dataset */
 			$_field_info = $this->rfDB->getFieldData($_id);
-			$_current_data = $this->rfDB->_splitTableData($_field_info->d_binary);
+			$_current_data = $_field_info->d_content;
 			$_store_data = array();
 						
 			foreach ($_captions as $_imgId=>$_caption) {
@@ -1223,7 +1101,7 @@ class rokfor_MAIN
 				}
 			}
 			if (!$img_exception)
-				$this->rfDB->setFieldData($this->rfDB->_glueTableData($_store_data),$_id,'_databinary');			
+				$this->rfDB->setFieldData($_store_data,$_id);			
 
 			/* Delete unused Files */
 			foreach ($_current_data as $_todel) {
@@ -1244,24 +1122,30 @@ class rokfor_MAIN
 
 				/* Multi Line */
 				if (is_array($_data)) {
-					if (in_array("-1", $_data) && $_field_info->t_fieldtype=="TypologySelect") $_data = "-1";	// If in a select box -1 is selected, all other values are automatically deselected...
-					else $_data = join($_data, "<::::::>");
+					if (in_array("-1", $_data) && $_field_info->t_fieldtype=="TypologySelect") $_data = ["-1"];	// If in a select box -1 is selected, all other values are automatically deselected...
 				}
+        /* Json has to be decoded - because it will be encoded anyway */
+        else if ($_field_info->d_isjson) {
+          $_data = json_decode($_data);
+        }
 				else {
 					/* Clean HTML Markup if RTF Editor (Text Field only)*/
-					$_rtfeditor_disabled = false;
-					if (stristr($_field_info->t_colnames, 'rtfeditor=false') || $_field_info->t_fieldtype<>"Text") $_rtfeditor_disabled = true;
-					if ((!$_rtfeditor_disabled&&defined("EDITOR"))) {
-						$_data = $this->_clean_from_rteditor($_data);						
+					if (
+            $_field_info->t_fieldtype == "Text" 
+            && !stristr($_field_info->t_colnames, 'rtfeditor=false') 
+            && defined("EDITOR")
+            ) {
+						  $_data = $this->_clean_from_rteditor($_data);						
 					}
 				}
 				// Call Postprocessors stored in Database
 				$_data = $this->_callFieldPostProcessor($_id,$_data);
 				// Save and update 
-				$this->rfDB->setFieldData($_data,$_id,'_datatext');
+				$this->rfDB->setFieldData($_data,$_id);
 			}
 		}
-		$this->buffer .= "<body onload=\"parent.window.force_upload_stop = true;\">stored</body>";
+		$this->buffer .= $this->rfTPL->domready();
+		$this->buffer .= "</head><body onload=\"parent.window.force_upload_stop = true;\">stored</body></html>";
 		
 	}
 	
@@ -1286,30 +1170,7 @@ class rokfor_MAIN
 	 * @author Urs Hofer
 	 */
 	function deleteFromBinary($fieldId,$imgId=false) {
-		$_field_info = $this->rfDB->getFieldData($fieldId);
- 		if ($imgId===false) {
-			$udb_update = "";
-			$deletedArray = explode("<;;;;;;>", $_field_info->d_binary);
-		}
-		else {
-			$udb_oldnames = explode("<;;;;;;>", $_field_info->d_binary);
-			$deletedArray = array_splice($udb_oldnames, $imgId, 1);
-			$udb_update = implode ("<;;;;;;>", $udb_oldnames);
-		}
-
-		foreach ($deletedArray as $toDelete) {
-			$_filename = end(explode("<::::::>",$toDelete));
-			if (is_file(REPOSITORYDIR.'/'.$_filename)) unlink(REPOSITORYDIR.'/'.$_filename); /* Original */
-			if (is_file(REPOSITORYDIR.'/'.$_filename."-preview.jpg")) {
-				foreach (glob(REPOSITORYDIR.'/'.$_filename."-preview*") as $filename) {
-				   unlink($filename); /* Jpg Previews */
-				}
-			}
-			if (is_file(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg")) unlink(REPOSITORYDIR.'/thumbs/'.$_filename."-thmb.jpg");	/* Jpg Preview */								
-		}
-
-
-		$this->rfDB->setFieldData($udb_update,$fieldId,'_databinary');
+    $this->rfDB->_deleteFromBinary($fieldId, $imgId);
 	}
 	
 	/**
@@ -1323,45 +1184,11 @@ class rokfor_MAIN
 	 * @author Urs Hofer
 	 */
 	function newContribution($_issueid, $_chapterid, $_contribname, $_templateid) {
-
 		if (!$_contribname || !$_templateid || !$_issueid || !$_chapterid) return false;
-
-		$initTime= time();
-		// Insert into Contributions
-		$sql = ("
-			INSERT INTO `_contributions` (`id`, `_fortemplate`, `_forissue`, `_name`, `_status`, `_newdate`, `_moddate`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-			('', '$_templateid', '$_issueid', '".$this->rfDB->_esc($_contribname)."', 'Open', $initTime, $initTime, '".$this->rfDB->getUserId()."', NULL, '$_chapterid', -1, 1);
-		");
-		$this->rfDB->query($sql);
-		$newId = $this->rfDB->insert_id();
-		$sql = ("
-			UPDATE  `_contributions` SET  `__sort__` =  '$newId' WHERE  `_contributions`.`id` =$newId LIMIT 1 ;
-		");
-		$this->rfDB->query($sql);
-		
-		// Prepare Cell Fields in Datatable...
-		$_fields = $this->rfDB->getTemplateFields($_templateid);
-		
-//		print_r($_fields);
-
-		$parentNode = 0;
-		foreach ($_fields as $fields) {
-
-			// 2. Insert Fields in the Datatable
-			$sql_I = ("			
-				INSERT INTO `_data` (`id`, `_forcontribution`, `_fortemplatefield`, `_datatext`, `_databinary`, `_datainteger`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-				('', '$newId', '".$fields->id."', NULL, NULL, NULL, '".$this->rfDB->getUserId()."', NULL, NULL, -2, $parentNode);
-			");
-			$this->rfDB->query($sql_I);
-			$parentNode++;
-			// $parentNode = $newId_I = $this->rfDB->insert_id();
-			//$sql_I = ("UPDATE  `_data` SET  `__sort__` =  '$newId_I' WHERE  `_data`.`id` =$newId_I LIMIT 1;");				
-			//$this->rfDB->query($sql_I);
-		}
-		// Set newContribution Session Var: $_SESSION['addcontribution']. XML Output will automatically select this node with
-		// the css class mooTree_selected. So a XML reload in the tree will visually mark the new contribution
-		$_SESSION['lastTemplate'] = $_templateid;
-		return ($_SESSION['addcontribution'] = $newId);
+    $newId = $this->rfDB->addElement ($_contribname,$_templateid,$_chapterid,$_issueid);
+		$_SESSION['lastTemplate']     = $_templateid;
+    $_SESSION['addcontribution']  = $newId;
+		return $newId;
 	}
 	
 	/**
@@ -1372,14 +1199,17 @@ class rokfor_MAIN
 	 * @author Urs Hofer
 	 */
 	function closeContribution($contribId, $action = 'Close') {
-		if ($contribId == "multi") foreach ($_POST['data'] as $contribId) {
-				$sql = ("UPDATE  `_contributions` SET  `_status` =  '$action' WHERE  `_contributions`.`id` =$contribId LIMIT 1 ;");
-				$this->rfDB->query($sql);
-		}
-		else {
-			$sql = ("UPDATE  `_contributions` SET  `_status` =  '$action' WHERE  `_contributions`.`id` =$contribId LIMIT 1 ;");
-			$this->rfDB->query($sql);
-		}
+		$_contribs = array();
+		if ($contribId == "multi") $_contribs = $_POST['data'];
+		else $_contribs[0] = $contribId;
+		foreach ($_contribs as $_contribId) {
+      if ($action == 'Close')
+        $this->rfDB->closeElement($_contribId);
+      else if ($action == 'Open')
+        $this->rfDB->openElement($_contribId);
+      else if ($action == 'Deleted')
+        $this->rfDB->trashElement($_contribId);
+		}    
 		$this->buffer .= "ok";
 
 	}				
@@ -1392,25 +1222,13 @@ class rokfor_MAIN
 	 * @author Urs Hofer
 	 */
 	function trashContribution($contribId) {
-		// Delete Binaries
 		$_contribs = array();
 		if ($contribId == "multi") $_contribs = $_POST['data'];
 		else $_contribs[0] = $contribId;
-
 		foreach ($_contribs as $_contribId) {
-			$sql = ("SELECT id from _data WHERE _forcontribution = '".$_contribId."' and _databinary <> '' ");
-			while ($todel = $this->rfDB->fetch_object($this->rfDB->query($sql))) {
-				$this->buffer .= "deleting binaries: ".$todel->id;
-				$this->deleteFromBinary($todel->id);
-			}
-			// Delete Data
-			$sql = ("DELETE from _data WHERE _forcontribution = '".$_contribId."'");
-			$this->rfDB->query($sql);
-			// Delete Contribution
-			$sql = ("DELETE from _contributions WHERE id = '".$_contribId."'");
-			$this->rfDB->query($sql);
+      $this->buffer .= "trashing $_contribId";
+			$this->rfDB->deleteElement($_contribId);
 		}
-
 		$this->buffer .= "ok";
 	}				
 	
@@ -1426,11 +1244,10 @@ class rokfor_MAIN
 		$sql = ("SELECT * from _data WHERE _forcontribution = ".$fromId);
 		$oldData = $this->rfDB->query($sql);
 		while ($oldVals = $this->rfDB->fetch_object($oldData)) {
-			
+			$_info = $this->rfDB->getFieldData($oldVals->id);
 			/* TODO: Clone binary data: Upload, Thumb und alle -preview[x].jpg */
-			$_binary_clone = "";
-			if ($oldVals->_databinary) {
-				$image_processed = $this->rfDB->_splitTableData($oldVals->_databinary);
+			if ($oldVals->_content && $_info->t_fieldtype == "Bild") {
+				$image_processed = $this->rfDB->_splitTableData($oldVals->_content);
 				foreach ($image_processed as &$urls) {
 					if (is_file(REPOSITORYDIR.'/'.$urls[1]))  {
 						$marker = time();
@@ -1449,14 +1266,13 @@ class rokfor_MAIN
 						$urls[1] = $marker.$urls[1];
 					}
 				}
-				$_binary_clone = $this->rfDB->_glueTableData($image_processed);
+				$oldVals->_content = $this->rfDB->_glueTableData($image_processed);
 			}			
 			
-			$sql_I = ("			
+			$sql_I = ('
 				UPDATE `_data` 
-				SET `_datatext`='".$this->rfDB->_esc($oldVals->_datatext)."', `_datainteger` = '".$oldVals->_datainteger."' , `_databinary` = '".$_binary_clone."'
-				WHERE _fortemplatefield = ".$oldVals->_fortemplatefield." AND _forcontribution = $contribId;
-			");
+				SET    `_content`= "'.$this->rfDB->_esc($oldVals->_content).'"
+				WHERE  _fortemplatefield = '.$oldVals->_fortemplatefield.' AND _forcontribution = '.$contribId);
 			$this->rfDB->query($sql_I);
 		}		
 		$this->buffer .= "ok";
@@ -1464,7 +1280,7 @@ class rokfor_MAIN
 	
 	function cloneContribution($_contrib,$newName) {
 		if (!$newName) return false;
-		$newId = $this->newContribution($_contrib->_forissue, $_contrib->__split__, $newName, $_contrib->_fortemplate);
+		$newId = $this->newContribution($_contrib->_forissue, $_contrib->_forchapter, $newName, $_contrib->_fortemplate);
 		$this->cloneData($newId,$_contrib->id);
 		$this->buffer .= "ok $newId";
 		return $newId;
@@ -1472,10 +1288,7 @@ class rokfor_MAIN
 	
 	function renameContribution($contribId,$newName) {
 		if ($contribId<>$_SESSION['contribid']) return false;	// Something bad happened: the function is not called by the current open contribution
-		$sql = ("
-			UPDATE  `_contributions` SET  `_name` =  '".$this->rfDB->_esc($newName)."' WHERE  `id` =$contribId LIMIT 1 ;
-		");
-		$this->rfDB->query($sql);				
+		$this->rfDB->renameElement($newName, $contribId);
 		$this->buffer .= "ok";		
 	}
 	
@@ -1519,10 +1332,16 @@ class rokfor_MAIN
 	 * @return void
 	 * @author Urs Hofer
 	 */
+  
+  /*
+  ================
+  TODO
+  ================
+  */
+  
 	function checkContribution($_contrib) {
 		$_templateFields = $this->rfDB->getTemplateFields($_contrib->_fortemplate);
 		$_dataFields = $this->rfDB->getFieldsByElement($_contrib->id, false);
-
 		$_reSorted = $_hasChanged = $_hasAdded = $_hasDeleted = 0;
 
 
@@ -1533,7 +1352,13 @@ class rokfor_MAIN
 		foreach ($_templateFields as $_key=>$_templateField) {
 			foreach ($_dataFields as $_dkey=>$_dataField) {
 				if ($_dataField->t_id == $_templateField->id) {
-					$this->rfDB->query("UPDATE  `_data` SET  `__sort__` =  '".$_key."' WHERE  `_data`.`id` = ".$_dataField->id." LIMIT 1 ;");			
+          try {
+            $sql = "UPDATE  `_data` SET  `__sort__` =  '".$_key."' WHERE  `_data`.`id` = ".$_dataField->id." LIMIT 1 ;";
+            $this->rfDB->query($sql);			            
+          } catch (Exception $e) {
+            echo "Error in: ".$sql;
+          }
+
 					unset($_dataFields[$_dkey]);
 					unset($_templateFields[$_key]);					
 					$_reSorted++;
@@ -1541,20 +1366,22 @@ class rokfor_MAIN
 				}
 			}
 		}
+
+
 		// Cycle thru remaining template fields
 		// Either add take an existing field or add a new one
 		foreach ($_templateFields as $_key=>$_templateField) {
 				// Change exsiting fields to new template relations
 				if ($_existingData = reset($_dataFields)) {
-					$this->rfDB->query("UPDATE  `_data` SET  `_fortemplatefield` =  '".$_templateField->id."' WHERE  `_data`.`id` = ".$_existingData->id." LIMIT 1 ;");			
+					$this->rfDB->query("UPDATE  _data SET  _fortemplatefield =  $_templateField->id WHERE  id = $_existingData->id LIMIT 1 ;");			
 					$_hasChanged++;
 					unset($_dataFields[key($_dataFields)]);
 				}
 				// or add a field into the db...
 				else {
 					$sql_I = ("			
-						INSERT INTO `_data` (`id`, `_forcontribution`, `_fortemplatefield`, `_datatext`, `_databinary`, `_datainteger`, `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
-						('', '".$_contrib->id."', '".$_templateField->id."', NULL, NULL, NULL, '".$this->rfDB->getUserId()."', NULL, NULL, -2, '".$_key."');
+						INSERT INTO `_data` (`id`, `_forcontribution`, `_fortemplatefield`, `_content`, `_isjson`,  `__user__`, `__config__`, `__split__`, `__parentnode__`, `__sort__`) VALUES 
+						('', '".$_contrib->id."', '".$_templateField->id."', NULL, NULL, '".$this->rfDB->getUserId()."', NULL, NULL, -2, '".$_key."');
 					");
 					$this->rfDB->query($sql_I);
 					$_hasAdded++;					
@@ -1565,7 +1392,7 @@ class rokfor_MAIN
 		// Remaining old fields can be deleted. Only used when changing a template.
 		// Deleting Template Fields delete all corresponding data fields via sql triggers
 		foreach ($_dataFields as $_dataField) {
-			if ($_dataField->d_binary) $this->deleteFromBinary($_dataField->id);				
+			if ($_dataField->d_content) $this->deleteFromBinary($_dataField->id);				
 			$this->rfDB->query("DELETE from _data WHERE id = ".$_dataField->id." LIMIT 1");				
 			$_hasDeleted++;
 		}
@@ -1650,8 +1477,8 @@ class rokfor_MAIN
 	 */
 	function cloneIssue($_issueid,$_newname) {
 		$sql = ("
-			INSERT INTO _issues ( _name, _opendate, _closedate, _status, _infotext, _forbook, _singleplugin, _allplugin, _rtfplugin, _xmlplugin, _narrationplugin, __user__, __config__, __split__, __parentnode__, __sort__)			
-			SELECT _name, _opendate, _closedate, _status, _infotext, _forbook, _singleplugin, _allplugin, _rtfplugin, _xmlplugin, _narrationplugin, __user__, __config__, __split__, __parentnode__, __sort__
+			INSERT INTO _issues ( _name, _opendate, _closedate, _status, _infotext, _forbook, __user__, __config__, __split__, __parentnode__, __sort__)			
+			SELECT _name, _opendate, _closedate, _status, _infotext, _forbook, __user__, __config__, __split__, __parentnode__, __sort__
 			FROM _issues WHERE id = $_issueid
 		");
 		$this->rfDB->query($sql);	
@@ -1660,6 +1487,14 @@ class rokfor_MAIN
 			UPDATE  _issues SET  __sort__ =  $_newid, _name = '$_newname' WHERE  id = $_newid LIMIT 1 ;
 		");
 		$this->rfDB->query($sql);		
+    
+    // Clone Plugins
+    $plugnames = array('_singleplugin', '_allplugin', '_rtfplugin', '_xmlplugin', '_narrationplugin');
+		foreach ($plugnames as $plugname) {
+      foreach ($this->rfDB->getCrossRef($_issueid, '_issueid', '_pluginid', 'R_issues'.$plugname) as $_plugid) {
+        $this->rfDB->addCrossRef($_newid, '_issueid', $_plugid, '_pluginid', 'R_issues'.$plugname);
+      }
+		}       
 		
 		if ($_elements = $this->rfDB->getElementsByIssue($_issueid)) {
 			foreach ($_elements as $_value) {
@@ -1803,15 +1638,12 @@ class rokfor_MAIN
 			case 'addIssue':
 				$sql = ("UPDATE _issues SET `__sort__` = -1 WHERE _forbook = ".$_id); $this->rfDB->query($sql);
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
-					$_plugins = array();
-					foreach (explode('<:>',$_row[4]) as $_plugs) {
-						list($_key,$_plugid) = explode('-',$_plugs);
-						$_plugins[$_key] .= $_plugid."<::::::>";
-					}
+
 					if ($_row[0] == "added") {
-						$sql = ("INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`, `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`,`__user__`, `__parentnode__`, `__sort__`) 
- 						VALUES ('".$this->rfDB->_esc($_row[1])."', ".time().", ".strtotime($_row[3]).", '".$_row[5]."', '".$_row[6]."', '".$this->rfDB->_esc($_row[2])."',".$_id.", '".$_plugins['_singleplugin']."', '".$_plugins['_allplugin']."', '".$_plugins['_rtfplugin']."', '".$_plugins['_xmlplugin']."', '".$_plugins['_narrationplugin']."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+						$sql = ("INSERT INTO _issues (`_name`, `_opendate`, `_closedate`, `_status`, `__config__`, `_infotext`, `_forbook`,`__user__`, `__parentnode__`, `__sort__`) 
+ 						VALUES ('".$this->rfDB->_esc($_row[1])."', ".time().", ".strtotime($_row[3]).", '".$_row[5]."', '".$_row[6]."', '".$this->rfDB->_esc($_row[2])."',".$_id.", '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
+            $_row[0] = $this->rfDB->insert_id();            
 					} else {
 						$sql = ("UPDATE _issues SET 
 							`_name` = '".$this->rfDB->_esc($_row[1])."',
@@ -1819,15 +1651,22 @@ class rokfor_MAIN
 							`_closedate` =  '".strtotime($_row[3])."',
 							`_status` =  '".$_row[5]."',
 							`__config__` =  '".$_row[6]."',
-							`_infotext` =  '".$this->rfDB->_esc($_row[2])."',
-							`_singleplugin` =  '".$_plugins['_singleplugin']."',
-							`_allplugin` =  '".$_plugins['_allplugin']."',
-							`_rtfplugin` =  '".$_plugins['_rtfplugin']."',
-							`_xmlplugin` =  '".$_plugins['_xmlplugin']."',
-							`_narrationplugin` =  '".$_plugins['_narrationplugin']."'
+							`_infotext` =  '".$this->rfDB->_esc($_row[2])."'
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
-					}			
+					}
+          
+          // Sync Plug Tables
+          $sql = ("DELETE FROM R_issues_singleplugin     WHERE _issueid = ".$_row[0]); $this->rfDB->query($sql);
+          $sql = ("DELETE FROM R_issues_allplugin        WHERE _issueid = ".$_row[0]); $this->rfDB->query($sql);
+          $sql = ("DELETE FROM R_issues_rtfplugin        WHERE _issueid = ".$_row[0]); $this->rfDB->query($sql);
+          $sql = ("DELETE FROM R_issues_xmlplugin        WHERE _issueid = ".$_row[0]); $this->rfDB->query($sql);
+          $sql = ("DELETE FROM R_issues_narrationplugin  WHERE _issueid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[4] as $_plugs) {
+						list($_key,$_plugid) = explode('-',$_plugs);
+            $this->rfDB->addCrossRef($_row[0], '_issueid', $_plugid, '_pluginid', 'R_issues'.$_key);
+					}          
+          			
 				}
 				$sql = ("DELETE FROM _issues WHERE `__sort__` = -1 && _forbook = ".$_id); $this->rfDB->query($sql);
 				// Recursive Deletes are done with MySQL Triggers
@@ -1836,22 +1675,12 @@ class rokfor_MAIN
 			case 'Listtemplates':
 				$sql = ("UPDATE _templatenames SET `__sort__` = -1"); $this->rfDB->query($sql);
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
-					$_chapters = $_books = "";
-					foreach (explode('<:>',$_row[5]) as $_chapt) {
-						list($_key,$_chapterid) = explode('-',$_chapt);
-						$_chapters .= $_chapterid."<::::::>";
-					}
-					foreach (explode('<:>',$_row[6]) as $_book) {
-						list($_key,$_booksid) = explode('-',$_book);
-						$_books .= $_booksid."<::::::>";
-					}
-										
 					if ($_row[0] == "added") {
-						$sql = ("INSERT INTO _templatenames (_name, _helptext, _helpimage, _inchapter, _forbook, _category, _public, __user__, __parentnode__ , __sort__) 
- 						VALUES ('".$this->rfDB->_esc($_row[1])."','".$this->rfDB->_esc($_row[2])."','".$this->rfDB->_esc($_row[3])."','".$_chapters."','".$_books."', '".$this->rfDB->_esc($_row[4])."','".$this->rfDB->_esc($_row[7])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
+						$sql = ("INSERT INTO _templatenames (_name, _helptext, _helpimage, _category, _public, __user__, __parentnode__ , __sort__) 
+ 						VALUES ('".$this->rfDB->_esc($_row[1])."','".$this->rfDB->_esc($_row[2])."','".$this->rfDB->_esc($_row[3])."', '".$this->rfDB->_esc($_row[4])."','".$this->rfDB->_esc($_row[7])."', '".$this->rfDB->getUserId()."', '-1', ".$__sort__.")");
 						$this->rfDB->query($sql);
 						/* Clone Fields for the New Template */
-						$_newTemplateId = $this->rfDB->insert_id();
+						$_row[0] = $_newTemplateId = $this->rfDB->insert_id();
 						if ($_oldTemplateId = $_row[8]) {
 						
 							$sql = ("
@@ -1904,13 +1733,23 @@ class rokfor_MAIN
 							`__sort__` =  ".$__sort__.",
 							`_helptext` =  '".$this->rfDB->_esc($_row[2])."',
 							`_helpimage` =  '".$this->rfDB->_esc($_row[3])."',
-							`_inchapter` =  '".$_chapters."',
-							`_forbook` =  '".$_books."',
 							`_category` =  '".$this->rfDB->_esc($_row[4])."',
 							`_public` =  '".$this->rfDB->_esc($_row[7])."'
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
-					}			
+					}
+          
+
+          $sql = ("DELETE FROM R_templatenames_inchapter  WHERE _templateid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[5] as $_chapt) {
+						list($_key,$_chapterid) = explode('-',$_chapt);
+            $this->rfDB->addCrossRef($_row[0], '_templateid', $_chapterid, '_chapterid', 'R_templatenames_inchapter');
+					} 
+          $sql = ("DELETE FROM R_templatenames_forbook  WHERE _templateid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[6] as $_book) {
+						list($_key,$_booksid) = explode('-',$_book);
+            $this->rfDB->addCrossRef($_row[0], '_templateid', $_booksid, '_bookid', 'R_templatenames_forbook');
+					}           
 				}
 				$sql = ("DELETE FROM _templatenames WHERE `__sort__` = -1"); $this->rfDB->query($sql);
 				$this->buffer .= $this->rfTPL->templateSorting(false);
@@ -2008,55 +1847,48 @@ class rokfor_MAIN
 				else $sql = 'UPDATE _rights SET `__sort__` = -1 WHERE __user__ = "'.$this->rfDB->getUserId().'" || __user__ = "'.$this->rfDB->getUserName().'"';
 				$this->rfDB->query($sql);										
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
-					$_issues = $_books = $_templates = $_users = "";
-					foreach (explode('<:>',$_row[5]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_users .= $_id."<::::::>";
-					}
-					foreach (explode('<:>',$_row[4]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_issues .= $_id."<::::::>";
-					}					
-					foreach (explode('<:>',$_row[3]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_books .= $_id."<::::::>";
-					}
-					foreach (explode('<:>',$_row[2]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_templates .= $_id."<::::::>";
-					}					
 					
 					if ($_row[0] == "added") {
 						$sql = ("INSERT INTO _rights (
 							`_group`, 
-							`_fortemplate`, 
-							`_forissue`, 
-							`_forbook`, 
-							`_foruser`, 
 							`__user__`, 
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
 							'".$this->rfDB->_esc($_row[1])."', 
-							'".$this->rfDB->_esc($_templates)."', 
-							'".$this->rfDB->_esc($_issues)."', 
-						 	'".$this->rfDB->_esc($_books)."',
-						 	'".$this->rfDB->_esc($_users)."',
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
+  						$_row[0] = $this->rfDB->insert_id();
 					} else {
 						$sql = ("UPDATE _rights SET 
 							`_group` 		= '".$this->rfDB->_esc($_row[1])."', 
-							`_fortemplate`	= '".$this->rfDB->_esc($_templates)."', 
-							`_forissue`		= '".$this->rfDB->_esc($_issues)."', 
-							`_forbook`		= '".$this->rfDB->_esc($_books)."',
-							`_foruser`		= '".$this->rfDB->_esc($_users)."',
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}
+
+          $sql = ("DELETE FROM R_rights_foruser  WHERE _rightid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[5] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_rightid', $_id, '_userid', 'R_rights_foruser');
+					}
+          $sql = ("DELETE FROM R_rights_forissue  WHERE _rightid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[4] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_rightid', $_id, '_issueid', 'R_rights_forissue');
+					}					
+          $sql = ("DELETE FROM R_rights_forbook  WHERE _rightid = ".$_row[0]); $this->rfDB->query($sql);                      
+					foreach ($_row[3] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_rightid', $_id, '_bookid', 'R_rights_forbook');
+					}
+          $sql = ("DELETE FROM R_rights_fortemplate  WHERE _rightid = ".$_row[0]); $this->rfDB->query($sql);                      
+					foreach ($_row[2] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_rightid', $_id, '_templateid', 'R_rights_fortemplate');
+					}		
 				}			
 				$sql = ("DELETE FROM _rights WHERE `__sort__` = -1"); $this->rfDB->query($sql);
 				break;		
@@ -2099,37 +1931,35 @@ class rokfor_MAIN
 				$sql = ("UPDATE _fieldpostprocessor SET `__sort__` = -1");
 				$this->rfDB->query($sql);										
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
-					$_templates = "";
-					foreach (explode('<:>',$_row[2]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_templates .= $_id."<::::::>";
-					}
-					
+
 					if ($_row[0] == "added") {
 						$sql = ("INSERT INTO _fieldpostprocessor (
 							`_name`, 
 							`_code`, 
-							`_forfield`, 
 							`__user__`, 
 							`__parentnode__`, 
 							`__sort__`) 
 						VALUES (
 							'".$this->rfDB->_esc($_row[1])."', 
 							'".$this->rfDB->_esc($_row[3])."', 
-							'".$this->rfDB->_esc($_templates)."', 
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
+  						$_row[0] = $this->rfDB->insert_id();              
 					} else {
 						$sql = ("UPDATE _fieldpostprocessor SET 
 							`_name` 		= '".$this->rfDB->_esc($_row[1])."', 
 							`_code`			= '".$this->rfDB->_esc($_row[3])."', 
-							`_forfield`		= '".$this->rfDB->_esc($_templates)."', 
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}
+          $sql = ("DELETE FROM R_fieldpostprocessor_forfield  WHERE _postprocessorid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[2] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_postprocessorid', $_id, '_templateid', 'R_fieldpostprocessor_forfield');
+					}   					
 				}			
 				$sql = ("DELETE FROM _fieldpostprocessor WHERE `__sort__` = -1"); $this->rfDB->query($sql);
 				break;
@@ -2137,17 +1967,10 @@ class rokfor_MAIN
 				$sql = ("UPDATE _batch SET `__sort__` = -1");
 				$this->rfDB->query($sql);										
 				foreach ($this->rfDB->_splitTableData($_POST['store']) as $__sort__=>$_row) {
-					$_templates = "";
-					foreach (explode('<:>',$_row[3]) as $_d) {
-						list($_key,$_id) = explode('-',$_d);
-						$_templates .= $_id."<::::::>";
-					}
-
 					if ($_row[0] == "added") {
 						$sql = ("INSERT INTO _batch (
 							`_name`, 
 							`_description`,               
-							`_forbook`, 
 							`_precode`, 
 							`_postcode`, 
 							`__user__`, 
@@ -2156,24 +1979,28 @@ class rokfor_MAIN
 						VALUES (
 							'".$this->rfDB->_esc($_row[1])."', 
 							'".$this->rfDB->_esc($_row[2])."', 
-							'".$this->rfDB->_esc($_templates)."', 
 							'".$this->rfDB->_esc($_row[4])."', 
 							'".$this->rfDB->_esc($_row[5])."', 
 							'".$this->rfDB->getUserId()."', 
 							'-1', 
 							".$__sort__.")");
 							$this->rfDB->query($sql);
+  						$_row[0] = $this->rfDB->insert_id();
 					} else {
 						$sql = ("UPDATE _batch SET 
 							`_name` 		= '".$this->rfDB->_esc($_row[1])."', 
 							`_description`	= '".$this->rfDB->_esc($_row[2])."', 
-							`_forbook`		= '".$this->rfDB->_esc($_templates)."', 
 							`_precode`		= '".$this->rfDB->_esc($_row[4])."', 
 							`_postcode`		= '".$this->rfDB->_esc($_row[5])."',    							
 							`__sort__`      =".$__sort__."
 							 WHERE id = ".$_row[0]." LIMIT 1");
 						$this->rfDB->query($sql);
 					}
+          $sql = ("DELETE FROM R_batch_forbook  WHERE _batchid = ".$_row[0]); $this->rfDB->query($sql);            
+					foreach ($_row[3] as $_d) {
+						list($_key,$_id) = explode('-',$_d);
+            $this->rfDB->addCrossRef($_row[0], '_batchid', $_id, '_bookid', 'R_batch_forbook');
+					}          
 				}			
 				$sql = ("DELETE FROM _batch WHERE `__sort__` = -1"); $this->rfDB->query($sql);
 				break;		
@@ -2473,10 +2300,10 @@ class rokfor_MAIN
 						break;
 					}
 					/* Check for Filename in Database */
-					$sql = 'SELECT _issues.__config__,_data._databinary FROM _data
+					$sql = 'SELECT _issues.__config__,_data._content FROM _data
 					LEFT JOIN _contributions ON _data._forcontribution = _contributions.id		
 					LEFT JOIN _issues ON _issues.id = _contributions._forissue
-					WHERE _data._databinary LIKE "%'.$_file_in_db.'%" AND (_issues.__config__=1 || _issues.__config__=2) LIMIT 1';
+					WHERE _data._content LIKE "%'.$_file_in_db.'%" AND (_issues.__config__=1 || _issues.__config__=2) LIMIT 1';
 					if ($this->rfDB->num_rows($this->rfDB->query($sql))>0) $_access_ok = true;
 					break;
 			}
@@ -2641,7 +2468,7 @@ class rokfor_MAIN
 								switch ($field->_fieldtype) {
 									case 'Bild':
 										$_field = $_contribution->addChild('field');
-										foreach ($this->rfDB->_splitTableData($field->d_binary) as $urls) {
+										foreach ($field->d_content as $urls) {
 											if (is_file(REPOSITORYDIR.'/'.$urls[1]))  {
 												$_url = $_field->addChild('file');
 												$_url->addAttribute('url', 'http://'.PROJECT_NAME.REPOSITORY.'/'.$urls[1]);
@@ -2655,11 +2482,11 @@ class rokfor_MAIN
 										break;
 									case 'Zahl':
 									case 'TypologySlider':
-										$_field = $_contribution->addChild('field', $field->d_integer);
+										$_field = $_contribution->addChild('field', $field->d_content);
 										break;	
 									case 'Tabelle':
 										$_field = $_contribution->addChild('field');
-										foreach ($this->rfDB->_splitTableData($field->d_text) as $rows) {
+										foreach ($this->rfDB->_splitTableData($field->d_content) as $rows) {
 											$_row = $_row->addChild('tr');
 											foreach ($rows as $columns) {											
 												$_column = $_row->addChild('td');
@@ -2671,10 +2498,10 @@ class rokfor_MAIN
 										break;																		
 									default:
 										$_field = $_contribution->addChild('field');
-										if ($field->d_text) {
+										if ($field->d_content) {
 											$node= dom_import_simplexml($_field); 
 										   	$no = $node->ownerDocument; 
-										   	$node->appendChild($no->createCDATASection($field->d_text));
+										   	$node->appendChild($no->createCDATASection($field->d_content));
 										}										
 										break;
 								}
@@ -2764,7 +2591,7 @@ class rokfor_MAIN
 						switch ($field->_fieldtype) {
 							case 'Bild':
 								$_field = $_contribution->addChild('field');
-								foreach ($_this->rfDB->_splitTableData($field->d_binary) as $urls) {
+								foreach ($field->d_content as $urls) {
 										if (is_file(REPOSITORYDIR.'/'.$urls[1]))  {
 											$_url = $_field->addChild('file');
 											$_url->addAttribute('url', 'http://'.PROJECT_NAME.REPOSITORY.'/'.$urls[1]);
@@ -2778,11 +2605,11 @@ class rokfor_MAIN
 									break;
 								case 'Zahl':
 								case 'TypologySlider':
-									$_field = $_contribution->addChild('field', $field->d_integer);
+									$_field = $_contribution->addChild('field', $field->d_content);
 									break;	
 								case 'Tabelle':
 									$_field = $_contribution->addChild('field');
-									foreach ($_this->rfDB->_splitTableData($field->d_text) as $rows) {
+									foreach ($_this->rfDB->_splitTableData($field->d_content) as $rows) {
 										$_row = $_row->addChild('tr');
 										foreach ($rows as $columns) {											
 											$_column = $_row->addChild('td');
@@ -2794,10 +2621,10 @@ class rokfor_MAIN
 									break;																		
 								default:
 									$_field = $_contribution->addChild('field');
-									if ($field->d_text) {
+									if ($field->d_content) {
 										$node= dom_import_simplexml($_field); 
 									   	$no = $node->ownerDocument; 
-									   	$node->appendChild($no->createCDATASection($field->d_text));
+									   	$node->appendChild($no->createCDATASection($field->d_content));
 									}										
 									break;
 							}
@@ -2812,7 +2639,7 @@ class rokfor_MAIN
 					// Check for children
 					$query = $_this->rfDB->query($sql);
 					while ($_children = $_this->rfDB->fetch_object($query)) {				
-						$_child = (int)$_this->rfDB->getFieldsByName($_nestfield, $_children->id)->d_text;
+						$_child = (int)$_this->rfDB->getFieldsByName($_nestfield, $_children->id)->d_content;
 						if ($_child == $contribution->id) {
 							_add_contrib($_children,$_contribution, $_this, $sql, $_nestfield);
 						}
@@ -2826,7 +2653,7 @@ class rokfor_MAIN
 				_contributions._forissue = '.$_issueid;
 				$query = $this->rfDB->query($sql);
 				while ($_contribution = $this->rfDB->fetch_object($query)) {				
-					$_parent = (int)$this->rfDB->getFieldsByName($_nestfield, $_contribution->id)->d_text;
+					$_parent = (int)$this->rfDB->getFieldsByName($_nestfield, $_contribution->id)->d_content;
 					if ($_parent == -1) _add_contrib($_contribution,$_tree, $this, $sql, $_nestfield);
 				}
 				
@@ -2919,7 +2746,7 @@ class rokfor_MAIN
 					$retval = array();
 					foreach ($_data as $value) {
 						if ($_fieldId = $this->rfDB->getFieldsByName($value[0], $_contribid)->id) {
-							$this->rfDB->setFieldData($this->_clean_from_rteditor($value[1], true),$_fieldId, '_datatext');
+							$this->rfDB->setFieldData($this->_clean_from_rteditor($value[1], true),$_fieldId);
 							$retval[$value[0]] = "ok";
 						}
 						else {
@@ -2975,10 +2802,10 @@ class rokfor_MAIN
 	}
 	
 	function moveContribution($_contrib,$_bookissuechapter) {
-		list ($_b,$_forissue,$__split__) = explode("-", $_bookissuechapter);
-		$sql = ("UPDATE  `_contributions` SET  `__split__` =  '$__split__', `_forissue` =  '$_forissue' WHERE  `_contributions`.`id` =".$_contrib->id." LIMIT 1;");		
+		list ($_b,$_forissue,$_forchapter) = explode("-", $_bookissuechapter);
+		$sql = ("UPDATE  `_contributions` SET  `_forchapter` =  '$_forchapter', `_forissue` =  '$_forissue' WHERE  `_contributions`.`id` =".$_contrib->id." LIMIT 1;");		
 		$this->rfDB->query($sql);
-		$this->buffer = "Moved contrib ".$_contrib->id." to Book $_b, Issue $_forissue, Chapter $__split__";
+		$this->buffer = "Moved contrib ".$_contrib->id." to Book $_b, Issue $_forissue, Chapter $_forchapter";
 	}
 	
 	
@@ -3051,7 +2878,7 @@ class rokfor_MAIN
 					$this->rfTPL->mainformHeader($_contrib,$this->rfDB->getTemplateNamebyId($this->parameter));	
 					foreach ($this->rfDB->getFieldsByElement($this->parameter) as $_fieldinfo) {
 						$this->rfTPL->mainformField($this->rfDB->getFieldData($_fieldinfo->id));	
-					}
+					}          
 					$this->rfTPL->mainformFooter();						
 
 					break;

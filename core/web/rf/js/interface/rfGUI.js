@@ -431,8 +431,10 @@ var rfGUI = new Class({
 	*/
 	pasteHistory: function(source, field, multi, editortype) {
 		if (multi>1) {
-			var _val = decodeURIComponent(source.options[source.selectedIndex].value).split("<::::::>");
-			for (var c = 0; c < _val.length; c++) $(field + "_" + c).value = _val[c];
+			var _val = JSON.parse(decodeURIComponent(source.options[source.selectedIndex].value));
+      for (var c in _val)
+        if (_val.hasOwnProperty(c))
+          $(field + "_" + c).value = _val[c];
 		}
 		else {
 			switch(editortype)
@@ -582,16 +584,15 @@ var rfGUI = new Class({
 			constrain: true,
 			onComplete: function(e){
 				if (serialize) {
-					tbl.getNext('input').set('value',this.serialize(false, function(element, index){
+					tbl.getNext('input').set('value',JSON.stringify(this.serialize(false, function(element, index){
 						var row = element.getElements('textarea, select, input');
 						var arr = Array();
 						row.each(function(e){
-							if (e.getAttribute('multiple')) arr.push(e.getSelected().get('value').join('<:>'));
-							else arr.push(e.get('value').replace(/<;;;;;;>/g,"&lt;;;;;;;&gt;").replace(/<::::::>/g,"&lt;::::::&gt;"));	// Exception if somebody actually writes a delimiter in a field.
+							if (e.getAttribute('multiple')) arr.push(e.getSelected().get('value'));
+							else arr.push(e.get('value'));	// Exception if somebody actually writes a delimiter in a field.
 						});																												// Can sometimes happen in code callback fields
-						return (arr.join('<::::::>'));
-					}).join('<;;;;;;>'));
-					if (tbl.getNext('input').get('value')=='<;;;;;;>'||!tbl.table.elements.length) tbl.getNext('input').set('value','');
+						return (arr);
+					})));
 				}
 			}
 		});
@@ -621,8 +622,12 @@ var rfGUI = new Class({
 	Set Preview Context by Ajax Call
 	*/
 	previewAjax: function(url,nodeinfo) {
+    if ($('preview') == null) return;
 		$('preview').setStyle('opacity',0);
-		var callback = function() {$('preview').setStyle('opacity',1)};
+		var callback = function() {
+      if ($('preview') == null) return;
+      $('preview').setStyle('opacity',1)
+    };
 		this._ajaxtransport(url,'preview',typeof nodeinfo == "object"?Object.toQueryString(nodeinfo):nodeinfo,false,false,callback);
 	},
 
@@ -685,7 +690,7 @@ var rfGUI = new Class({
 			var ids = elm.getElement('.cloudContainer').getChildren().get('id');						
 			var coords = elm.getElement('.cloudContainer').getChildren().getPosition(elm.getElement('.cloudContainer'));
 			var threeDee = elm.getElement('.threeDee').get('value').toInt();
-			var saveTxt = "";
+			var saveTxt = [];
 			for (var c = 0; c < result.length; c++)  {				
 				if (result[c] && classes[c]=="cloud-drag-handle") {
 					// update hash			
@@ -694,10 +699,10 @@ var rfGUI = new Class({
 					// create string from hashes
 					coordStr = gui.createVals($(ids[c]).retrieve('xHash'),$(ids[c]).retrieve('yHash'));					
 					// save in string
-					saveTxt += (translation_table?translation_table[0][result[c]]:result[c])+'<::::::>'+(coordStr[0])+'<::::::>'+(coordStr[1])+'<;;;;;;>';					
+					saveTxt.push((translation_table?translation_table[0][result[c]]:result[c]),coordStr[0],coordStr[1]);					
 				}
 			}
-			elm.getElement('.saveVal').set('value',saveTxt);
+			elm.getElement('.saveVal').set('value',JSON.stringify(saveTxt));
 		}
 		
 		if (input) {
@@ -714,18 +719,21 @@ var rfGUI = new Class({
 			e.stop();
 			var val = elm.getElement('.cloudrecTask').get('value');
 			if (!val) return;
-			var vals = val.split("<;;;;;;>");
-			for (var c = 0; c < vals.length; c++) if (vals[c] != "") {
-				newVal = vals[c].split("<::::::>");
-				createNewEntry((translation_table?translation_table[1][newVal[0]]:newVal[0]),newVal[1]?newVal[1]:10,newVal[2]?newVal[2]:10);	
-			} 
+			var vals = JSON.parse(val);
+      for (var c in vals)
+        if (vals.hasOwnProperty(c))
+          if (vals[c] != "") {
+            newVal = vals[c];
+            createNewEntry((translation_table?translation_table[1][newVal[0]]:newVal[0]),newVal[1]?newVal[1]:10,newVal[2]?newVal[2]:10);	
+			    } 
 			updateForm();    
 		});	
-
 		// Fügt einen neuen Wert in die Cloud
 		//
 
 		var createNewEntry = function(val,x,y) {
+      console.log(val,x,y);
+      
 			var div = new Element('div', {id: 'item-'+cont+'-'+val, text:val, 'class':'cloud-drag-handle'});
 			var threeDee = elm.getElement('.threeDee').get('value').toInt();
 			elm.getElement('.cloudContainer').adopt(div);
@@ -778,37 +786,44 @@ var rfGUI = new Class({
 		}
 
 		// Create List from Saved Values:
-		var vals = (elm.getElement('.saveVal').get('value')).split("<;;;;;;>");
-		for (var c = 0; c < vals.length; c++) if (vals[c] != "") {
-			newVal = vals[c].split("<::::::>");
-			var splitData = this.splitVals (newVal[1],newVal[2],elm);
-			newElement = createNewEntry((translation_table?translation_table[1][newVal[0]]:newVal[0]),(splitData[0].get(0))?(splitData[0].get(0)):(0),(splitData[1].get(0))?(splitData[1].get(0)):(0));	
-			$(newElement).store('xHash', splitData[0]);	
-			$(newElement).store('yHash', splitData[1]);			
-		}
+		var vals = JSON.parse(elm.getElement('.saveVal').get('value'));
+    for (var c in vals)
+      if (vals.hasOwnProperty(c))
+        if (vals[c]) {
+    			newVal = vals[c][0];
+    			var splitData = this.splitVals (newVal[1],newVal[2],elm);
+    			console.log(newVal, splitData);
+          newElement = createNewEntry(
+            (translation_table?translation_table[1][newVal[0]]:newVal[0]),
+            (splitData[0].get(0))?(splitData[0].get(0)):(0),
+            (splitData[1].get(0))?(splitData[1].get(0)):(0)
+          );	
+    			$(newElement).store('xHash', splitData[0]);	
+    			$(newElement).store('yHash', splitData[1]);			
+    		}
 	},
 
 	// Combine Hashes with X and Y coordinates and the according 3d-Depth into a serialized string
 	createVals: function(x,y) {
-		var xStr, yStr;
-		xStr = yStr = "";
-		x.each(function(value, key){xStr += key+'_'+value+'<>';});
-		y.each(function(value, key){yStr += key+'_'+value+'<>';});	
+		var xStr = [];
+    var yStr = [];
+		x.each(function(value, key){xStr.push([key, value]);});
+		y.each(function(value, key){yStr.push([key, value]);});	
 		return Array(xStr,yStr);
 	},
 
 	// Split Coordinates-Hashes with 3d-Depth into array of hashes
-	splitVals: function(x,y,elm) {
-		xA = x.split("<>");	
-		yA = y.split("<>");		
+	splitVals: function(xA, yA, elm) {
 		var retX = new Hash();
 		var retY = new Hash();	
-		xA.each(function(item,ind){
-			if (item.split("_")[0]!="" && item.split("_")[1]!="") this.set(item.split("_")[0], item.split("_")[1]);	
-		},retX);
-		yA.each(function(item,ind){
-			if (item.split("_")[0]!="" && item.split("_")[1]!="") this.set(item.split("_")[0], item.split("_")[1]);	
-		},retY);
+    if (xA)
+  		xA.each(function(item,ind){
+  			if (item[0]!="" && item[1]!="") this.set(item[0], item[1]);	
+  		},retX);
+    if (yA)
+  		yA.each(function(item,ind){
+  			if (item[0]!="" && item[1]!="") this.set(item[0], item[1]);	
+  		},retY);
 		return Array(retX,retY);
 	},
 
@@ -913,10 +928,10 @@ var rfGUI = new Class({
 				el.getParent().getChildren().each(function(e){
 					arr.push(translation_table[0][e.get('text')]);
 				});
-				result = arr.join("<;;;;;;>");
+				result = JSON.stringify(arr);
 			}
 			else {
-				result = el.getParent().getChildren().get('text').join("<;;;;;;>");
+				result = JSON.stringify(el.getParent().getChildren().get('text'));
 			}
 			elm_sort.getElement('.saveVal').set('value',result);
 		}
@@ -964,13 +979,12 @@ var rfGUI = new Class({
 					list.getChildren().each(function(e){
 						arr.push(translation_table[0][e.get('text')]);
 					});
-					result = arr.join("<;;;;;;>");
+					result = JSON.stringify(arr);
 				}
 				else {
-					result = list.getChildren().get('text').join("<;;;;;;>");
+					result = JSON.stringify(list.getChildren().get('text'));
 				}
 				elm_sort.getElement('.saveVal').set('value',result);								
-//				elm_sort.getElement('.saveVal').set('value',list.getChildren().get('text').join("<;;;;;;>"));
 			});
 			handle.inject(li, 'top');
 			del.inject(li, 'top');			
@@ -980,10 +994,12 @@ var rfGUI = new Class({
 		}
 
 		// Create List from Saved Values:
-		var vals = (elm_sort.getElement('.saveVal').get('value')).split("<;;;;;;>");
-		for (var c = 0; c < vals.length; c++) if (vals[c] != "") {
-			createNewEntry(translation_table?translation_table[1][vals[c]]:vals[c]);	
-		}
+		var vals = JSON.parse(elm_sort.getElement('.saveVal').get('value'));
+    for (var c in vals)
+      if (vals.hasOwnProperty(c))
+        if (vals[c] != "") {
+          createNewEntry(translation_table?translation_table[1][vals[c]]:vals[c]);	
+        }
 	},
 	
 	addSlider: function(cont) {
@@ -998,7 +1014,7 @@ var rfGUI = new Class({
 
 	addSquare: function(cont) {
 		var el = $(cont).getElement('.knob');
-		var vals = (el.getElement('.saveVal').get('value')).split("<::::::>");
+		var vals = JSON.parse(el.getElement('.saveVal').get('value'));
 
 		$(el).setStyle('visibility', 'visible');
 		$(el).position({
@@ -1012,7 +1028,7 @@ var rfGUI = new Class({
 			container: cont,
 			onComplete: function(elm){
 				var coords = elm.getPosition(cont);
-				elm.getElement('.saveVal').set('value',(100/332*coords.x)+'<::::::>'+(100/312*coords.y));
+				elm.getElement('.saveVal').set('value',JSON.stringify(array[(100/332*coords.x),(100/312*coords.y)]));
 		    }
 		});
 	}	
