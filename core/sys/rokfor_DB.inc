@@ -692,15 +692,30 @@ class rokfor_DB {
 		return $this->query($sql);		
 	}
 	
-	/**
+  /**
 	 * Adds an Edition
 	 * 
-	 * Plugins are not updated !!!
-	 *
-	 * @return void
-	 * @author Urs Hofer
-	 */
-	function addEdition($_name, $_book, $_note, $_user = false, $_sort = false, $_status = 'Open', $_opentime = 0, $_closetime = 0, $_config = 0, $_p1 = "", $_p2 = "", $_p3 = "", $_p4 = "", $_p5 = "") {
+	 * Plugins are passed as arrays. Returns the id of the new Edition or false on failure.
+   *
+   * @param string $_name 
+   * @param int $_book 
+   * @param string $_note 
+   * @param string $_user 
+   * @param int $_sort 
+   * @param string $_status 
+   * @param int $_opentime 
+   * @param int $_closetime 
+   * @param int $_config 
+   * @param array $_p1 
+   * @param array $_p2 
+   * @param array $_p3 
+   * @param array $_p4 
+   * @param array $_p5 
+   * @return mixed
+   * @author Urs Hofer
+   */
+
+	function addEdition($_name, $_book, $_note, $_user = false, $_sort = false, $_status = 'Open', $_opentime = 0, $_closetime = 0, $_config = 0, $_p1 = [], $_p2 = [], $_p3 = [], $_p4 = [], $_p5 = []) {
 		$this->clearCache();
 		if ($_opentime == 0) $_opentime = time();
 		if ($_closetime == 0) $_closetime = $_opentime * 2;
@@ -735,10 +750,7 @@ class rokfor_DB {
         '-1', 
         ".$this->_esc($_sort).")";
     
-    // Plugin References:
-    // `_singleplugin`,`_allplugin`,`_rtfplugin`,`_xmlplugin`,`_narrationplugin`
-    // '".$this->_esc($_p1)."', '".$this->_esc($_p2)."', '".$this->_esc($_p3)."', '".$this->_esc($_p4)."', '".$this->_esc($_p5)."',
-    
+    $newId = false;
 		if ($this->query($sql)) {
 			// Add read write permission for the issue to the current user
 			$newId = $this->insert_id();
@@ -754,7 +766,19 @@ class rokfor_DB {
           ".$rights->id.", 
           ".$newId.")");		
 			}
+      // Sync Plug Tables
+      $sql = ("DELETE FROM R_issues_singleplugin     WHERE _issueid = ".$newId); $this->db->query($sql);
+      $sql = ("DELETE FROM R_issues_allplugin        WHERE _issueid = ".$newId); $this->db->query($sql);
+      $sql = ("DELETE FROM R_issues_rtfplugin        WHERE _issueid = ".$newId); $this->db->query($sql);
+      $sql = ("DELETE FROM R_issues_xmlplugin        WHERE _issueid = ".$newId); $this->db->query($sql);
+      $sql = ("DELETE FROM R_issues_narrationplugin  WHERE _issueid = ".$newId); $this->db->query($sql); 
+      foreach (array('_singleplugin','_allplugin','_rtfplugin','_xmlplugin','_narrationplugin') as $_key => $_plug) {
+  			foreach (${"_p".($_key+1)} as $_plugid) {
+          $this->rfDB->addCrossRef($newId, '_issueid', $_plugid, '_pluginid', 'R_issues'.$_plug);
+  			}    
+      }           
 		}
+    return $newId;
 	}		
 	
 	/**
