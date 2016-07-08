@@ -81,6 +81,7 @@ class db {
   }
   
   function close() {
+    echo "closing";
     $this->db->close();
     unset($this->db);
   }
