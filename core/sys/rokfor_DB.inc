@@ -77,7 +77,7 @@ class db {
   }
   
   function __destruct () {
-    $this->close();
+    $this->db->close();
   }
   
   function close() {
