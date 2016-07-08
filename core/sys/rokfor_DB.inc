@@ -59,7 +59,12 @@ class db {
   private $dbname;
   
   function db($host,$user,$pass,$dbname,$version = false) {
-    $this->db = new mysqli($host, $user, $pass, $dbname);
+//    $this->db = new mysqli($host, $user, $pass, $dbname);
+    $this->db = new mysqli();
+    $this->db->init();
+    $this->db->real_connect($host, $user, $pass, $dbname);
+    
+    
     if ($this->db->connect_error) {
       $this->error("Error Connecting mysqli");
       return false;
@@ -81,13 +86,14 @@ class db {
   }
   
   function close() {
-    echo "closing";
     $this->db->close();
     unset($this->db);
   }
   
   function reopen() {
-    $this->db = new mysqli($this->host, $this->user, $this->pass, $this->dbname);    
+    $this->db = new mysqli();
+    $this->db->init();
+    $this->db->real_connect($this->host, $this->user, $this->pass, $this->dbname);
   }
   
   function escape($sql) {
