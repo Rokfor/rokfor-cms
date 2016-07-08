@@ -48,6 +48,16 @@ class db {
    */
   var $show_error;
   
+  
+  /**
+   * storing private credentials 
+   **/
+  
+  private $host;
+  private $user;
+  private $pass;
+  private $dbname;
+  
   function db($host,$user,$pass,$dbname,$version = false) {
     $this->db = new mysqli($host, $user, $pass, $dbname);
     if ($this->db->connect_error) {
@@ -57,11 +67,25 @@ class db {
     $this->version = $version;
     $this->appname = "";
     $this->show_error = false;
+
+    $this->host = $host;
+    $this->user = $user;
+    $this->pass = $pass;
+    $this->dbname = $dbname;
+    
     return true;
   }
   
   function __destruct () {
+    $this->close();
+  }
+  
+  function close() {
     $this->db->close();
+  }
+  
+  function reopen() {
+    $this->db = new mysqli($this->host, $this->user, $this->pass, $this->dbname);    
   }
   
   function escape($sql) {
