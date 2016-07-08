@@ -60,6 +60,10 @@ class db {
     return true;
   }
   
+  function __destruct () {
+    $this->db->close();
+  }
+  
   function escape($sql) {
     return $this->db->escape_string($sql);
   }
