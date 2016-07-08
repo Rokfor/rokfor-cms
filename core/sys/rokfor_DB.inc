@@ -82,7 +82,9 @@ class db {
   }
   
   function __destruct () {
-    $this->db->close();
+    if ($this->db) {
+      $this->db->close();
+    }
   }
   
   function close() {
@@ -101,6 +103,9 @@ class db {
   }
   
   function query($query_string,$limit = 0, $offset = 0, $showerror = 1) {
+    if (!$this->db) {
+      $this->reopen();
+    }
     if($limit != 0) $query_string.= " LIMIT $offset, $limit";    
     $this->query_id = $this->db->query($query_string);
     if ($showerror==1 && !$this->query_id) $this->error("Invalid SQL: ".$query_string);
